@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Underway — Built for the Long Haul</title>
+<!-- Favicon: Underway logo SVG as data URI -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MjAuMDUgMjc5LjAyIj48cmVjdCB3aWR0aD0iNjIwIiBoZWlnaHQ9IjI3OSIgZmlsbD0iI2Y3ZWZlNiIvPjxwYXRoIGZpbGw9IiMxOTI5M2EiIGQ9Ik0yMjIuOTcsMGMyOSwuODgsMzYuMDEsNDAuNjUsNy4zNiw0OS42OC0zLjgzLDEuMjgtNC42OSwyLjY4LTMuOTUsNi43LDYuNDYsMzUuMTEsMzQuMjUsNjIuNDUsNjkuNTMsNjcuNTEsNDUuNjgsOC42NCw4OS43OC0yMS4zMiw5OC4yNS02Ny4zLjg1LTMuODEuMzYtNS40NC0zLjgtNi42OC0xMi45Mi0zLjg0LTE5LjQ4LTEzLjQ1LTE4LjU5LTI2LjA3LDEuMDItMTQuMzUsMTEuNTktMjMuNzEsMjcuNTMtMjMuNzksMjYuMTYtLjEyLDUyLjMzLS4wMiw3OC40OS4xMiwyMy45OS4xMyw0Ny45OC40OCw3MS45Ny42NCwzNS44OS0uODEsMzUuMDMsNTEuNzMuODYsNTEuNTMtMjguMDMsMS40Mi02Ny4yNC0yLjkzLTc0LjkyLDMyLjI5LTQuNzgsMTguMjYtNy4xNCwzNi45My03Ljk4LDU1Ljc0LTIuMzQsMjUuMTQtNC4zLDU5LjA0LDI1LjIyLDY3LjkxLDEuNTktLjMsMS44OS0xLjMyLDIuMzMtMi4xOSwzLjQ2LTYuODUsOS4zNC05Ljc3LDE2LjY5LTkuOSwxNy4zMiwxLjUxLDQ5Ljc3LTguMjcsNDkuNjUsMTguMjRxLjAyLDguNDIsOC41Niw4LjQ1YzEyLjUuMDIsMjUtLjAxLDM3LjUuMDQsMTkuMS0xLjEzLDkuOCwyMy4xNiwxMS45OCwzNC45NCwxLjAyLDExLjQ2LTU4LjQ4LDE2LjM2LTY5LjEzLDE4LjY2LTY1LjgzLDcuMDUtMTMxLjY4LTIuNjEtMTk3LjI1LTcuOTktNzAuNDItNi41OC0xNDEuMTQtMTIuODQtMjExLjkyLTkuNzctNDYuMTcuMTYtOTEuODQsOC42NC0xMzcuMTEsMTQuNjUtMi42MS0uNzktMy44OS0yLjExLTMuODgtNC45My0xLjA1LTU5LjktMy4zNy00My4zLDUyLjQ5LTQ1LjQ5LDE0LjE5Ljc5LTQuMjktMjcuMzEsMjYuNzQtMjYuODksMTYuNTEsMS40MiwzOC4zMi01LjksNDcuNDcsMTIuMzEsNDMuMjEtMTEuMzcsMjMuMS04Ni43MiwxOC43OS0xMTkuMzktNi4zMi0zOS4xNS00NS4yMS0zNS42LTc2LjQ4LTM2Ljc1LTIwLjk1LjcxLTMzLjQyLTI1LjA5LTIwLjc0LTQxLjY1QzUzLjU0LDMuOTMsNjAuNTksMS4wMiw2OC41NS45NSwxMTkuODcuNTIsMTcxLjE5LjI4LDIyMi45NywwWiIvPjwvc3ZnPg==">
+<!-- Fallback PNG-format favicon for older browsers via SVG -->
+<link rel="shortcut icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2MjAuMDUgMjc5LjAyIj48cmVjdCB3aWR0aD0iNjIwIiBoZWlnaHQ9IjI3OSIgZmlsbD0iI2Y3ZWZlNiIvPjxwYXRoIGZpbGw9IiMxOTI5M2EiIGQ9Ik0yMjIuOTcsMGMyOSwuODgsMzYuMDEsNDAuNjUsNy4zNiw0OS42OC0zLjgzLDEuMjgtNC42OSwyLjY4LTMuOTUsNi43LDYuNDYsMzUuMTEsMzQuMjUsNjIuNDUsNjkuNTMsNjcuNTEsNDUuNjgsOC42NCw4OS43OC0yMS4zMiw5OC4yNS02Ny4zLjg1LTMuODEuMzYtNS40NC0zLjgtNi42OC0xMi45Mi0zLjg0LTE5LjQ4LTEzLjQ1LTE4LjU5LTI2LjA3LDEuMDItMTQuMzUsMTEuNTktMjMuNzEsMjcuNTMtMjMuNzksMjYuMTYtLjEyLDUyLjMzLS4wMiw3OC40OS4xMiwyMy45OS4xMyw0Ny45OC40OCw3MS45Ny42NCwzNS44OS0uODEsMzUuMDMsNTEuNzMuODYsNTEuNTMtMjguMDMsMS40Mi02Ny4yNC0yLjkzLTc0LjkyLDMyLjI5LTQuNzgsMTguMjYtNy4xNCwzNi45My03Ljk4LDU1Ljc0LTIuMzQsMjUuMTQtNC4zLDU5LjA0LDI1LjIyLDY3LjkxLDEuNTktLjMsMS44OS0xLjMyLDIuMzMtMi4xOSwzLjQ2LTYuODUsOS4zNC05Ljc3LDE2LjY5LTkuOSwxNy4zMiwxLjUxLDQ5Ljc3LTguMjcsNDkuNjUsMTguMjRxLjAyLDguNDIsOC41Niw4LjQ1YzEyLjUuMDIsMjUtLjAxLDM3LjUuMDQsMTkuMS0xLjEzLDkuOCwyMy4xNiwxMS45OCwzNC45NCwxLjAyLDExLjQ2LTU4LjQ4LDE2LjM2LTY5LjEzLDE4LjY2LTY1LjgzLDcuMDUtMTMxLjY4LTIuNjEtMTk3LjI1LTcuOTktNzAuNDItNi41OC0xNDEuMTQtMTIuODQtMjExLjkyLTkuNzctNDYuMTcuMTYtOTEuODQsOC42NC0xMzcuMTEsMTQuNjUtMi42MS0uNzktMy44OS0yLjExLTMuODgtNC45My0xLjA1LTU5LjktMy4zNy00My4zLDUyLjQ5LTQ1LjQ5LDE0LjE5Ljc5LTQuMjktMjcuMzEsMjYuNzQtMjYuODksMTYuNTEsMS40MiwzOC4zMi01LjksNDcuNDcsMTIuMzEsNDMuMjEtMTEuMzcsMjMuMS04Ni43MiwxOC43OS0xMTkuMzktNi4zMi0zOS4xNS00NS4yMS0zNS42LTc2LjQ4LTM2Ljc1LTIwLjk1LjcxLTMzLjQyLTI1LjA5LTIwLjc0LTQxLjY1QzUzLjU0LDMuOTMsNjAuNTksMS4wMiw2OC41NS45NSwxMTkuODcuNTIsMTcxLjE5LjI4LDIyMi45NywwWiIvPjwvc3ZnPg==">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* ─── RESET & BASE ─── */
@@ -255,15 +259,6 @@ nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video
   background: var(--border);
 }
 
-@media(max-width:900px) {
-  .comp-info-bar { margin: 0 24px 32px; flex-direction: column; align-items: flex-start; }
-  .comp-info-right { align-items: flex-start; }
-  .photos-grid, .photos-teaser-cta { margin: 0 24px; }
-  .gallery-sidebar { display: none; }
-  .gallery-grid { grid-template-columns: 1fr 1fr; }
-  .gallery-nav { padding: 0 20px; }
-  .gallery-main-header { flex-direction: column; align-items: flex-start; }
-}
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width:6px; }
 ::-webkit-scrollbar-track { background: var(--cream); }
@@ -315,6 +310,70 @@ nav {
   padding:10px 20px;
 }
 .nav-cta:hover { background:var(--mid) !important; }
+
+/* ─── MOBILE HAMBURGER ─── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 110;
+}
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--navy);
+  transition: all .3s ease;
+}
+.nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger.open span:nth-child(2) { opacity: 0; }
+.nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ─── MOBILE NAV DRAWER ─── */
+.mobile-nav-drawer {
+  display: none;
+  position: fixed;
+  top: 72px; left: 0; right: 0;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  z-index: 99;
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+}
+.mobile-nav-drawer.open {
+  max-height: 400px;
+}
+.mobile-nav-drawer ul {
+  list-style: none;
+  padding: 16px 0 24px;
+}
+.mobile-nav-drawer ul li a {
+  display: block;
+  padding: 16px 28px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--navy);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  opacity: .7;
+}
+.mobile-nav-drawer ul li:last-child a { border-bottom: none; }
+.mobile-nav-drawer ul li a:active { background: rgba(25,41,58,.05); }
+.mobile-nav-cta-item a {
+  background: var(--navy) !important;
+  color: var(--cream) !important;
+  opacity: 1 !important;
+  margin: 16px 24px 0;
+  text-align: center;
+}
 
 /* ─── MARQUEE ─── */
 .marquee-wrap {
@@ -888,31 +947,6 @@ footer > * { position: relative; z-index: 1; }
 .coord-bl { bottom:12px; left:16px; }
 .coord-br { bottom:12px; right:16px; }
 
-/* ─── RESPONSIVE ─── */
-@media(max-width:900px) {
-  nav { padding:0 24px; }
-  .nav-links { display:none; }
-  .hero { grid-template-columns:1fr; }
-  .hero-right { display:none; }
-  .hero-left { padding:60px 28px; }
-  .intro { grid-template-columns:1fr; }
-  .intro-text { border-right:none; border-bottom:1px solid var(--border); padding:48px 28px; }
-  .intro-stats { padding:48px 28px; }
-  .products-grid { grid-template-columns:1fr; margin:0 24px; }
-  .status-grid { margin:0 24px; }
-  .status-row { grid-template-columns:140px 1fr; }
-  .status-pct, .status-badge { display:none; }
-  .partners-grid { grid-template-columns:1fr 1fr; margin:0 24px; }
-  .contact-section { grid-template-columns:1fr; padding:60px 24px; gap:48px; }
-  .community-channels { grid-template-columns:1fr; margin:0 24px; }
-  .videos-grid { grid-template-columns:1fr; margin:0; }
-  .videos-section { margin:0 24px; }
-  footer { padding:32px 24px; flex-wrap:wrap; gap:16px; }
-  .marquee-wrap { display:none; }
-  body { padding-top:0; }
-  .hero { padding-top:72px; }
-}
-
 /* ─── ANIMATIONS ─── */
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(24px); }
@@ -969,7 +1003,6 @@ footer > * { position: relative; z-index: 1; }
 .product-modal.open { display:flex; }
 .product-modal-inner {
   background:var(--cream); color:var(--navy);
-  /* Width is auto — driven by grid columns inside */
   width: fit-content;
   max-width: 97vw;
   position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column;
@@ -978,7 +1011,6 @@ footer > * { position: relative; z-index: 1; }
 .product-modal-close:hover { opacity:.9; }
 .product-modal-layout {
   display:grid;
-  /* columns set dynamically by JS */
   min-height:420px;
 }
 .product-modal-images { background:rgba(25,41,58,.05); border-right:1px solid rgba(25,41,58,.1); display:flex; flex-direction:column; position:relative; }
@@ -1162,16 +1194,6 @@ footer > * { position: relative; z-index: 1; }
 }
 .btn-discord:hover { background: var(--mid); }
 
-@media(max-width:900px) {
-  .update-announce, .update-rows { margin: 0 24px; }
-  .update-announce { grid-template-columns: 1fr; }
-  .update-announce-images { min-height: 200px; border-top: 1px solid var(--border); }
-  .update-row { grid-template-columns: 1fr; }
-  .update-row-images { min-height: 220px; }
-  .update-row.alt { direction: ltr; }
-  .discord-cta-bar { margin: 24px 24px 0; flex-direction:column; align-items:flex-start; }
-}
-
 .product-modal-discord {
   border-top: 1px solid rgba(25,41,58,.1);
   padding: 28px 40px;
@@ -1228,6 +1250,179 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
   transition: transform 0.8s cubic-bezier(.16,1,.3,1) 0.3s;
 }
 .section-rule.revealed { transform: scaleX(1); }
+
+/* ══════════════════════════════════════════════════
+   ─── IMPROVED MOBILE RESPONSIVE STYLES ───
+   ══════════════════════════════════════════════════ */
+@media(max-width:900px) {
+
+  /* ── Cursor off on touch ── */
+  .cursor-dot { display: none; }
+  *, *::before, *::after { cursor: auto !important; }
+
+  /* ── Nav ── */
+  nav { padding: 0 20px 0 20px; }
+  .nav-links { display: none; }
+  .nav-logo-tag { display: none; }
+  .nav-hamburger { display: flex; }
+  .mobile-nav-drawer { display: block; }
+
+  /* ── Marquee hidden on mobile ── */
+  .marquee-wrap { display: none; }
+
+  /* ── Hero ── */
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 72px;
+    min-height: auto;
+  }
+  .hero-left {
+    padding: 48px 24px 40px;
+    gap: 24px;
+  }
+  .hero-title { font-size: clamp(48px, 12vw, 72px); }
+  .hero-right { display: none; }
+  .hero-btns { flex-direction: column; gap: 12px; }
+  .btn-primary, .btn-ghost { width: 100%; text-align: center; padding: 16px 24px; }
+
+  /* ── Section headers ── */
+  .section-header { padding: 56px 24px 36px; }
+
+  /* ── Intro ── */
+  .intro { grid-template-columns: 1fr; }
+  .intro-text {
+    padding: 48px 24px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .intro-text h2 { font-size: 28px; }
+  .intro-stats {
+    padding: 40px 24px;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .stat-num { font-size: 32px; }
+
+  /* ── Products ── */
+  .products-grid {
+    grid-template-columns: 1fr;
+    margin: 0 16px;
+  }
+  .product-card { padding: 32px 24px; }
+
+  /* ── Status ── */
+  .status-grid { margin: 0 16px; }
+  .status-row { grid-template-columns: 1fr 1fr; padding: 16px 18px; gap: 12px; }
+  .status-pct { display: none; }
+  .status-badge { display: none; }
+
+  /* ── Photos ── */
+  .comp-info-bar {
+    margin: 0 16px 28px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 18px;
+  }
+  .comp-info-right { align-items: flex-start; width: 100%; }
+  .comp-info-right .btn-primary { width: 100%; text-align: center; }
+  .comp-prompt-text { font-size: 15px; }
+  .photos-grid {
+    grid-template-columns: 1fr;
+    margin: 0 16px;
+  }
+  .photos-teaser-cta { margin: 0 16px; }
+  .photo-info { padding: 16px 18px 20px; }
+
+  /* ── Announcements ── */
+  .update-announce {
+    margin: 0 16px 1px;
+    grid-template-columns: 1fr;
+  }
+  .update-announce-text { padding: 28px 24px; border-right: none; border-bottom: 1px solid var(--border); }
+  .update-announce-images { min-height: 220px; }
+  .update-rows { margin: 0 16px; }
+  .update-row { grid-template-columns: 1fr; }
+  .update-row-text { padding: 28px 24px; border-right: none; }
+  .update-row.alt .update-row-text { border-left: none; }
+  .update-row-images { min-height: 220px; }
+  .update-title { font-size: 20px; }
+  .discord-cta-bar { margin: 20px 16px 0; flex-direction: column; align-items: flex-start; padding: 20px; }
+  .btn-discord { width: 100%; text-align: center; }
+
+  /* ── Community ── */
+  .community-channels {
+    grid-template-columns: 1fr;
+    margin: 0 16px 40px;
+  }
+  .channel-card { padding: 32px 28px; }
+  .videos-section { margin: 0 16px; }
+  .videos-grid { grid-template-columns: 1fr; gap: 16px; }
+
+  /* ── Partners ── */
+  .partners-grid {
+    grid-template-columns: 1fr 1fr;
+    margin: 0 16px;
+  }
+  .partner-card { padding: 28px 20px; }
+  .partner-initial { font-size: 28px; }
+  .partner-name { font-size: 11px; }
+
+  /* ── Footer ── */
+  footer {
+    padding: 28px 20px;
+    flex-wrap: wrap;
+    gap: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer-meta { order: 3; }
+  .footer-links { flex-wrap: wrap; gap: 16px 20px; }
+
+  /* ── Product modal ── */
+  .product-modal { padding: 0; align-items: flex-end; }
+  .product-modal-inner {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 0;
+  }
+  .product-modal-layout {
+    grid-template-columns: 1fr !important;
+    min-height: auto;
+  }
+  .product-modal-images { border-right: none; border-bottom: 1px solid rgba(25,41,58,.1); }
+  .product-modal-img-main { min-height: 260px !important; }
+  .product-modal-content {
+    width: 100%;
+    max-height: none;
+    padding: 28px 24px;
+  }
+  .product-modal-name { font-size: 26px; }
+  .product-modal-discord { padding: 20px 24px; }
+  .pm-img-nav { opacity: .7 !important; }
+
+  /* ── Gallery page ── */
+  .gallery-nav { padding: 0 16px; gap: 12px; }
+  .gallery-nav-label { display: none; }
+  .gallery-sidebar { display: none; }
+  .gallery-main-header { padding: 20px 16px 18px; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .gallery-prompt-title { font-size: 22px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+
+  /* ── Coords off ── */
+  .coord { display: none; }
+}
+
+/* Extra small screens */
+@media(max-width: 480px) {
+  .photos-grid { grid-template-columns: 1fr; }
+  .gallery-grid { grid-template-columns: 1fr; }
+  .intro-stats { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .partners-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: clamp(40px, 11vw, 56px); }
+  .section-title { font-size: clamp(28px, 8vw, 40px); }
+}
 </style>
 </head>
 <body>
@@ -1276,7 +1471,23 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
     <li><a href="#community">Community</a></li>
     <li><a href="#partners" class="nav-cta">Partners</a></li>
   </ul>
+  <!-- Mobile hamburger button -->
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 </nav>
+
+<!-- Mobile nav drawer -->
+<div class="mobile-nav-drawer" id="mobile-nav-drawer">
+  <ul>
+    <li><a href="#products" onclick="closeMobileNav()">Products</a></li>
+    <li><a href="#photos" onclick="closeMobileNav()">Photos</a></li>
+    <li><a href="#community" onclick="closeMobileNav()">Community</a></li>
+    <li class="mobile-nav-cta-item"><a href="#partners" onclick="closeMobileNav()">Partners</a></li>
+  </ul>
+</div>
 
 <!-- ─── MARQUEE ─── -->
 <div class="marquee-wrap">
@@ -1608,6 +1819,26 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
 
 <!-- ─── SCRIPTS ─── -->
 <script>
+// Mobile nav
+function closeMobileNav() {
+  document.getElementById('mobile-nav-drawer').classList.remove('open');
+  document.getElementById('nav-hamburger').classList.remove('open');
+}
+document.getElementById('nav-hamburger').addEventListener('click', function() {
+  var drawer = document.getElementById('mobile-nav-drawer');
+  var btn = this;
+  drawer.classList.toggle('open');
+  btn.classList.toggle('open');
+});
+// Close drawer on outside click
+document.addEventListener('click', function(e) {
+  var drawer = document.getElementById('mobile-nav-drawer');
+  var btn = document.getElementById('nav-hamburger');
+  if (drawer.classList.contains('open') && !drawer.contains(e.target) && !btn.contains(e.target)) {
+    closeMobileNav();
+  }
+});
+
 // Marquee
 (function(){
   var BOLL_PATH = "M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z";
@@ -1632,9 +1863,10 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
   requestAnimationFrame(tick);
 })();
 
-// Custom cursor
+// Custom cursor (desktop only)
 (function() {
   var dot = document.getElementById('cursor-dot');
+  if (!dot) return;
   document.addEventListener('mousemove', function(e) {
     dot.style.left = e.clientX + 'px';
     dot.style.top = e.clientY + 'px';
@@ -1745,7 +1977,7 @@ document.querySelectorAll('.anim').forEach(function(el) {
   el.style.animationPlayState = 'paused'; observer.observe(el);
 });
 
-// ── PRODUCT MODAL — image-ratio-driven left column ──
+// ── PRODUCT MODAL ──
 var pmImages = [];
 var pmCurrentImg = 0;
 
@@ -1813,14 +2045,14 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
     if (cta_url) { window.open(cta_url, '_blank'); } else { closeProductModal(); }
   };
 
-  // Parse images
   pmImages = imageStr ? imageStr.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4 && s.indexOf('.') !== -1; }) : [];
   pmCurrentImg = 0;
 
   var main = document.getElementById('pm-img-main');
   var thumbStrip = document.getElementById('pm-thumb-strip');
   var layout = document.querySelector('.product-modal-layout');
-  var RIGHT_W = 420; // right content column fixed width
+  var RIGHT_W = 420;
+  var isMobile = window.innerWidth <= 900;
 
   if (pmImages.length > 0) {
     main.style.cursor = 'zoom-in';
@@ -1833,25 +2065,26 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
       (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
     main.onclick = function() { pmOpenLightbox(pmCurrentImg); };
 
-    // Start square as fallback, then resize once image natural dimensions are known
-    layout.style.gridTemplateColumns = RIGHT_W + 'px ' + RIGHT_W + 'px';
-    main.style.minHeight = RIGHT_W + 'px';
-
-    var img = main.querySelector('.pm-main-img');
-    function applyRatio() {
-      if (!img || !img.naturalWidth || !img.naturalHeight) return;
-      var ratio = img.naturalWidth / img.naturalHeight;
-      // Left column width = RIGHT_W height * image ratio, capped at viewport
-      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - RIGHT_W, 960);
-      var minImgW = 240;
-      var imgColW = Math.max(minImgW, Math.min(Math.round(RIGHT_W * ratio), maxImgW));
-      layout.style.gridTemplateColumns = imgColW + 'px ' + RIGHT_W + 'px';
-      var maxH = Math.round(window.innerHeight * 0.72);
-      main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
-    }
-    if (img) {
-      if (img.complete && img.naturalWidth) { applyRatio(); }
-      else { img.addEventListener('load', applyRatio); }
+    if (isMobile) {
+      layout.style.gridTemplateColumns = '1fr';
+    } else {
+      layout.style.gridTemplateColumns = RIGHT_W + 'px ' + RIGHT_W + 'px';
+      main.style.minHeight = RIGHT_W + 'px';
+      var img = main.querySelector('.pm-main-img');
+      function applyRatio() {
+        if (!img || !img.naturalWidth || !img.naturalHeight) return;
+        var ratio = img.naturalWidth / img.naturalHeight;
+        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - RIGHT_W, 960);
+        var minImgW = 240;
+        var imgColW = Math.max(minImgW, Math.min(Math.round(RIGHT_W * ratio), maxImgW));
+        layout.style.gridTemplateColumns = imgColW + 'px ' + RIGHT_W + 'px';
+        var maxH = Math.round(window.innerHeight * 0.72);
+        main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+      }
+      if (img) {
+        if (img.complete && img.naturalWidth) { applyRatio(); }
+        else { img.addEventListener('load', applyRatio); }
+      }
     }
 
     if (pmImages.length > 1) {
@@ -1863,9 +2096,12 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
       thumbStrip.style.display = 'none';
     }
   } else {
-    // No images — both columns equal square (420 × 420)
-    layout.style.gridTemplateColumns = RIGHT_W + 'px ' + RIGHT_W + 'px';
-    main.style.minHeight = RIGHT_W + 'px';
+    if (isMobile) {
+      layout.style.gridTemplateColumns = '1fr';
+    } else {
+      layout.style.gridTemplateColumns = RIGHT_W + 'px ' + RIGHT_W + 'px';
+      main.style.minHeight = RIGHT_W + 'px';
+    }
     main.style.cursor = 'default';
     main.onclick = null;
     main.innerHTML = '<div class="pm-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:72px;opacity:.1"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span></div>';
@@ -1902,14 +2138,13 @@ function closeVideoModal() {
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeProductModal(); closeVideoModal(); pmLightboxClose(); }
+  if (e.key === 'Escape') { closeProductModal(); closeVideoModal(); pmLightboxClose(); closeMobileNav(); }
   if (e.key === 'ArrowLeft' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(-1);
   if (e.key === 'ArrowRight' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(1);
 });
 
 // Google Sheets URLs
 var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
-var STATUS_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
 
 function renderComingSoon() {
   var grid = document.getElementById('products-grid');
@@ -2002,27 +2237,21 @@ function loadFromSheets() {
     .catch(function() { renderComingSoon(); });
 }
 
-// ── TEST_MODE = false — loads from Google Sheets ──
-var TEST_MODE = false;
-if (TEST_MODE) {
-  // test data removed
-} else {
-  loadFromSheets();
-}
+loadFromSheets();
 </script>
 
 <!-- ═══ GALLERY PAGE ═══ -->
 <div id="gallery-page" style="display:none">
   <div class="gallery-nav">
     <button class="gallery-back" onclick="closeGallery()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg> Back to Underway
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg> Back
     </button>
     <a href="#" class="gallery-nav-logo">
       <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="height:26px;width:auto;"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z"/></svg>
     </a>
     <div class="gallery-nav-right">
       <span class="gallery-nav-label">Photo Competition</span>
-      <a href="#" class="btn-gallery-submit">Submit a Photo</a>
+      <a href="#" class="btn-gallery-submit">Submit</a>
     </div>
   </div>
   <div class="gallery-body">
@@ -2069,16 +2298,15 @@ if (TEST_MODE) {
         </div>
       </div>
       <div class="gallery-grid" id="gallery-grid">
-        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Golden Hour — Solent</div><div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">38</span></button></div></div></div>
-        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Holding Fast — North Sea</div><div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">157</span></button></div></div></div>
-        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@coastal_eng</span></div><div class="photo-title">Pilot Unit at Dawn</div><div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
-        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Med Berth — Dusk</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@maritime_supply_int</span></div><div class="photo-title">Med Berth — Dusk</div><div class="photo-desc">Superyacht mooring setup, polished stainless in the last light. Worth every penny.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">118</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">43</span></button></div></div></div>
-        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Bollard — Low Sun</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@kirkland_marine</span></div><div class="photo-title">Bollard — Low Sun</div><div class="photo-desc">Long shadow across the dock. Series II prototype at the yard, late afternoon light.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">76</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">31</span></button></div></div></div>
-        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Dawn Patrol — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@tidal_basin</span></div><div class="photo-title">Dawn Patrol — Solent</div><div class="photo-desc">Fenders still wet from the night tide. Caught this ten minutes before the crew arrived.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">59</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">19</span></button></div></div></div>
-        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Storm Hold — Tyne</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Storm Hold — Tyne</div><div class="photo-desc">Full gale. Every bollard held. Taken from the dock office window.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">187</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">142</span></button></div></div></div>
-        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Swell Running — Blyth</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Swell Running — Blyth</div><div class="photo-desc">D-type fenders doing exactly what they should. Force 6, building.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">94</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">67</span></button></div></div></div>
-        <div class="photo-card" data-prompt="installation"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>D-Type Run — Hamble</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@halcyon_yachts</span></div><div class="photo-title">D-Type Run — Hamble</div><div class="photo-desc">Full fender run along the pontoon finger. Single afternoon.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">134</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
-        <div class="photo-card" data-prompt="detail"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Series I — Base Casting</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@underway_jamie</span></div><div class="photo-title">Series I — Base Casting</div><div class="photo-desc">The new anti-rotation collar. You have to see it in person.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">112</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">95</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Golden Hour — Solent</div><div class="photo-desc">Series I bollards catching the first light.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">38</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Holding Fast — North Sea</div><div class="photo-desc">Force 8, 3am. The mooring held.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">157</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@coastal_eng</span></div><div class="photo-title">Pilot Unit at Dawn</div><div class="photo-desc">First smart monitoring unit live in the field.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Med Berth — Dusk</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@maritime_supply_int</span></div><div class="photo-title">Med Berth — Dusk</div><div class="photo-desc">Superyacht mooring setup in the last light.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">118</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">43</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Bollard — Low Sun</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@kirkland_marine</span></div><div class="photo-title">Bollard — Low Sun</div><div class="photo-desc">Series II prototype at the yard, late afternoon.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">76</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">31</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Dawn Patrol — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@tidal_basin</span></div><div class="photo-title">Dawn Patrol — Solent</div><div class="photo-desc">Fenders still wet from the night tide.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">59</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">19</span></button></div></div></div>
+        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Storm Hold — Tyne</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Storm Hold — Tyne</div><div class="photo-desc">Full gale. Every bollard held.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">187</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">142</span></button></div></div></div>
+        <div class="photo-card" data-prompt="installation"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>D-Type Run — Hamble</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@halcyon_yachts</span></div><div class="photo-title">D-Type Run — Hamble</div><div class="photo-desc">Full fender run along the pontoon finger.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">134</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
+        <div class="photo-card" data-prompt="detail"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Series I — Base Casting</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@underway_jamie</span></div><div class="photo-title">Series I — Base Casting</div><div class="photo-desc">The new anti-rotation collar.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">112</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">95</span></button></div></div></div>
       </div>
     </div>
   </div>
