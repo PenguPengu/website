@@ -1744,15 +1744,10 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
     <h2 class="section-title">Trusted <em>Partners</em></h2>
     <div class="section-rule"></div>
   </div>
-  <div class="partners-grid">
-    <div class="partner-card reveal-scale"><div class="partner-initial">A</div><div class="partner-name">Albatross Marine Ltd</div><div class="partner-type">Supply · Distribution</div></div>
-    <div class="partner-card reveal-scale delay-r1"><div class="partner-initial">N</div><div class="partner-name">Northsea Ports Group</div><div class="partner-type">Port Authority</div></div>
-    <div class="partner-card reveal-scale delay-r2"><div class="partner-initial">H</div><div class="partner-name">Halcyon Yacht Works</div><div class="partner-type">Refit &amp; Build</div></div>
-    <div class="partner-card reveal-scale delay-r3"><div class="partner-initial">K</div><div class="partner-name">Kirkland Heavy Marine</div><div class="partner-type">Commercial Fleet</div></div>
-    <div class="partner-card"><div class="partner-initial">C</div><div class="partner-name">Coastal Eng. Solutions</div><div class="partner-type">Engineering</div></div>
-    <div class="partner-card"><div class="partner-initial">S</div><div class="partner-name">Stonebridge Dock Co.</div><div class="partner-type">Infrastructure</div></div>
-    <div class="partner-card"><div class="partner-initial">M</div><div class="partner-name">Maritime Supply INT</div><div class="partner-type">Global Distributor</div></div>
-    <div class="partner-card"><div class="partner-initial">T</div><div class="partner-name">Tidal Basin Authority</div><div class="partner-type">Regulatory Partner</div></div>
+  <div class="partners-grid-wrap">
+    <div class="partners-grid" id="partners-grid">
+      <!-- loaded from Google Sheets -->
+    </div>
   </div>
 </section>
 
@@ -2227,6 +2222,55 @@ function renderProducts(products) {
   });
 }
 
+
+var PARTNERS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
+
+var PARTNER_REGISTRY = [];
+function renderPartners(partners) {
+  var grid = document.getElementById('partners-grid');
+  if (!grid) return;
+  if (!partners || partners.length === 0) {
+    grid.innerHTML = '<div style="padding:40px;opacity:.4;font-size:11px;letter-spacing:.15em;text-transform:uppercase;grid-column:1/-1">Partners coming soon</div>';
+    return;
+  }
+  PARTNER_REGISTRY = partners.map(function(p) {
+    var r = {};
+    Object.keys(p).forEach(function(k){ r[k.toLowerCase().trim()] = (p[k] || '').trim(); });
+    return r;
+  });
+  grid.innerHTML = PARTNER_REGISTRY.map(function(r, i) {
+    var nm      = r.name || '';
+    var ty      = r.type || '';
+    var initial = nm ? nm.charAt(0).toUpperCase() : '?';
+    return '<div class="partner-card" data-idx="' + i + '">' +
+      '<div class="partner-initial">' + initial + '</div>' +
+      '<div class="partner-name">' + nm + '</div>' +
+      (ty ? '<div class="partner-type">' + ty + '</div>' : '') +
+      '<div class="partner-hint" style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div>' +
+    '</div>';
+  }).join('');
+  grid.querySelectorAll('.partner-card').forEach(function(card) {
+    card.style.opacity = '1';
+    card.addEventListener('click', function() {
+      openPartnerModal(PARTNER_REGISTRY[parseInt(this.getAttribute('data-idx'))]);
+    });
+  });
+}
+
+function loadPartners() {
+  fetch(PARTNERS_URL)
+    .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+    .then(function(text) {
+      var rows = parseCSV(text);
+      renderPartners(rows);
+    })
+    .catch(function(err) {
+      console.error('Partners fetch error:', err);
+      var grid = document.getElementById('partners-grid');
+      if (grid) grid.innerHTML = '<div style="padding:40px;grid-column:1/-1;font-size:10px;opacity:.4;letter-spacing:.1em">Partners loading failed.</div>';
+    });
+}
+
 function loadFromSheets() {
   fetch(PRODUCTS_URL)
     .then(function(res) { if (!res.ok) throw new Error('Fetch failed'); return res.text(); })
@@ -2239,6 +2283,7 @@ function loadFromSheets() {
 }
 
 loadFromSheets();
+loadPartners();
 
 // ── YOUTUBE LATEST VIDEOS ──
 document.addEventListener('DOMContentLoaded', function() {
