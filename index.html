@@ -1774,40 +1774,19 @@ nav.scrolled {
   </div>
 
   <div class="videos-section">
-    <div class="videos-header">
-      <p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:28px">Latest from YouTube</p>
+    <div class="videos-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:0">Latest from YouTube</p>
+      <a id="yt-channel-link" href="#" target="_blank" rel="noopener"
+         style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.45;text-decoration:none;display:flex;align-items:center;gap:7px;transition:opacity .2s;"
+         onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.45'">
+        View all videos
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
-    <div class="videos-grid">
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb">
-          <div class="video-thumb-bg"></div>
-          <div class="video-play-btn">&#9654;</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">Bollard Series I — Product Overview</div>
-          <div class="video-meta">3 days ago</div>
-        </div>
-      </div>
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb">
-          <div class="video-thumb-bg"></div>
-          <div class="video-play-btn">&#9654;</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">Installation Guide — D-Type Fenders</div>
-          <div class="video-meta">1 week ago</div>
-        </div>
-      </div>
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb">
-          <div class="video-thumb-bg"></div>
-          <div class="video-play-btn">&#9654;</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">Behind the Scenes — Manufacturing</div>
-          <div class="video-meta">2 weeks ago</div>
-        </div>
-      </div>
+    <div class="videos-grid" id="yt-videos-grid">
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:80%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:40%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:70%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:35%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:75%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:45%"></div></div></div>
     </div>
   </div>
 </section>
@@ -2295,7 +2274,7 @@ document.addEventListener('keydown', function(e) {
 var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 // ↓ Replace PARTNERS_GID with the gid= value from the partners sheet tab URL
 var PARTNERS_GID = '648553996';
-var PARTNERS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?output=csv&gid=' + 648553996 + '&single=true';
+var PARTNERS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?output=csv&gid=' + PARTNERS_GID + '&single=true';
 var STATUS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
 
 function renderComingSoon() {
@@ -2507,6 +2486,68 @@ if (TEST_MODE) {
   loadFromSheets();
 }
 loadPartners();
+
+// ── YOUTUBE LATEST VIDEOS ──
+document.addEventListener('DOMContentLoaded', function() {
+  var YT_KEY = (typeof UNDERWAY_CONFIG !== 'undefined') ? UNDERWAY_CONFIG.ytKey : '';
+  var YT_CHANNEL = (typeof UNDERWAY_CONFIG !== 'undefined') ? UNDERWAY_CONFIG.ytChannelId : '';
+
+  function timeAgo(dateStr) {
+    var diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 3600)    return Math.floor(diff / 60) + ' mins ago';
+    if (diff < 86400)   return Math.floor(diff / 3600) + ' hours ago';
+    if (diff < 604800)  return Math.floor(diff / 86400) + ' days ago';
+    if (diff < 2592000) return Math.floor(diff / 604800) + ' weeks ago';
+    return Math.floor(diff / 2592000) + ' months ago';
+  }
+
+  function renderYTVideos(items) {
+    var grid = document.getElementById('yt-videos-grid');
+    if (!items || items.length === 0) { grid.innerHTML = ''; return; }
+    grid.innerHTML = '';
+    items.slice(0, 3).forEach(function(item) {
+      var videoId = item.id.videoId;
+      var title = item.snippet.title;
+      var thumb = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+      var published = timeAgo(item.snippet.publishedAt);
+      var card = document.createElement('div');
+      card.className = 'video-card';
+      var thumbDiv = document.createElement('div');
+      thumbDiv.className = 'video-thumb';
+      thumbDiv.style.position = 'relative';
+      var img = document.createElement('img');
+      img.src = thumb;
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
+      img.alt = title;
+      var overlay = document.createElement('div');
+      overlay.className = 'video-thumb-bg';
+      var playBtn = document.createElement('div');
+      playBtn.className = 'video-play-btn';
+      playBtn.innerHTML = '&#9654;';
+      thumbDiv.appendChild(img);
+      thumbDiv.appendChild(overlay);
+      thumbDiv.appendChild(playBtn);
+      var infoDiv = document.createElement('div');
+      infoDiv.className = 'video-info';
+      infoDiv.innerHTML = '<div class="video-title">' + title + '</div><div class="video-meta">' + published + '</div>';
+      card.appendChild(thumbDiv);
+      card.appendChild(infoDiv);
+      card.addEventListener('click', (function(id) {
+        return function() { openVideoModal('https://www.youtube.com/embed/' + id); };
+      })(videoId));
+      grid.appendChild(card);
+    });
+  }
+
+  var el = document.getElementById('yt-channel-link');
+  if (el && YT_CHANNEL) el.href = 'https://www.youtube.com/channel/' + YT_CHANNEL;
+
+  if (!YT_KEY || !YT_CHANNEL) return;
+  fetch('https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&channelId=' + YT_CHANNEL + '&part=snippet&order=date&maxResults=3&type=video')
+    .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(data) { if (data.error) throw new Error(data.error.message); renderYTVideos(data.items); })
+    .catch(function(err) { console.warn('YouTube API:', err); });
+});
 </script>
 
 <!-- ═══ GALLERY PAGE (SPA) ═══ -->
