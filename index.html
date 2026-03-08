@@ -86,6 +86,7 @@ nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video
   display: flex; flex-direction: column;
   transition: background .2s;
   cursor: default;
+  min-width: 0; overflow: hidden;
 }
 .photo-card:hover { background: #f0e8de; }
 .photo-card.hidden { display: none; }
@@ -96,11 +97,13 @@ nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video
   border-bottom: 1px solid var(--border);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 10px; color: var(--navy); opacity: .3;
+  gap: 10px; color: var(--navy);
   font-size: 9px; letter-spacing: .15em; text-transform: uppercase;
   overflow: hidden; position: relative;
+  min-width: 0; max-width: 100%;
 }
-.photo-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:1; }
+.photo-img .photo-placeholder { opacity: .3; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.photo-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .photo-winner-badge {
   position: absolute; top: 12px; left: 12px;
   background: var(--navy); color: var(--cream);
@@ -2236,6 +2239,9 @@ function renderGalleryFromSheet(rows) {
     return r;
   });
 
+  // DEBUG — remove once confirmed working
+  console.log('[Gallery] parsed rows:', JSON.stringify(normalised.slice(0,3), null, 2));
+
   // Read contest metadata from first row
   var first = normalised[0];
   var theme       = first['theme'] || '';
@@ -2270,9 +2276,15 @@ function renderGalleryFromSheet(rows) {
     var hearts  = parseInt(r['hearts']) || 0;
     var fire    = parseInt(r['fire']) || 0;
 
+    // Convert cdn.discordapp.com -> media.discordapp.net (hotlink-friendly)
+    if (imgUrl && imgUrl.indexOf('cdn.discordapp.com') !== -1) {
+      imgUrl = imgUrl.replace('cdn.discordapp.com', 'media.discordapp.net');
+    }
+
+    var placeholder = '<div class="photo-placeholder">' + IMG_SVG + '<span>' + title + '</span></div>';
     var imgHtml = imgUrl
-      ? '<img src="' + imgUrl + '" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display=\'none\'" alt="' + title + '">' + IMG_SVG
-      : IMG_SVG + '<span>' + title + '</span>';
+      ? '<img src="' + imgUrl + '" alt="' + title.replace(/"/g, "") + '" onerror="this.remove()">' + placeholder
+      : placeholder;
 
     return '<div class="photo-card" data-prompt="' + prompt + '">' +
       '<div class="photo-img">' + imgHtml + '</div>' +
@@ -2322,14 +2334,41 @@ function renderComingSoon() {
 }
 
 function parseCSV(text) {
-  var lines = text.trim().split('\n');
-  var headers = lines[0].split(',').map(function(h) { return h.trim().replace(/^"|"$/g, ''); });
-  return lines.slice(1).map(function(line) {
-    var vals = line.match(/(".*?"|[^,]+)(?=,|$)/g) || [];
+  function parseLine(line) {
+    var fields = [], i = 0, len = line.length;
+    while (i <= len) {
+      if (i === len) { fields.push(''); break; }
+      if (line[i] === '"') {
+        var j = i + 1, val = '';
+        while (j < len) {
+          if (line[j] === '"') {
+            if (line[j+1] === '"') { val += '"'; j += 2; }
+            else { j++; break; }
+          } else { val += line[j++]; }
+        }
+        fields.push(val);
+        while (j < len && line[j] !== ',') j++;
+        i = j + 1;
+      } else {
+        var end = line.indexOf(',', i);
+        if (end === -1) { fields.push(line.slice(i)); break; }
+        fields.push(line.slice(i, end));
+        i = end + 1;
+      }
+    }
+    return fields;
+  }
+  var lines = text.trim().replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  var headers = parseLine(lines[0]).map(function(h){ return h.trim(); });
+  var rows = [];
+  for (var i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    var vals = parseLine(lines[i]);
     var obj = {};
-    headers.forEach(function(h, i) { obj[h] = (vals[i] || '').replace(/^"|"$/g, '').trim(); });
-    return obj;
-  });
+    headers.forEach(function(h, idx){ obj[h] = (vals[idx] || '').trim(); });
+    rows.push(obj);
+  }
+  return rows;
 }
 
 function statusClass(s) {
