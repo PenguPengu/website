@@ -2283,38 +2283,15 @@ document.addEventListener('keydown', function(e) {
 var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 var STATUS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
 
-var FALLBACK_PRODUCTS = [
-  { name:'Bollard Series', type:'Marine Hardware', status:'Active',
-    desc:'Cast iron and marine-grade steel bollards for commercial and private docks. Available in single and double-horn configurations from 5T to 100T SWL.',
-    details:'SWL range 5T-100T. Cast iron & stainless variants. Hot-dip galvanised finish. Custom powder coat options. BS EN 13411 compliant. 14-week lead time for bespoke orders.',
-    cta:'Request a Quote',
-    dc_channel:'#bollard-series', dc_title:'Series II in final testing — first look inside', dc_body:'Redesigned base casting, 40% improvement in corrosion resistance, and new anti-rotation collar. Rolling out Q3 2026.', dc_meta:'Posted by Underway_Official · Today' },
-  { name:'Fender Systems', type:'Impact Protection', status:'Active',
-    desc:'Cylindrical, D-type, and arch fenders in solid rubber or foam-filled construction. Designed for high-cycle berthing in commercial port environments.',
-    details:'Solid rubber & foam-filled. EPDM and SBR compounds. UV & saltwater resistant. Standard and custom profiles. Energy absorption from 0.3 to 420 kNm.',
-    cta:'Request a Quote',
-    dc_channel:'#fender-systems', dc_title:'D-Type lead times back to standard 3-week dispatch', dc_body:'Supply chain delays resolved. If you had a quote that lapsed, reach out and we will honour the original price.', dc_meta:'Posted by Jamie_UW · Yesterday' },
-  { name:'Mooring Systems', type:'Complete Solutions', status:'Active',
-    desc:'Engineered mooring arrangements for ferries, superyachts, and cargo vessels. Full site survey, design, supply, and installation available.',
-    details:'Full turnkey supply. Design-led approach. Compatibility with existing dock infrastructure. CAD drawings provided. Class approval documentation available.',
-    cta:'Request a Quote',
-    dc_channel:'#mooring-systems', dc_title:'Solent Marina install — Series I full setup', dc_body:'Six bollards, D-type fenders on pontoon fingers, heavy-duty cleats. Installed in a single day by a two-person crew.', dc_meta:'Posted by Underway_Official · 2 days ago' },
-  { name:'Dock Hardware', type:'Deck Fittings', status:'Active',
-    desc:'Cleats, fairleads, deck rings, capstans, and chain stoppers. Marine-grade 316L stainless throughout, with optional surface finishes to spec.',
-    details:'316L marine stainless. Investment cast and machined options. Polished, brushed, and matte finishes. 60+ standard SKUs. Bespoke profiles accepted.',
-    cta:'Request a Quote',
-    dc_channel:'#dock-hardware', dc_title:'New heavy-duty cleat range — catalogue updated', dc_body:'Six new SKUs added including a 316L offshore cleat rated to 8T. Full dimensional drawings available in #resources.', dc_meta:'Posted by Jamie_UW · 4 days ago' },
-  { name:'Rigging Lines', type:'Rope & Textile', status:'In Development',
-    desc:'High-modulus mooring lines in HMPE, polyester, and nylon constructions. Working load ratings from 2T to 250T for all berthing applications.',
-    details:'HMPE, polyester, nylon constructions. Eye splice, thimble, and shackle terminations. Swaged fittings on request. Full load test certification.',
-    cta:'Register Interest',
-    dc_channel:'#rigging-lines', dc_title:'Prototype samples out for testing with three partners', dc_body:'First batch of HMPE lines in testing. Feedback so far is strong on the eye splice. Targeting catalogue launch Q4 2026.', dc_meta:'Posted by Underway_Official · 1 week ago' },
-  { name:'Smart Monitoring', type:'IoT / Marine Tech', status:'Coming Soon',
-    desc:'Sensor-equipped bollards and fenders with real-time load monitoring, tidal compensation, and remote alerting via our vessel management dashboard.',
-    details:'Load cells integrated into bollard castings. LoRaWAN & cellular connectivity. Cloud dashboard. API access. Pilot programme launching Q3 2026.',
-    cta:'Join Waitlist',
-    dc_channel:'#smart-monitoring', dc_title:'Pilot programme — 4 spots remaining', dc_body:'6 of 10 spots taken. Pilot partners get 50% off hardware and direct engineering team access. DM us to register interest.', dc_meta:'Posted by Jamie_UW · 3 days ago' }
-];
+function renderComingSoon() {
+  var grid = document.getElementById('products-grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;">' +
+    '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(247,239,230,.2)" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d=\'M12 6v6l4 2\'/></svg>' +
+    '<div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream);letter-spacing:-.01em;">Catalogue Coming Soon</div>' +
+    '<div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range. Check back shortly or join our Discord for first access.</div>' +
+    '<a href=\"#discord\" style=\"margin-top:8px;background:var(--cream);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;padding:12px 28px;text-decoration:none;\">Join Discord &#8594;</a>' +
+  '</div>';
+}
 
 function parseCSV(text) {
   var lines = text.trim().split('\n');
@@ -2385,13 +2362,17 @@ function renderProducts(products) {
 }
 
 function loadFromSheets() {
-  Promise.all([fetch(PRODUCTS_URL), fetch(STATUS_URL)])
+  fetch(PRODUCTS_URL)
     .then(function(res) {
-      if (!res[0].ok || !res[1].ok) throw new Error('Fetch failed');
-      return Promise.all([res[0].text(), res[1].text()]);
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.text();
     })
-    .then(function(texts) { renderProducts(parseCSV(texts[0])); })
-    .catch(function() { renderProducts(FALLBACK_PRODUCTS); });
+    .then(function(text) {
+      var products = parseCSV(text);
+      if (products.length === 0) throw new Error('Empty');
+      renderProducts(products);
+    })
+    .catch(function() { renderComingSoon(); });
 }
 
 loadFromSheets();
