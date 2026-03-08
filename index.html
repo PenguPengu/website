@@ -1751,6 +1751,26 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
   </div>
 </section>
 
+<!-- Partner Modal -->
+<div class="partner-modal" id="partner-modal" onclick="closePartnerModal()">
+  <div class="partner-modal-inner" onclick="event.stopPropagation()">
+    <button class="partner-modal-close" onclick="closePartnerModal()">&#10005;</button>
+    <div id="pm-partner-banner"></div>
+    <div class="partner-modal-body">
+      <div class="partner-modal-body-row">
+        <div id="pm-partner-logo"></div>
+        <div class="partner-modal-body-text">
+          <div class="partner-modal-initial" id="pm-partner-initial"></div>
+          <div class="partner-modal-name" id="pm-partner-name"></div>
+          <div class="partner-modal-type" id="pm-partner-type"></div>
+        </div>
+      </div>
+      <div class="partner-modal-desc" id="pm-partner-desc"></div>
+      <div class="partner-modal-links" id="pm-partner-links"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Product Modal -->
 <div class="product-modal" id="product-modal" onclick="closeProductModal()">
   <div class="product-modal-inner" onclick="event.stopPropagation()">
@@ -2115,6 +2135,81 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   }
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+
+function openPartnerModal(p) {
+  var isLogo = (p.image_type || '').toLowerCase().trim() === 'logo';
+  var bannerEl = document.getElementById('pm-partner-banner');
+  var logoEl   = document.getElementById('pm-partner-logo');
+  bannerEl.innerHTML = '';
+  logoEl.innerHTML   = '';
+
+  if (isLogo) {
+    var logoWrap = document.createElement('div');
+    logoWrap.className = 'partner-modal-img-logo';
+    if (p.image) {
+      var img = document.createElement('img');
+      img.src = p.image;
+      logoWrap.appendChild(img);
+    } else {
+      var ph = document.createElement('div');
+      ph.className = 'partner-modal-img-placeholder';
+      ph.style.fontSize = '48px';
+      ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+      logoWrap.appendChild(ph);
+    }
+    logoEl.appendChild(logoWrap);
+  } else {
+    var bannerWrap = document.createElement('div');
+    bannerWrap.className = 'partner-modal-img-banner';
+    if (p.image) {
+      var img = document.createElement('img');
+      img.src = p.image;
+      bannerWrap.appendChild(img);
+    } else {
+      var ph = document.createElement('div');
+      ph.className = 'partner-modal-img-placeholder';
+      ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+      bannerWrap.appendChild(ph);
+    }
+    bannerEl.appendChild(bannerWrap);
+  }
+
+  document.getElementById('pm-partner-initial').textContent = p.name ? p.name.charAt(0).toUpperCase() : '';
+  document.getElementById('pm-partner-name').textContent   = p.name || '';
+  document.getElementById('pm-partner-type').textContent   = p.type || '';
+
+  var descText = p.desc || p.description || '';
+  var descEl = document.getElementById('pm-partner-desc');
+  descEl.textContent  = descText;
+  descEl.style.display = descText ? 'block' : 'none';
+
+  var linksEl = document.getElementById('pm-partner-links');
+  linksEl.innerHTML = '';
+  var hasLinks = false;
+  for (var n = 1; n <= 3; n++) {
+    var lbl = p['link' + n + '_label'];
+    var url = p['link' + n + '_url'];
+    if (lbl && url) {
+      hasLinks = true;
+      var a = document.createElement('a');
+      a.className = 'partner-modal-link';
+      if (url && url.indexOf('http') !== 0) url = 'https://' + url;
+      a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = lbl + ' →';
+      linksEl.appendChild(a);
+    }
+  }
+  linksEl.style.display = hasLinks ? 'flex' : 'none';
+
+  document.getElementById('partner-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePartnerModal() {
+  document.getElementById('partner-modal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function closeProductModal() {
