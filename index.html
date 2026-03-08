@@ -1541,19 +1541,11 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
     </div>
-    <div class="videos-grid">
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
-        <div class="video-info"><div class="video-title">Bollard Series I — Product Overview</div><div class="video-meta">3 days ago</div></div>
-      </div>
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
-        <div class="video-info"><div class="video-title">Installation Guide — D-Type Fenders</div><div class="video-meta">1 week ago</div></div>
-      </div>
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
-        <div class="video-info"><div class="video-title">Behind the Scenes — Manufacturing</div><div class="video-meta">2 weeks ago</div></div>
-      </div>
+    <div class="videos-grid" id="yt-videos-grid">
+      <!-- skeleton loaders -->
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(247,239,230,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(247,239,230,.08);border-radius:2px;margin-bottom:8px;width:80%"></div><div style="height:10px;background:rgba(247,239,230,.05);border-radius:2px;width:40%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(247,239,230,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(247,239,230,.08);border-radius:2px;margin-bottom:8px;width:70%"></div><div style="height:10px;background:rgba(247,239,230,.05);border-radius:2px;width:35%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(247,239,230,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(247,239,230,.08);border-radius:2px;margin-bottom:8px;width:75%"></div><div style="height:10px;background:rgba(247,239,230,.05);border-radius:2px;width:45%"></div></div></div>
     </div>
   </div>
 </section>
@@ -2190,6 +2182,67 @@ if (TEST_MODE) {
 } else {
   loadFromSheets();
 }
+
+// ── YOUTUBE LATEST VIDEOS ──
+document.addEventListener('DOMContentLoaded', function() {
+  var YT_KEY = UNDERWAY_CONFIG.ytKey;
+  var YT_CHANNEL = UNDERWAY_CONFIG.ytChannelId;
+
+  function timeAgo(dateStr) {
+    var diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 3600)    return Math.floor(diff / 60) + ' mins ago';
+    if (diff < 86400)   return Math.floor(diff / 3600) + ' hours ago';
+    if (diff < 604800)  return Math.floor(diff / 86400) + ' days ago';
+    if (diff < 2592000) return Math.floor(diff / 604800) + ' weeks ago';
+    return Math.floor(diff / 2592000) + ' months ago';
+  }
+
+  function renderYTVideos(items) {
+    var grid = document.getElementById('yt-videos-grid');
+    if (!items || items.length === 0) { grid.innerHTML = ''; return; }
+    grid.innerHTML = '';
+    items.slice(0, 3).forEach(function(item) {
+      var videoId = item.id.videoId;
+      var title = item.snippet.title;
+      var thumb = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+      var published = timeAgo(item.snippet.publishedAt);
+      var card = document.createElement('div');
+      card.className = 'video-card';
+      var thumbDiv = document.createElement('div');
+      thumbDiv.className = 'video-thumb';
+      thumbDiv.style.position = 'relative';
+      var img = document.createElement('img');
+      img.src = thumb;
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
+      img.alt = title;
+      var overlay = document.createElement('div');
+      overlay.className = 'video-thumb-bg';
+      var playBtn = document.createElement('div');
+      playBtn.className = 'video-play-btn';
+      playBtn.innerHTML = '&#9654;';
+      thumbDiv.appendChild(img);
+      thumbDiv.appendChild(overlay);
+      thumbDiv.appendChild(playBtn);
+      var infoDiv = document.createElement('div');
+      infoDiv.className = 'video-info';
+      infoDiv.innerHTML = '<div class="video-title">' + title + '</div><div class="video-meta">' + published + '</div>';
+      card.appendChild(thumbDiv);
+      card.appendChild(infoDiv);
+      card.addEventListener('click', (function(id) {
+        return function() { openVideoModal('https://www.youtube.com/embed/' + id); };
+      })(videoId));
+      grid.appendChild(card);
+    });
+  }
+
+  var el = document.getElementById('yt-channel-link');
+  if (el) el.href = 'https://www.youtube.com/channel/' + YT_CHANNEL;
+
+  fetch('https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&channelId=' + YT_CHANNEL + '&part=snippet&order=date&maxResults=3&type=video')
+    .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(data) { if (data.error) throw new Error(data.error.message); renderYTVideos(data.items); })
+    .catch(function(err) { console.warn('YouTube API:', err); });
+});
 </script>
 
 <!-- ═══ GALLERY PAGE ═══ -->
