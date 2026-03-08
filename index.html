@@ -27,13 +27,12 @@ body {
 }
 
 /* ─── GLOBAL NAUTICAL GRID ─── */
-body::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+body {
   background-image:
     linear-gradient(rgba(25,41,58,.042) 1px, transparent 1px),
     linear-gradient(90deg, rgba(25,41,58,.042) 1px, transparent 1px);
   background-size: 120px 120px;
+  background-attachment: local;
 }
 nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video-modal { position: relative; z-index: 1; }
 .products-section { isolation: isolate; }
@@ -45,49 +44,6 @@ nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video
   background-size: 120px 120px;
 }
 .products-section > * { position: relative; z-index: 1; }
-
-/* ─── GLOBAL NAUTICAL GRID ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(25,41,58,.042) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(25,41,58,.042) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
-nav, .marquee-wrap, section, footer,
-.coord, .cursor-dot, .product-modal, .video-modal {
-  position: relative;
-  z-index: 1;
-}
-/* Cream sections get navy-tinted grid (already showing through body::before) */
-/* Navy sections override with cream-tinted grid */
-.products-section { isolation: isolate; }
-.products-section::before {
-  content: '';
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(247,239,230,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(247,239,230,.05) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
-.products-section > * { position: relative; z-index: 1; }
-
-/* ─── GLOBAL NAUTICAL BG ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(25,41,58,.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(25,41,58,.045) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
 /* All sections sit above bg */
 nav, .marquee-wrap, section, footer, .coord,
 .cursor-dot, .product-modal, .video-modal {
@@ -805,30 +761,40 @@ nav {
 
 /* ─── PARTNERS ─── */
 .partners-section {
-  background:rgba(25,41,58,.04);
   padding:80px 0;
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
+}
+.partners-grid-wrap {
+  margin:0 80px;
+  background:rgba(25,41,58,.04);
+  border:1px solid var(--border);
+  display:inline-grid;
+  width:calc(100% - 160px);
 }
 .partners-grid {
   display:grid;
   grid-template-columns: repeat(4, 1fr);
   gap:1px;
   background:var(--border);
-  margin:0 80px;
+  width:100%;
 }
 .partner-card {
   background:var(--cream);
   padding:40px 32px;
   display:flex; flex-direction:column;
   gap:12px;
+  cursor:pointer;
+  transition:background .2s;
 }
+.partner-card:hover { background:#f0e8de; }
 .partner-initial {
   font-family:var(--serif);
   font-size:36px;
   font-weight:900;
   opacity:.1;
   letter-spacing:-.02em;
+  transition:opacity .2s;
 }
 .partner-name {
   font-size:12px;
@@ -841,7 +807,40 @@ nav {
   text-transform:uppercase;
   opacity:.4;
 }
-.partner-card:hover .partner-initial { opacity:.15; }
+.partner-card:hover .partner-initial { opacity:.2; }
+
+/* ─── PARTNER MODAL ─── */
+.partner-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
+.partner-modal.open { display:flex; }
+.partner-modal-inner {
+  background:var(--cream); color:var(--navy);
+  width:min(760px,95vw);
+  position:relative; max-height:90vh; overflow-y:auto;
+  display:flex; flex-direction:column;
+}
+.partner-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
+.partner-modal-close:hover { opacity:.9; }
+.partner-modal-img {
+  width:100%; height:220px;
+  background:rgba(25,41,58,.06);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; flex-shrink:0; position:relative;
+  border-bottom:1px solid var(--border);
+}
+.partner-modal-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.partner-modal-img-placeholder { font-family:var(--serif); font-size:80px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
+.partner-modal-body { padding:44px 48px; display:flex; flex-direction:column; gap:16px; }
+.partner-modal-initial { font-family:var(--serif); font-size:52px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-8px; }
+.partner-modal-name { font-family:var(--serif); font-size:32px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
+.partner-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; }
+.partner-modal-desc { font-size:12px; line-height:1.85; opacity:.6; border-top:1px solid rgba(25,41,58,.08); padding-top:18px; margin-top:4px; }
+.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+.partner-modal-link {
+  font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--navy); border:1px solid rgba(25,41,58,.3); padding:10px 20px;
+  text-decoration:none; transition:.15s; display:inline-block;
+}
+.partner-modal-link:hover { background:var(--navy); color:var(--cream); }
 
 .partner-links {
   display:flex;
@@ -1016,7 +1015,8 @@ footer {
   .status-grid { margin:0 24px; }
   .status-row { grid-template-columns:140px 1fr; }
   .status-pct, .status-badge { display:none; }
-  .partners-grid { grid-template-columns:1fr 1fr; margin:0 24px; }
+  .partners-grid-wrap { margin:0 16px; width:calc(100% - 32px); }
+  .partners-grid { grid-template-columns:1fr 1fr; }
   .contact-section { grid-template-columns:1fr; padding:60px 24px; gap:48px; }
   .community-channels { grid-template-columns:1fr; margin:0 24px 40px; }
   .videos-grid { grid-template-columns:1fr; margin:0; }
@@ -1391,57 +1391,60 @@ nav.scrolled {
 
 
 <!-- Global nautical background icons -->
-<svg class="nautical-bg-icons" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <g transform="translate(880,180)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
+<svg class="nautical-bg-icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <g transform="translate(88vw, 18vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
     <line x1="0" y1="-44" x2="0" y2="44"/><line x1="-44" y1="0" x2="44" y2="0"/>
     <line x1="-31" y1="-31" x2="31" y2="31"/><line x1="31" y1="-31" x2="-31" y2="31"/>
     <circle cx="0" cy="0" r="18"/><circle cx="0" cy="0" r="4" fill="currentColor"/>
     <polygon points="0,-44 -5,-20 0,-28 5,-20" fill="currentColor"/>
     <text x="5" y="-48" font-family="monospace" font-size="8" fill="currentColor" stroke="none">N</text>
   </g>
-  <g transform="translate(60,550)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
+  <g transform="translate(6vw, 55vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
     <line x1="0" y1="-32" x2="0" y2="32"/><line x1="-32" y1="0" x2="32" y2="0"/>
     <circle cx="0" cy="0" r="14"/><circle cx="0" cy="0" r="3" fill="currentColor"/>
     <polygon points="0,-32 -4,-14 0,-20 4,-14" fill="currentColor"/>
   </g>
-  <g transform="translate(920,820)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
+  <g transform="translate(92vw, 82vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
     <line x1="0" y1="-28" x2="0" y2="28"/><line x1="-28" y1="0" x2="28" y2="0"/>
     <circle cx="0" cy="0" r="12"/><circle cx="0" cy="0" r="2.5" fill="currentColor"/>
     <polygon points="0,-28 -3,-12 0,-17 3,-12" fill="currentColor"/>
   </g>
-  <g transform="translate(930,420)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
+  <g transform="translate(93vw, 42vh)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
     <circle cx="0" cy="-18" r="6"/><line x1="0" y1="-12" x2="0" y2="18"/>
     <line x1="-14" y1="-8" x2="14" y2="-8"/>
     <path d="M-14,18 Q-20,10 -14,6 M14,18 Q20,10 14,6"/>
     <circle cx="0" cy="18" r="2.5" fill="currentColor"/>
   </g>
-  <g transform="translate(80,780)" stroke="currentColor" stroke-width="1" fill="none" opacity=".04">
+  <g transform="translate(8vw, 78vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".04">
     <circle cx="0" cy="-14" r="5"/><line x1="0" y1="-9" x2="0" y2="14"/>
     <line x1="-11" y1="-6" x2="11" y2="-6"/>
     <path d="M-11,14 Q-16,8 -11,4 M11,14 Q16,8 11,4"/>
   </g>
-  <g transform="translate(100,280)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
+  <g transform="translate(10vw, 28vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
     <path d="M-30,0 Q-20,-12 -10,0 Q0,12 10,0 Q20,-12 30,0"/>
     <path d="M-30,10 Q-20,-2 -10,10 Q0,22 10,10 Q20,-2 30,10" opacity=".5"/>
   </g>
-  <g transform="translate(800,700)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
+  <g transform="translate(80vw, 70vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
     <path d="M-24,0 Q-16,-9 -8,0 Q0,9 8,0 Q16,-9 24,0"/>
     <path d="M-24,7 Q-16,-2 -8,7 Q0,16 8,7 Q16,-2 24,7" opacity=".5"/>
   </g>
-  <g transform="translate(520,900)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".04">
+  <g transform="translate(52vw, 90vh)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".04">
     <line x1="-20" y1="0" x2="20" y2="0"/><line x1="0" y1="-20" x2="0" y2="20"/>
     <line x1="-14" y1="-14" x2="14" y2="14" opacity=".4"/><line x1="14" y1="-14" x2="-14" y2="14" opacity=".4"/>
     <circle cx="0" cy="0" r="8" opacity=".5"/>
   </g>
-  <g transform="translate(500,80)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".035">
+  <g transform="translate(50vw, 8vh)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".035">
     <line x1="-24" y1="0" x2="24" y2="0"/><line x1="0" y1="-24" x2="0" y2="24"/>
     <circle cx="0" cy="0" r="10"/>
     <polygon points="0,-24 -3,-10 0,-15 3,-10" fill="currentColor"/>
   </g>
-  <g stroke="currentColor" stroke-width=".5" opacity=".04">
-    <line x1="20" y1="150" x2="32" y2="150"/><line x1="20" y1="300" x2="28" y2="300"/>
-    <line x1="20" y1="450" x2="32" y2="450"/><line x1="20" y1="600" x2="28" y2="600"/>
-    <line x1="20" y1="750" x2="32" y2="750"/><line x1="20" y1="900" x2="28" y2="900"/>
+  <g transform="translate(2vw, 0)" stroke="currentColor" stroke-width=".5" opacity=".04">
+    <line x1="0" y1="15vh" x2="12" y2="15vh"/>
+    <line x1="0" y1="30vh" x2="8" y2="30vh"/>
+    <line x1="0" y1="45vh" x2="12" y2="45vh"/>
+    <line x1="0" y1="60vh" x2="8" y2="60vh"/>
+    <line x1="0" y1="75vh" x2="12" y2="75vh"/>
+    <line x1="0" y1="90vh" x2="8" y2="90vh"/>
   </g>
 </svg>
 <!-- Corner coordinates -->
@@ -1774,12 +1777,31 @@ nav.scrolled {
     <div class="section-rule"></div>
   </div>
 
-  <div class="partners-grid" id="partners-grid">
-    <!-- loaded from Google Sheets -->
+  <div class="partners-grid-wrap">
+    <div class="partners-grid" id="partners-grid">
+      <!-- loaded from Google Sheets -->
+    </div>
   </div>
 </section>
 
 
+
+<!-- Partner Modal -->
+<div class="partner-modal" id="partner-modal" onclick="closePartnerModal()">
+  <div class="partner-modal-inner" onclick="event.stopPropagation()">
+    <button class="partner-modal-close" onclick="closePartnerModal()">&#10005;</button>
+    <div class="partner-modal-img" id="pm-partner-img">
+      <div class="partner-modal-img-placeholder" id="pm-partner-placeholder"></div>
+    </div>
+    <div class="partner-modal-body">
+      <div class="partner-modal-initial" id="pm-partner-initial"></div>
+      <div class="partner-modal-name" id="pm-partner-name"></div>
+      <div class="partner-modal-type" id="pm-partner-type"></div>
+      <div class="partner-modal-desc" id="pm-partner-desc"></div>
+      <div class="partner-modal-links" id="pm-partner-links"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Product Modal -->
 <div class="product-modal" id="product-modal" onclick="closeProductModal()">
@@ -2221,6 +2243,45 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+function openPartnerModal(p) {
+  var imgEl = document.getElementById('pm-partner-img');
+  var ph = document.getElementById('pm-partner-placeholder');
+  var existImg = imgEl.querySelector('img');
+  if (existImg) existImg.remove();
+  if (p.image) {
+    var img = document.createElement('img');
+    img.src = p.image;
+    imgEl.appendChild(img);
+    ph.style.display = 'none';
+  } else {
+    ph.style.display = 'block';
+    ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+  }
+  document.getElementById('pm-partner-initial').textContent = p.name ? p.name.charAt(0).toUpperCase() : '';
+  document.getElementById('pm-partner-name').textContent = p.name || '';
+  document.getElementById('pm-partner-type').textContent = p.type || '';
+  document.getElementById('pm-partner-desc').textContent = p.desc || p.description || '';
+  var linksEl = document.getElementById('pm-partner-links');
+  linksEl.innerHTML = '';
+  for (var n = 1; n <= 3; n++) {
+    var lbl = p['link' + n + '_label'];
+    var url = p['link' + n + '_url'];
+    if (lbl && url) {
+      var a = document.createElement('a');
+      a.className = 'partner-modal-link';
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = lbl + ' →';
+      linksEl.appendChild(a);
+    }
+  }
+  document.getElementById('partner-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePartnerModal() {
+  document.getElementById('partner-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function closeProductModal() {
   document.getElementById('product-modal').classList.remove('open');
   document.body.style.overflow = '';
@@ -2351,46 +2412,36 @@ function loadFromSheets() {
 }
 
 // ── PARTNERS ──
+var PARTNER_REGISTRY = [];
 function renderPartners(partners) {
   var grid = document.getElementById('partners-grid');
   if (!grid) return;
   if (!partners || partners.length === 0) {
-    grid.innerHTML = '<div style="padding:40px;opacity:.4;font-size:11px;letter-spacing:.15em;text-transform:uppercase">Partners coming soon</div>';
+    grid.innerHTML = '<div style="padding:40px;opacity:.4;font-size:11px;letter-spacing:.15em;text-transform:uppercase;grid-column:1/-1">Partners coming soon</div>';
     return;
   }
-  var delays = ['', ' reveal-delay-1', ' reveal-delay-2', ' reveal-delay-3'];
-  grid.innerHTML = partners.map(function(p, i) {
+  // Normalise keys
+  PARTNER_REGISTRY = partners.map(function(p) {
     var r = {};
     Object.keys(p).forEach(function(k){ r[k.toLowerCase().trim()] = (p[k] || '').trim(); });
-    var nm  = r.name  || '';
-    var ty  = r.type  || '';
-    var dsc = r.desc  || r.description || '';
+    return r;
+  });
+  grid.innerHTML = PARTNER_REGISTRY.map(function(r, i) {
+    var nm      = r.name || '';
+    var ty      = r.type || '';
     var initial = nm ? nm.charAt(0).toUpperCase() : '?';
-    var delay = delays[i % delays.length];
-
-    // Build up to 3 links
-    var links = '';
-    for (var n = 1; n <= 3; n++) {
-      var lbl = r['link' + n + '_label'];
-      var url = r['link' + n + '_url'];
-      if (lbl && url) {
-        links += '<a class="partner-link" href="' + url + '" target="_blank" rel="noopener">' + lbl + '</a>';
-      }
-    }
-
-    return '<div class="partner-card reveal-scale' + delay + '">' +
+    return '<div class="partner-card" data-idx="' + i + '">' +
       '<div class="partner-initial">' + initial + '</div>' +
       '<div class="partner-name">' + nm + '</div>' +
-      (ty  ? '<div class="partner-type">'  + ty  + '</div>' : '') +
-      (dsc ? '<div class="partner-desc" style="font-size:10px;opacity:.55;line-height:1.5;margin-top:2px">' + dsc + '</div>' : '') +
-      (links ? '<div class="partner-links">' + links + '</div>' : '') +
+      (ty ? '<div class="partner-type">' + ty + '</div>' : '') +
+      '<div class="partner-hint" style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div>' +
     '</div>';
   }).join('');
-  // Force visible — partners load async after observer setup
-  grid.querySelectorAll('.partner-card').forEach(function(el) {
-    el.style.opacity = '1';
-    el.style.transform = 'none';
-    el.style.animation = 'none';
+  grid.querySelectorAll('.partner-card').forEach(function(card) {
+    card.style.opacity = '1';
+    card.addEventListener('click', function() {
+      openPartnerModal(PARTNER_REGISTRY[parseInt(this.getAttribute('data-idx'))]);
+    });
   });
 }
 
