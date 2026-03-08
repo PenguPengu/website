@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Underway — Built for the Long Haul</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="config.js"></script>
 <style>
 /* ─── RESET & BASE ─── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -1302,25 +1303,25 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
 <div class="cursor-dot" id="cursor-dot"></div>
 
 <svg class="nautical-bg-icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <g transform="translate(88vw, 18vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
+  <g transform="translate(1267, 162)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
     <line x1="0" y1="-44" x2="0" y2="44"/><line x1="-44" y1="0" x2="44" y2="0"/>
     <line x1="-31" y1="-31" x2="31" y2="31"/><line x1="31" y1="-31" x2="-31" y2="31"/>
     <circle cx="0" cy="0" r="18"/><circle cx="0" cy="0" r="4" fill="currentColor"/>
     <polygon points="0,-44 -5,-20 0,-28 5,-20" fill="currentColor"/>
     <text x="5" y="-48" font-family="monospace" font-size="8" fill="currentColor" stroke="none">N</text>
   </g>
-  <g transform="translate(6vw, 55vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
+  <g transform="translate(86, 495)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
     <line x1="0" y1="-32" x2="0" y2="32"/><line x1="-32" y1="0" x2="32" y2="0"/>
     <circle cx="0" cy="0" r="14"/><circle cx="0" cy="0" r="3" fill="currentColor"/>
     <polygon points="0,-32 -4,-14 0,-20 4,-14" fill="currentColor"/>
   </g>
-  <g transform="translate(93vw, 42vh)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
+  <g transform="translate(1339, 378)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
     <circle cx="0" cy="-18" r="6"/><line x1="0" y1="-12" x2="0" y2="18"/>
     <line x1="-14" y1="-8" x2="14" y2="-8"/>
     <path d="M-14,18 Q-20,10 -14,6 M14,18 Q20,10 14,6"/>
     <circle cx="0" cy="18" r="2.5" fill="currentColor"/>
   </g>
-  <g transform="translate(10vw, 28vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
+  <g transform="translate(144, 252)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
     <path d="M-30,0 Q-20,-12 -10,0 Q0,12 10,0 Q20,-12 30,0"/>
     <path d="M-30,10 Q-20,-2 -10,10 Q0,22 10,10 Q20,-2 30,10" opacity=".5"/>
   </g>
@@ -2362,8 +2363,10 @@ if (TEST_MODE) {
 
 // ── YOUTUBE LATEST VIDEOS ──
 document.addEventListener('DOMContentLoaded', function() {
+  if (typeof UNDERWAY_CONFIG === 'undefined') { console.warn('config.js not loaded — YouTube disabled'); return; }
   var YT_KEY = UNDERWAY_CONFIG.ytKey;
   var YT_CHANNEL = UNDERWAY_CONFIG.ytChannelId;
+  if (!YT_KEY || !YT_CHANNEL) { console.warn('YouTube API key or channel ID missing in config.js'); return; }
 
   function timeAgo(dateStr) {
     var diff = (Date.now() - new Date(dateStr)) / 1000;
