@@ -1062,7 +1062,7 @@ footer {
 
 .product-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
 .product-modal.open { display:flex; }
-.product-modal-inner { background:var(--cream); color:var(--navy); width:min(1100px,95vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
+.product-modal-inner { background:var(--cream); color:var(--navy); width:min(1400px,97vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
 .product-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .product-modal-close:hover { opacity:.9; }
 .product-modal-layout { display:grid; grid-template-columns:1fr 1fr; min-height:480px; }
@@ -1092,7 +1092,7 @@ footer {
 .pm-lightbox-nav.prev { left:20px; }
 .pm-lightbox-nav.next { right:20px; }
 .pm-lightbox-counter { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.5); font-family:var(--mono); font-size:10px; letter-spacing:.2em; }
-.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; max-height:70vh; }
+.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; max-height:70vh; min-width:380px; }
 .product-modal-content::-webkit-scrollbar { width:3px; }
 .product-modal-content::-webkit-scrollbar-track { background:transparent; }
 .product-modal-content::-webkit-scrollbar-thumb { background:rgba(25,41,58,.15); }
@@ -1864,7 +1864,7 @@ nav.scrolled {
         <div class="product-modal-type" id="pm-type"></div>
         <div class="product-modal-desc" id="pm-desc"></div>
         <div class="product-modal-details" id="pm-details"></div>
-        <button class="product-modal-cta" id="pm-cta" onclick="closeProductModal()">Request a Quote</button>
+        <button class="product-modal-cta" id="pm-cta">Request a Quote</button>
       </div>
     </div>
     <div class="product-modal-discord" id="pm-discord">
@@ -2162,7 +2162,7 @@ function pmShowImage(idx) {
     img.onload = function() {
       var ratio = img.naturalWidth / img.naturalHeight;
       var layout = document.querySelector('.product-modal-layout');
-      var maxImgW = Math.min(window.innerWidth * 0.93 - 48 - 320, 900);
+      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - 380, 1000);
       var imgColW = Math.max(300, Math.min(Math.round(480 * ratio), maxImgW));
       layout.style.gridTemplateColumns = imgColW + 'px 1fr';
       var maxH = Math.round(window.innerHeight * 0.65);
@@ -2240,7 +2240,7 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
         if (!img.naturalWidth) return;
         var ratio = img.naturalWidth / img.naturalHeight;
         var layout = document.querySelector('.product-modal-layout');
-        var maxImgW = Math.min(window.innerWidth * 0.93 - 48 - 320, 900);
+        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - 380, 1000);
         var imgColW = Math.max(300, Math.min(Math.round(480 * ratio), maxImgW));
         layout.style.gridTemplateColumns = imgColW + 'px 1fr';
         var maxH = Math.round(window.innerHeight * 0.65);
