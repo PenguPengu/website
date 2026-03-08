@@ -2286,7 +2286,13 @@ function loadFromSheets() {
     .catch(function() { renderProducts(FALLBACK_PRODUCTS); });
 }
 
-loadFromSheets();
+// ── TEST MODE ── set to false to load live from Google Sheets
+var TEST_MODE = false;
+if (TEST_MODE) {
+  renderProducts(FALLBACK_PRODUCTS);
+} else {
+  loadFromSheets();
+}
 </script>
 
 <!-- ═══ GALLERY PAGE (SPA) ═══ -->
