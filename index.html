@@ -2408,7 +2408,59 @@ function loadFromSheets() {
     .catch(function() { renderComingSoon(); });
 }
 
-loadFromSheets();
+// ── TEST MODE ── set to false to load from Google Sheets
+var TEST_MODE = true;
+if (TEST_MODE) {
+  var testProducts = [
+    {
+      name: 'Harbour Cleat Mk.II',
+      type: 'Deck Hardware',
+      status: 'Active',
+      desc: 'Heavy-duty cast stainless cleat rated to 4,000kg load. Designed for commercial quay installations and high-traffic berths.',
+      details: 'Material: 316L Stainless\nRating: 4,000kg\nMount: 4x M12 bolts\nFinish: Satin\nLength: 250mm',
+      cta: 'Request a Quote',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1200&q=80,https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80,https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+      dc_channel: 'hardware', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'NavChart Pro',
+      type: 'Navigation Software',
+      status: 'Active',
+      desc: 'Offline-capable chart plotter with real-time AIS overlay, tidal data, and voyage logging for professional mariners.',
+      details: 'Platform: iOS / Android / Web\nCharts: BSB4, S-57 ENC\nAIS: Built-in\nOffline: Full chart cache\nLicence: Annual subscription',
+      cta: 'Download Free Trial',
+      cta_url: 'https://example.com',
+      image: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&q=80,https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
+      dc_channel: 'software', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'Storm Mooring Kit',
+      type: 'Safety Equipment',
+      status: 'In Development',
+      desc: 'Emergency mooring system rated for Force 10 conditions. Includes 3x bridle lines, chafe guards, and quick-release shackles.',
+      details: 'Lines: 3x 16mm nylon\nBreaking load: 6,200kg\nChafe guards: Leather + neoprene\nShackles: 316 SS quick-release\nBag: Waterproof roll-top',
+      cta: 'Join Waitlist',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1500514966906-fe245eea9344?w=1200&q=80,https://images.unsplash.com/photo-1530053969600-caed2596d242?w=1200&q=80,https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=1200&q=80,https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=1200&q=80',
+      dc_channel: 'safety', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'Tidal Anchor Pro',
+      type: 'Ground Tackle',
+      status: 'Coming Soon',
+      desc: 'Next-generation scoop anchor with auto-resetting shank. Proven in 200+ commercial deployments across tidal rivers and offshore anchorages.',
+      details: 'Weight: 25kg\nRating: Vessels to 25m\nShank: Hinged auto-reset\nFinish: Hot-dip galvanised\nChain: 10mm calibrated',
+      cta: 'Notify Me',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80,https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+      dc_channel: 'tackle', dc_title: '', dc_body: '', dc_meta: ''
+    }
+  ];
+  renderProducts(testProducts);
+} else {
+  loadFromSheets();
+}
 </script>
 
 <!-- ═══ GALLERY PAGE (SPA) ═══ -->
