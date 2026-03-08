@@ -2229,36 +2229,26 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
     var showNav = pmImages.length > 1;
     main.innerHTML =
       '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);" onerror="this.parentElement.innerHTML=\'<div class=pm-placeholder style=width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px><span style=font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase>Photos coming soon</span></div>\'">' +
-
-    // After injecting, detect aspect ratio and resize the image column
-    (function(){
-      setTimeout(function(){
-        var img = main.querySelector('.pm-main-img');
-        if (!img) return;
-        function applyRatio() {
-          var ratio = img.naturalWidth / img.naturalHeight;
-          var layout = document.querySelector('.product-modal-layout');
-          var contentMinW = 320; // min px for the text column
-          var maxVw = window.innerWidth * 0.93 - 48; // 95vw minus padding
-          var maxImgW = Math.min(maxVw - contentMinW, 900); // cap image column
-          var imgH = 480; // baseline height
-          var idealW = Math.round(imgH * ratio);
-          var imgColW = Math.max(300, Math.min(idealW, maxImgW));
-          layout.style.gridTemplateColumns = imgColW + 'px 1fr';
-          // Also set the img-main height to match aspect ratio up to viewport
-          var maxH = Math.round(window.innerHeight * 0.65);
-          var finalH = Math.min(Math.round(imgColW / ratio), maxH);
-          main.style.minHeight = finalH + 'px';
-        }
-        if (img.complete && img.naturalWidth) { applyRatio(); }
-        else { img.addEventListener('load', applyRatio); }
-      }, 0);
-      return '';
-    })()
       (showNav ? '<button class="pm-img-nav prev" onclick="event.stopPropagation();pmShowImage(pmCurrentImg-1)">&#8592;</button>' : '') +
       (showNav ? '<button class="pm-img-nav next" onclick="event.stopPropagation();pmShowImage(pmCurrentImg+1)">&#8594;</button>' : '') +
       (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
     main.onclick = function() { pmOpenLightbox(pmCurrentImg); };
+    setTimeout(function(){
+      var img = main.querySelector('.pm-main-img');
+      if (!img) return;
+      function applyRatio() {
+        if (!img.naturalWidth) return;
+        var ratio = img.naturalWidth / img.naturalHeight;
+        var layout = document.querySelector('.product-modal-layout');
+        var maxImgW = Math.min(window.innerWidth * 0.93 - 48 - 320, 900);
+        var imgColW = Math.max(300, Math.min(Math.round(480 * ratio), maxImgW));
+        layout.style.gridTemplateColumns = imgColW + 'px 1fr';
+        var maxH = Math.round(window.innerHeight * 0.65);
+        main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+      }
+      if (img.complete && img.naturalWidth) { applyRatio(); }
+      else { img.addEventListener('load', applyRatio); }
+    }, 0);
 
     // Thumbnail strip
     if (pmImages.length > 1) {
