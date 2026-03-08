@@ -1065,7 +1065,7 @@ footer {
 .product-modal-inner { background:var(--cream); color:var(--navy); width:min(1400px,97vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
 .product-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .product-modal-close:hover { opacity:.9; }
-.product-modal-layout { display:grid; grid-template-columns:1fr 1fr; min-height:480px; }
+.product-modal-layout { display:grid; grid-template-columns:480px 1fr; min-height:480px; }
 .product-modal-images { background:rgba(25,41,58,.05); border-right:1px solid rgba(25,41,58,.1); display:flex; flex-direction:column; position:relative; }
 .product-modal-img-main { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px; position:relative; overflow:hidden; cursor:zoom-in; }
 .product-modal-img-main img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:rgba(25,41,58,.04); }
@@ -2160,12 +2160,14 @@ function pmShowImage(idx) {
   if (img) {
     img.src = pmImages[idx];
     img.onload = function() {
+      if (!img.naturalWidth) return;
       var ratio = img.naturalWidth / img.naturalHeight;
+      var contentW = 420;
       var layout = document.querySelector('.product-modal-layout');
-      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - 380, 1000);
-      var imgColW = Math.max(300, Math.min(Math.round(480 * ratio), maxImgW));
-      layout.style.gridTemplateColumns = imgColW + 'px 1fr';
-      var maxH = Math.round(window.innerHeight * 0.65);
+      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
+      var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
+      layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
+      var maxH = Math.round(window.innerHeight * 0.7);
       main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
     };
   }
@@ -2224,26 +2226,31 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   var main = document.getElementById('pm-img-main');
   var thumbStrip = document.getElementById('pm-thumb-strip');
 
+  var layout = document.querySelector('.product-modal-layout');
+  var contentW = 420; // right side always stays this wide
   if (pmImages.length > 0) {
     main.style.cursor = 'zoom-in';
     var showNav = pmImages.length > 1;
     main.innerHTML =
-      '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);" onerror="this.parentElement.innerHTML=\'<div class=pm-placeholder style=width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px><span style=font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase>Photos coming soon</span></div>\'">' +
+      '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);" onerror="this.style.display=\'none\';this.parentElement.querySelector(\'.pm-placeholder\').style.display=\'flex\'">' +
+      '<div class="pm-placeholder" style="display:none;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase">Photos coming soon</span></div>' +
       (showNav ? '<button class="pm-img-nav prev" onclick="event.stopPropagation();pmShowImage(pmCurrentImg-1)">&#8592;</button>' : '') +
       (showNav ? '<button class="pm-img-nav next" onclick="event.stopPropagation();pmShowImage(pmCurrentImg+1)">&#8594;</button>' : '') +
       (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
     main.onclick = function() { pmOpenLightbox(pmCurrentImg); };
+    // Set a sensible default width immediately, then refine once image loads
+    layout.style.gridTemplateColumns = '480px ' + contentW + 'px';
+    main.style.minHeight = '480px';
     setTimeout(function(){
       var img = main.querySelector('.pm-main-img');
       if (!img) return;
       function applyRatio() {
         if (!img.naturalWidth) return;
         var ratio = img.naturalWidth / img.naturalHeight;
-        var layout = document.querySelector('.product-modal-layout');
-        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - 380, 1000);
-        var imgColW = Math.max(300, Math.min(Math.round(480 * ratio), maxImgW));
-        layout.style.gridTemplateColumns = imgColW + 'px 1fr';
-        var maxH = Math.round(window.innerHeight * 0.65);
+        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
+        var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
+        layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
+        var maxH = Math.round(window.innerHeight * 0.7);
         main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
       }
       if (img.complete && img.naturalWidth) { applyRatio(); }
@@ -2260,9 +2267,12 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
       thumbStrip.style.display = 'none';
     }
   } else {
+    // No images — square placeholder, equal columns
+    layout.style.gridTemplateColumns = contentW + 'px ' + contentW + 'px';
+    main.style.minHeight = contentW + 'px';
     main.style.cursor = 'default';
     main.onclick = null;
-    main.innerHTML = '<div class="pm-placeholder"><svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:80px;opacity:.12"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z"/></svg><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span></div>';
+    main.innerHTML = '<div class="pm-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:72px;opacity:.1"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span></div>';
     thumbStrip.style.display = 'none';
   }
 
@@ -2343,9 +2353,10 @@ function renderProducts(products) {
   var grid = document.getElementById('products-grid');
   grid.innerHTML = products.map(function(p, i) {
     var num = String(i + 1).padStart(2, '0');
-    var st = p.status || p.Status || '';
-    var nm = p.name || p.Name || '';
-    var ty = p.type || p.Type || '';
+    var lower = {}; Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
+    var st = lower.status || '';
+    var nm = lower.name || '';
+    var ty = lower.type || '';
     return '<div class="product-card anim" data-idx="' + i + '">' +
       '<div class="product-card-header">' +
         '<span class="product-number">' + num + '</span>' +
@@ -2353,7 +2364,7 @@ function renderProducts(products) {
       '</div>' +
       '<div class="product-name">' + nm + '</div>' +
       '<div class="product-type">' + ty + '</div>' +
-      '<p class="product-desc">' + (p.desc || p.Description || '') + '</p>' +
+      '<p class="product-desc">' + (lower.desc || lower.description || '') + '</p>' +
       '<div class="product-card-hint">Click to view</div>' +
     '</div>';
   }).join('');
@@ -2362,20 +2373,27 @@ function renderProducts(products) {
       var idx = parseInt(this.getAttribute('data-idx'));
       var p = PRODUCT_REGISTRY[idx];
       var num = String(idx + 1).padStart(2, '0');
+      // Case-insensitive field lookup
+      function col(p) {
+        var lower = {};
+        Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
+        return lower;
+      }
+      var r = col(p);
       openProductModal(
         num,
-        p.status || p.Status || '',
-        p.name || p.Name || '',
-        p.type || p.Type || '',
-        p.desc || p.Description || '',
-        p.details || p.Details || '',
-        p.cta || p.CTA || 'Request a Quote',
-        p.dc_channel || p.DC_Channel || '',
-        p.dc_title || p.DC_Title || '',
-        p.dc_body || p.DC_Body || '',
-        p.dc_meta || p.DC_Meta || '',
-        p.image || p.Image || '',
-        p.cta_url || p.CTA_URL || ''
+        r.status || '',
+        r.name || '',
+        r.type || '',
+        r.desc || r.description || '',
+        r.details || '',
+        r.cta || 'Request a Quote',
+        r.dc_channel || '',
+        r.dc_title || '',
+        r.dc_body || '',
+        r.dc_meta || '',
+        r.image || '',
+        r.cta_url || ''
       );
     });
   });
