@@ -813,37 +813,42 @@ nav {
 .partner-modal.open { display:flex; }
 .partner-modal-inner {
   background:var(--cream); color:var(--navy);
-  width:min(680px,95vw);
+  width:min(720px,95vw);
   position:relative; max-height:90vh; overflow-y:auto;
   display:flex; flex-direction:column;
 }
 .partner-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .partner-modal-close:hover { opacity:.9; }
 
-/* Both image modes are squares — logo is padded/contained, picture is cover cropped */
-.partner-modal-img-square {
-  width:160px; height:160px;
-  flex-shrink:0;
+/* Banner mode (default): full-width image at top */
+.partner-modal-img-banner {
+  width:100%; height:200px; flex-shrink:0;
   background:rgba(25,41,58,.06);
-  border:1px solid var(--border);
+  border-bottom:1px solid var(--border);
   display:flex; align-items:center; justify-content:center;
   overflow:hidden; position:relative;
 }
-.partner-modal-img-square.logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:16px; }
-.partner-modal-img-square.picture img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.partner-modal-img-placeholder { font-family:var(--serif); font-size:72px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
+.partner-modal-img-banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.partner-modal-img-placeholder { font-family:var(--serif); font-size:80px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
 
-/* Body: side by side — image left, text right */
-.partner-modal-body {
-  padding:40px 48px;
-  display:flex; flex-direction:row; gap:32px; align-items:flex-start;
+/* Logo mode: square thumbnail beside text, no border */
+.partner-modal-img-logo {
+  width:140px; height:140px; flex-shrink:0;
+  background:rgba(25,41,58,.04);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; position:relative;
 }
-.partner-modal-body-text { display:flex; flex-direction:column; gap:10px; flex:1; min-width:0; }
-.partner-modal-initial { font-family:var(--serif); font-size:48px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-6px; }
+.partner-modal-img-logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:12px; }
+
+/* Body layout */
+.partner-modal-body { padding:40px 48px; display:flex; flex-direction:column; gap:12px; }
+.partner-modal-body-row { display:flex; flex-direction:row; gap:28px; align-items:flex-start; }
+.partner-modal-body-text { display:flex; flex-direction:column; gap:8px; flex:1; min-width:0; }
+.partner-modal-initial { font-family:var(--serif); font-size:48px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-4px; }
 .partner-modal-name { font-family:var(--serif); font-size:28px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
-.partner-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; }
-.partner-modal-desc { font-size:12px; line-height:1.85; opacity:.6; border-top:1px solid rgba(25,41,58,.08); padding-top:14px; margin-top:2px; }
-.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; border-top:1px solid rgba(25,41,58,.08); padding-top:16px; margin-top:2px; }
+.partner-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; margin-bottom:4px; }
+.partner-modal-desc { font-size:12px; line-height:1.85; opacity:.6; border-top:1px solid rgba(25,41,58,.08); padding-top:16px; }
+.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; border-top:1px solid rgba(25,41,58,.08); padding-top:16px; }
 .partner-modal-link {
   font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
   color:var(--navy); border:1px solid rgba(25,41,58,.3); padding:10px 20px;
@@ -1799,15 +1804,20 @@ nav.scrolled {
 <div class="partner-modal" id="partner-modal" onclick="closePartnerModal()">
   <div class="partner-modal-inner" onclick="event.stopPropagation()">
     <button class="partner-modal-close" onclick="closePartnerModal()">&#10005;</button>
+    <!-- banner image goes here when not logo mode -->
+    <div id="pm-partner-banner"></div>
     <div class="partner-modal-body">
-      <div id="pm-partner-img-wrap"></div>
-      <div class="partner-modal-body-text">
-        <div class="partner-modal-initial" id="pm-partner-initial"></div>
-        <div class="partner-modal-name" id="pm-partner-name"></div>
-        <div class="partner-modal-type" id="pm-partner-type"></div>
-        <div class="partner-modal-desc" id="pm-partner-desc"></div>
-        <div class="partner-modal-links" id="pm-partner-links"></div>
+      <!-- logo mode: row with image + text side by side -->
+      <div class="partner-modal-body-row">
+        <div id="pm-partner-logo"></div>
+        <div class="partner-modal-body-text">
+          <div class="partner-modal-initial" id="pm-partner-initial"></div>
+          <div class="partner-modal-name" id="pm-partner-name"></div>
+          <div class="partner-modal-type" id="pm-partner-type"></div>
+        </div>
       </div>
+      <div class="partner-modal-desc" id="pm-partner-desc"></div>
+      <div class="partner-modal-links" id="pm-partner-links"></div>
     </div>
   </div>
 </div>
@@ -2253,32 +2263,52 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.body.style.overflow = 'hidden';
 }
 function openPartnerModal(p) {
-  var wrap = document.getElementById('pm-partner-img-wrap');
-  wrap.innerHTML = '';
-
-  // image_type: 'logo' = contained (object-fit:contain), anything else = cover-cropped square
   var isLogo = (p.image_type || '').toLowerCase().trim() === 'logo';
-  var container = document.createElement('div');
-  container.className = 'partner-modal-img-square ' + (isLogo ? 'logo' : 'picture');
-  if (p.image) {
-    var img = document.createElement('img');
-    img.src = p.image;
-    container.appendChild(img);
+  var bannerEl = document.getElementById('pm-partner-banner');
+  var logoEl   = document.getElementById('pm-partner-logo');
+  bannerEl.innerHTML = '';
+  logoEl.innerHTML   = '';
+
+  if (isLogo) {
+    // Square logo beside the text — no border
+    var logoWrap = document.createElement('div');
+    logoWrap.className = 'partner-modal-img-logo';
+    if (p.image) {
+      var img = document.createElement('img');
+      img.src = p.image;
+      logoWrap.appendChild(img);
+    } else {
+      var ph = document.createElement('div');
+      ph.className = 'partner-modal-img-placeholder';
+      ph.style.fontSize = '48px';
+      ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+      logoWrap.appendChild(ph);
+    }
+    logoEl.appendChild(logoWrap);
   } else {
-    var ph = document.createElement('div');
-    ph.className = 'partner-modal-img-placeholder';
-    ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
-    container.appendChild(ph);
+    // Full-width banner at top
+    var bannerWrap = document.createElement('div');
+    bannerWrap.className = 'partner-modal-img-banner';
+    if (p.image) {
+      var img = document.createElement('img');
+      img.src = p.image;
+      bannerWrap.appendChild(img);
+    } else {
+      var ph = document.createElement('div');
+      ph.className = 'partner-modal-img-placeholder';
+      ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+      bannerWrap.appendChild(ph);
+    }
+    bannerEl.appendChild(bannerWrap);
   }
-  wrap.appendChild(container);
 
   document.getElementById('pm-partner-initial').textContent = p.name ? p.name.charAt(0).toUpperCase() : '';
-  document.getElementById('pm-partner-name').textContent = p.name || '';
-  document.getElementById('pm-partner-type').textContent = p.type || '';
+  document.getElementById('pm-partner-name').textContent   = p.name || '';
+  document.getElementById('pm-partner-type').textContent   = p.type || '';
 
-  var descEl = document.getElementById('pm-partner-desc');
   var descText = p.desc || p.description || '';
-  descEl.textContent = descText;
+  var descEl = document.getElementById('pm-partner-desc');
+  descEl.textContent  = descText;
   descEl.style.display = descText ? 'block' : 'none';
 
   var linksEl = document.getElementById('pm-partner-links');
@@ -2291,9 +2321,8 @@ function openPartnerModal(p) {
       hasLinks = true;
       var a = document.createElement('a');
       a.className = 'partner-modal-link';
-      var href = url;
-      if (href && !href.match(/^https?:\/\//)) href = 'https://' + href;
-      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      if (url && url.indexOf('http') !== 0) url = 'https://' + url;
+      a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
       a.textContent = lbl + ' →';
       linksEl.appendChild(a);
     }
