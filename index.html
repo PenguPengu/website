@@ -2420,13 +2420,16 @@ function renderPartners(partners) {
 
 function loadPartners() {
   fetch(PARTNERS_URL)
-    .then(function(res) { if (!res.ok) throw new Error('fail'); return res.text(); })
+    .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
     .then(function(text) {
       var rows = parseCSV(text);
+      console.log('Partners loaded:', rows.length, 'rows', rows[0] ? Object.keys(rows[0]) : '');
       renderPartners(rows);
     })
-    .catch(function() {
-      // silently hide partners section or leave blank on error
+    .catch(function(err) {
+      console.error('Partners fetch error:', err);
+      var grid = document.getElementById('partners-grid');
+      if (grid) grid.innerHTML = '<div style="padding:40px;grid-column:1/-1;font-size:10px;opacity:.4;letter-spacing:.1em">Partners loading failed — check console.</div>';
     });
 }
 
