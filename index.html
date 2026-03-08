@@ -1062,7 +1062,7 @@ footer {
 
 .product-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
 .product-modal.open { display:flex; }
-.product-modal-inner { background:var(--cream); color:var(--navy); width:min(900px,95vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
+.product-modal-inner { background:var(--cream); color:var(--navy); width:min(1100px,95vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
 .product-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .product-modal-close:hover { opacity:.9; }
 .product-modal-layout { display:grid; grid-template-columns:1fr 1fr; min-height:480px; }
@@ -2156,16 +2156,23 @@ function pmShowImage(idx) {
   idx = ((idx % pmImages.length) + pmImages.length) % pmImages.length;
   pmCurrentImg = idx;
   var main = document.getElementById('pm-img-main');
-  // update main image
   var img = main.querySelector('img.pm-main-img');
-  if (img) img.src = pmImages[idx];
-  // update counter
+  if (img) {
+    img.src = pmImages[idx];
+    img.onload = function() {
+      var ratio = img.naturalWidth / img.naturalHeight;
+      var layout = document.querySelector('.product-modal-layout');
+      var maxImgW = Math.min(window.innerWidth * 0.93 - 48 - 320, 900);
+      var imgColW = Math.max(300, Math.min(Math.round(480 * ratio), maxImgW));
+      layout.style.gridTemplateColumns = imgColW + 'px 1fr';
+      var maxH = Math.round(window.innerHeight * 0.65);
+      main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+    };
+  }
   var counter = main.querySelector('.pm-img-counter');
   if (counter) counter.textContent = (idx + 1) + ' / ' + pmImages.length;
-  // update thumbs
   var thumbs = document.querySelectorAll('.pm-thumb');
   thumbs.forEach(function(t, i) { t.classList.toggle('active', i === idx); });
-  // show/hide nav arrows
   var showNav = pmImages.length > 1;
   main.querySelectorAll('.pm-img-nav').forEach(function(n) { n.style.display = showNav ? 'flex' : 'none'; });
 }
@@ -2210,8 +2217,8 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
     if (cta_url) { window.open(cta_url, '_blank'); } else { closeProductModal(); }
   };
 
-  // Parse images — comma-separated URLs
-  pmImages = imageStr ? imageStr.split(',').map(function(s){ return s.trim(); }).filter(Boolean) : [];
+  // Parse images — comma-separated URLs, strip blanks and obviously invalid entries
+  pmImages = imageStr ? imageStr.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4 && s.indexOf('.') !== -1; }) : [];
   pmCurrentImg = 0;
 
   var main = document.getElementById('pm-img-main');
@@ -2221,7 +2228,33 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
     main.style.cursor = 'zoom-in';
     var showNav = pmImages.length > 1;
     main.innerHTML =
-      '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);">' +
+      '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);" onerror="this.parentElement.innerHTML=\'<div class=pm-placeholder style=width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px><span style=font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase>Photos coming soon</span></div>\'">' +
+
+    // After injecting, detect aspect ratio and resize the image column
+    (function(){
+      setTimeout(function(){
+        var img = main.querySelector('.pm-main-img');
+        if (!img) return;
+        function applyRatio() {
+          var ratio = img.naturalWidth / img.naturalHeight;
+          var layout = document.querySelector('.product-modal-layout');
+          var contentMinW = 320; // min px for the text column
+          var maxVw = window.innerWidth * 0.93 - 48; // 95vw minus padding
+          var maxImgW = Math.min(maxVw - contentMinW, 900); // cap image column
+          var imgH = 480; // baseline height
+          var idealW = Math.round(imgH * ratio);
+          var imgColW = Math.max(300, Math.min(idealW, maxImgW));
+          layout.style.gridTemplateColumns = imgColW + 'px 1fr';
+          // Also set the img-main height to match aspect ratio up to viewport
+          var maxH = Math.round(window.innerHeight * 0.65);
+          var finalH = Math.min(Math.round(imgColW / ratio), maxH);
+          main.style.minHeight = finalH + 'px';
+        }
+        if (img.complete && img.naturalWidth) { applyRatio(); }
+        else { img.addEventListener('load', applyRatio); }
+      }, 0);
+      return '';
+    })()
       (showNav ? '<button class="pm-img-nav prev" onclick="event.stopPropagation();pmShowImage(pmCurrentImg-1)">&#8592;</button>' : '') +
       (showNav ? '<button class="pm-img-nav next" onclick="event.stopPropagation();pmShowImage(pmCurrentImg+1)">&#8594;</button>' : '') +
       (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
