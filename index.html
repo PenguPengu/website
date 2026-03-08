@@ -2228,11 +2228,18 @@ function renderGalleryFromSheet(rows) {
   var grid = document.getElementById('gallery-grid');
   if (!grid || rows.length === 0) return;
 
-  // Read contest metadata from row 1 extra columns if present
-  var first = rows[0];
-  var fl = {}; Object.keys(first).forEach(function(k){ fl[k.toLowerCase()] = first[k]; });
-  var contestOpen  = fl['contest_open'] === 'TRUE';
-  var theme        = fl['theme'] || '';
+  // Normalise all rows to lowercase keys
+  // Sheet schema: ID, Title, Description, Image, UserID, Hearts, Fire, Score, Timestamp, Contest_Open, Theme, OpenedAt
+  var normalised = rows.map(function(row) {
+    var r = {};
+    Object.keys(row).forEach(function(k){ r[k.toLowerCase().trim()] = (row[k] || '').trim(); });
+    return r;
+  });
+
+  // Read contest metadata from first row
+  var first = normalised[0];
+  var theme       = first['theme'] || '';
+  var contestOpen = first['contest_open'] === 'TRUE';
 
   // Update gallery prompt heading if theme is set
   if (theme) {
@@ -2240,27 +2247,28 @@ function renderGalleryFromSheet(rows) {
     var promptQuote = document.querySelector('.gallery-prompt-quote');
     if (promptTitle) promptTitle.textContent = theme;
     if (promptQuote) promptQuote.textContent = '"' + theme + '"';
+    // Also update main page comp bar
+    var compPromptText = document.querySelector('.comp-prompt-text');
+    if (compPromptText) compPromptText.textContent = '"' + theme + '"';
   }
 
-  // Sort by score descending
-  var sorted = rows.slice().sort(function(a, b) {
-    var aLow = {}; Object.keys(a).forEach(function(k){ aLow[k.toLowerCase()] = a[k]; });
-    var bLow = {}; Object.keys(b).forEach(function(k){ bLow[k.toLowerCase()] = b[k]; });
-    return (parseInt(bLow.score) || 0) - (parseInt(aLow.score) || 0);
+  // Sort by Score descending
+  var sorted = normalised.slice().sort(function(a, b) {
+    return (parseInt(b['score']) || 0) - (parseInt(a['score']) || 0);
   });
 
   var HEART_SVG = '<svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg>';
   var FIRE_SVG  = '<svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg>';
   var IMG_SVG   = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
 
-  function buildCard(row, prompt) {
-    var r = {}; Object.keys(row).forEach(function(k){ r[k.toLowerCase()] = row[k]; });
-    var imgUrl   = r.image || '';
-    var title    = r.title || 'Untitled';
-    var desc     = r.desc || r.description || '';
-    var userId   = r.userid || r.user_id || '';
-    var hearts   = parseInt(r.hearts) || 0;
-    var fire     = parseInt(r.fire) || 0;
+  function buildCard(r, prompt) {
+    // Exact column names (lowercased): id, title, description, image, userid, hearts, fire, score, timestamp, contest_open, theme, openedat
+    var imgUrl  = r['image'] || '';
+    var title   = r['title'] || 'Untitled';
+    var desc    = r['description'] || '';
+    var userId  = r['userid'] || '';
+    var hearts  = parseInt(r['hearts']) || 0;
+    var fire    = parseInt(r['fire']) || 0;
 
     var imgHtml = imgUrl
       ? '<img src="' + imgUrl + '" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display=\'none\'" alt="' + title + '">' + IMG_SVG
@@ -2282,15 +2290,15 @@ function renderGalleryFromSheet(rows) {
 
   var prompt = (theme || 'current').toLowerCase().replace(/\s+/g,'-');
 
-  // Full gallery grid
-  grid.innerHTML = sorted.map(function(row) { return buildCard(row, prompt); }).join('');
+  // Full gallery grid — sorted already normalised
+  grid.innerHTML = sorted.map(function(r) { return buildCard(r, prompt); }).join('');
 
-  // Teaser grid — top 3 by score on main page
+  // Teaser grid — top 3 by Score on main page
   var teaser = document.getElementById('photos-teaser-grid');
   if (teaser) {
     var top3 = sorted.slice(0, 3);
     if (top3.length > 0) {
-      teaser.innerHTML = top3.map(function(row) { return buildCard(row, prompt); }).join('');
+      teaser.innerHTML = top3.map(function(r) { return buildCard(r, prompt); }).join('');
     } else {
       teaser.innerHTML = '<div style="grid-column:1/-1;padding:48px 0;text-align:center;opacity:.35;font-size:13px;letter-spacing:.08em;text-transform:uppercase;">No submissions yet — be the first to enter</div>';
     }
