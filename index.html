@@ -1062,15 +1062,37 @@ footer {
 
 .product-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
 .product-modal.open { display:flex; }
-.product-modal-inner { background:var(--cream); color:var(--navy); width:auto; max-width:95vw; position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
+.product-modal-inner { background:var(--cream); color:var(--navy); width:min(1400px,97vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
 .product-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .product-modal-close:hover { opacity:.9; }
-.product-modal-layout { display:flex; flex-direction:row; }
-.product-modal-images { background:rgba(25,41,58,.05); border-right:1px solid rgba(25,41,58,.1); display:flex; flex-direction:column; flex-shrink:0; transition:width .2s; min-width:200px; }
-.product-modal-images.no-image { display:none; }
-.product-modal-img-main { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.product-modal-img-main img { width:100%; height:100%; object-fit:cover; display:block; }
-.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; width:460px; flex-shrink:0; }
+.product-modal-layout { display:grid; grid-template-columns:480px 1fr; min-height:480px; }
+.product-modal-images { background:rgba(25,41,58,.05); border-right:1px solid rgba(25,41,58,.1); display:flex; flex-direction:column; position:relative; }
+.product-modal-img-main { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px; position:relative; overflow:hidden; cursor:zoom-in; }
+.product-modal-img-main img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:rgba(25,41,58,.04); }
+.product-modal-img-main .pm-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:40px; width:100%; height:100%; }
+.pm-img-nav { position:absolute; top:50%; transform:translateY(-50%); background:var(--navy); color:var(--cream); border:none; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:5; opacity:0; transition:opacity .2s; font-size:16px; font-family:var(--mono); }
+.product-modal-images:hover .pm-img-nav { opacity:.8; }
+.pm-img-nav:hover { opacity:1 !important; }
+.pm-img-nav.prev { left:10px; }
+.pm-img-nav.next { right:10px; }
+.pm-img-counter { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(25,41,58,.6); color:var(--cream); font-family:var(--mono); font-size:9px; letter-spacing:.15em; padding:4px 10px; z-index:5; pointer-events:none; }
+.pm-thumb-strip { display:flex; gap:4px; padding:8px; border-top:1px solid rgba(25,41,58,.1); background:rgba(25,41,58,.03); flex-wrap:wrap; }
+.pm-thumb { width:48px; height:48px; object-fit:cover; cursor:pointer; border:2px solid transparent; opacity:.6; transition:.15s; flex-shrink:0; }
+.pm-thumb.active { border-color:var(--navy); opacity:1; }
+.pm-thumb:hover { opacity:1; }
+
+/* ── Lightbox ── */
+.pm-lightbox { display:none; position:fixed; inset:0; z-index:9000; background:rgba(10,16,22,.96); align-items:center; justify-content:center; }
+.pm-lightbox.open { display:flex; }
+.pm-lightbox-img { max-width:92vw; max-height:90vh; object-fit:contain; display:block; }
+.pm-lightbox-close { position:absolute; top:20px; right:28px; background:none; border:none; color:#fff; font-size:26px; cursor:pointer; font-family:var(--mono); opacity:.6; line-height:1; padding:4px 8px; }
+.pm-lightbox-close:hover { opacity:1; }
+.pm-lightbox-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.12); color:#fff; border:none; width:52px; height:52px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:22px; transition:.15s; font-family:var(--mono); }
+.pm-lightbox-nav:hover { background:rgba(255,255,255,.22); }
+.pm-lightbox-nav.prev { left:20px; }
+.pm-lightbox-nav.next { right:20px; }
+.pm-lightbox-counter { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.5); font-family:var(--mono); font-size:10px; letter-spacing:.2em; }
+.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; max-height:70vh; min-width:380px; }
 .product-modal-content::-webkit-scrollbar { width:3px; }
 .product-modal-content::-webkit-scrollbar-track { background:transparent; }
 .product-modal-content::-webkit-scrollbar-thumb { background:rgba(25,41,58,.15); }
@@ -1832,10 +1854,8 @@ nav.scrolled {
     <button class="product-modal-close" onclick="closeProductModal()">&#10005;</button>
     <div class="product-modal-layout">
       <div class="product-modal-images">
-        <div class="product-modal-img-main" id="pm-img-main">
-          <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:80px;opacity:.12"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z"/></svg>
-          <span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span>
-        </div>
+        <div class="product-modal-img-main" id="pm-img-main"></div>
+        <div class="pm-thumb-strip" id="pm-thumb-strip" style="display:none"></div>
       </div>
       <div class="product-modal-content">
         <div class="product-modal-num" id="pm-num"></div>
@@ -1844,7 +1864,7 @@ nav.scrolled {
         <div class="product-modal-type" id="pm-type"></div>
         <div class="product-modal-desc" id="pm-desc"></div>
         <div class="product-modal-details" id="pm-details"></div>
-        <button class="product-modal-cta" id="pm-cta" onclick="closeProductModal()">Request a Quote</button>
+        <button class="product-modal-cta" id="pm-cta">Request a Quote</button>
       </div>
     </div>
     <div class="product-modal-discord" id="pm-discord">
@@ -1864,6 +1884,15 @@ nav.scrolled {
       <iframe id="video-iframe" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
     </div>
   </div>
+</div>
+
+<!-- Lightbox -->
+<div class="pm-lightbox" id="pm-lightbox" onclick="pmLightboxClose()">
+  <button class="pm-lightbox-close" onclick="pmLightboxClose()">&#10005;</button>
+  <button class="pm-lightbox-nav prev" id="pm-lb-prev" onclick="event.stopPropagation();pmLightboxNav(-1)">&#8592;</button>
+  <img class="pm-lightbox-img" id="pm-lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <button class="pm-lightbox-nav next" id="pm-lb-next" onclick="event.stopPropagation();pmLightboxNav(1)">&#8594;</button>
+  <div class="pm-lightbox-counter" id="pm-lb-counter"></div>
 </div>
 
 <!-- ─── FOOTER ─── -->
@@ -2118,8 +2147,61 @@ var statusObserver = new IntersectionObserver(function(entries) {
   });
 }, { threshold: 0.1 });
 
+// Product Modal — multi-image gallery + lightbox
+var pmImages = [];
+var pmCurrentImg = 0;
+
+function pmShowImage(idx) {
+  if (!pmImages.length) return;
+  idx = ((idx % pmImages.length) + pmImages.length) % pmImages.length;
+  pmCurrentImg = idx;
+  var main = document.getElementById('pm-img-main');
+  var img = main.querySelector('img.pm-main-img');
+  if (img) {
+    img.src = pmImages[idx];
+    img.onload = function() {
+      if (!img.naturalWidth) return;
+      var ratio = img.naturalWidth / img.naturalHeight;
+      var contentW = 420;
+      var layout = document.querySelector('.product-modal-layout');
+      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
+      var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
+      layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
+      var maxH = Math.round(window.innerHeight * 0.7);
+      main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+    };
+  }
+  var counter = main.querySelector('.pm-img-counter');
+  if (counter) counter.textContent = (idx + 1) + ' / ' + pmImages.length;
+  var thumbs = document.querySelectorAll('.pm-thumb');
+  thumbs.forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+  var showNav = pmImages.length > 1;
+  main.querySelectorAll('.pm-img-nav').forEach(function(n) { n.style.display = showNav ? 'flex' : 'none'; });
+}
+
+function pmOpenLightbox(idx) {
+  pmCurrentImg = idx;
+  document.getElementById('pm-lb-img').src = pmImages[idx];
+  document.getElementById('pm-lb-counter').textContent = (idx + 1) + ' / ' + pmImages.length;
+  document.getElementById('pm-lb-prev').style.display = pmImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('pm-lb-next').style.display = pmImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('pm-lightbox').classList.add('open');
+}
+
+function pmLightboxNav(dir) {
+  var idx = ((pmCurrentImg + dir) % pmImages.length + pmImages.length) % pmImages.length;
+  pmCurrentImg = idx;
+  document.getElementById('pm-lb-img').src = pmImages[idx];
+  document.getElementById('pm-lb-counter').textContent = (idx + 1) + ' / ' + pmImages.length;
+  pmShowImage(idx);
+}
+
+function pmLightboxClose() {
+  document.getElementById('pm-lightbox').classList.remove('open');
+}
+
 // Product Modal
-function openProductModal(num, status, name, type, desc, details, cta, dc_channel, dc_title, dc_body, dc_meta, imgSrc) {
+function openProductModal(num, status, name, type, desc, details, cta, dc_channel, dc_title, dc_body, dc_meta, imageStr, cta_url) {
   var sc = { 'Active':'status-active', 'In Development':'status-dev', 'Coming Soon':'status-soon', 'In Dev':'status-dev' };
   document.getElementById('pm-num').textContent = num;
   var st = document.getElementById('pm-status');
@@ -2129,28 +2211,71 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.getElementById('pm-type').textContent = type;
   document.getElementById('pm-desc').textContent = desc;
   document.getElementById('pm-details').textContent = details;
-  document.getElementById('pm-cta').textContent = cta + ' ->';
-  // Show/hide image panel
-  var imgPanel = document.querySelector('.product-modal-images');
-  var imgMain  = document.getElementById('pm-img-main');
-  if (imgSrc) {
-    imgPanel.classList.remove('no-image');
-    imgPanel.style.width = '460px'; // default until image loads
-    var img = new Image();
-    img.onload = function() {
-      // Content panel is 460px tall (same as its width = square)
-      // Set image panel width so image fills full height at natural ratio
-      var panelH = document.querySelector('.product-modal-content').offsetHeight || 460;
-      var naturalW = Math.round(panelH * (img.naturalWidth / img.naturalHeight));
-      var clampedW = Math.max(200, Math.min(naturalW, window.innerWidth * 0.6));
-      imgPanel.style.width = clampedW + 'px';
-    };
-    img.src = imgSrc;
-    imgMain.innerHTML = '<img src="' + imgSrc + '" style="width:100%;height:100%;object-fit:cover;display:block;">';
+
+  // CTA button — use sheet text and url
+  var ctaBtn = document.getElementById('pm-cta');
+  ctaBtn.textContent = (cta || 'Request a Quote') + ' ->';
+  ctaBtn.onclick = function() {
+    if (cta_url) { window.open(cta_url, '_blank'); } else { closeProductModal(); }
+  };
+
+  // Parse images — comma-separated URLs, strip blanks and obviously invalid entries
+  pmImages = imageStr ? imageStr.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4 && s.indexOf('.') !== -1; }) : [];
+  pmCurrentImg = 0;
+
+  var main = document.getElementById('pm-img-main');
+  var thumbStrip = document.getElementById('pm-thumb-strip');
+
+  var layout = document.querySelector('.product-modal-layout');
+  var contentW = 420; // right side always stays this wide
+  if (pmImages.length > 0) {
+    main.style.cursor = 'zoom-in';
+    var showNav = pmImages.length > 1;
+    main.innerHTML =
+      '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);" onerror="this.style.display=\'none\';this.parentElement.querySelector(\'.pm-placeholder\').style.display=\'flex\'">' +
+      '<div class="pm-placeholder" style="display:none;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase">Photos coming soon</span></div>' +
+      (showNav ? '<button class="pm-img-nav prev" onclick="event.stopPropagation();pmShowImage(pmCurrentImg-1)">&#8592;</button>' : '') +
+      (showNav ? '<button class="pm-img-nav next" onclick="event.stopPropagation();pmShowImage(pmCurrentImg+1)">&#8594;</button>' : '') +
+      (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
+    main.onclick = function() { pmOpenLightbox(pmCurrentImg); };
+    // Set a sensible default width immediately, then refine once image loads
+    layout.style.gridTemplateColumns = '480px ' + contentW + 'px';
+    main.style.minHeight = '480px';
+    setTimeout(function(){
+      var img = main.querySelector('.pm-main-img');
+      if (!img) return;
+      function applyRatio() {
+        if (!img.naturalWidth) return;
+        var ratio = img.naturalWidth / img.naturalHeight;
+        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
+        var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
+        layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
+        var maxH = Math.round(window.innerHeight * 0.7);
+        main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+      }
+      if (img.complete && img.naturalWidth) { applyRatio(); }
+      else { img.addEventListener('load', applyRatio); }
+    }, 0);
+
+    // Thumbnail strip
+    if (pmImages.length > 1) {
+      thumbStrip.style.display = 'flex';
+      thumbStrip.innerHTML = pmImages.map(function(url, i) {
+        return '<img class="pm-thumb' + (i===0?' active':'') + '" src="' + url + '" onclick="pmShowImage(' + i + ')" alt="">';
+      }).join('');
+    } else {
+      thumbStrip.style.display = 'none';
+    }
   } else {
-    imgPanel.classList.add('no-image');
-    imgPanel.style.width = '';
+    // No images — square placeholder, equal columns
+    layout.style.gridTemplateColumns = contentW + 'px ' + contentW + 'px';
+    main.style.minHeight = contentW + 'px';
+    main.style.cursor = 'default';
+    main.onclick = null;
+    main.innerHTML = '<div class="pm-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:72px;opacity:.1"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span></div>';
+    thumbStrip.style.display = 'none';
   }
+
   var dcPanel = document.getElementById('pm-discord');
   if (dc_title) {
     document.getElementById('pm-dc-title').textContent = dc_title;
@@ -2182,45 +2307,24 @@ function closeVideoModal() {
 
 // Close modals on Escape
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeProductModal(); closeVideoModal(); }
+  if (e.key === 'Escape') { closeProductModal(); closeVideoModal(); pmLightboxClose(); }
+  if (e.key === 'ArrowLeft' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(-1);
+  if (e.key === 'ArrowRight' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(1);
 });
 
 // Google Sheets
 var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 var STATUS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
 
-var FALLBACK_PRODUCTS = [
-  { name:'Bollard Series', type:'Marine Hardware', status:'Active',
-    desc:'Cast iron and marine-grade steel bollards for commercial and private docks. Available in single and double-horn configurations from 5T to 100T SWL.',
-    details:'SWL range 5T-100T. Cast iron & stainless variants. Hot-dip galvanised finish. Custom powder coat options. BS EN 13411 compliant. 14-week lead time for bespoke orders.',
-    cta:'Request a Quote',
-    dc_channel:'#bollard-series', dc_title:'Series II in final testing — first look inside', dc_body:'Redesigned base casting, 40% improvement in corrosion resistance, and new anti-rotation collar. Rolling out Q3 2026.', dc_meta:'Posted by Underway_Official · Today' },
-  { name:'Fender Systems', type:'Impact Protection', status:'Active',
-    desc:'Cylindrical, D-type, and arch fenders in solid rubber or foam-filled construction. Designed for high-cycle berthing in commercial port environments.',
-    details:'Solid rubber & foam-filled. EPDM and SBR compounds. UV & saltwater resistant. Standard and custom profiles. Energy absorption from 0.3 to 420 kNm.',
-    cta:'Request a Quote',
-    dc_channel:'#fender-systems', dc_title:'D-Type lead times back to standard 3-week dispatch', dc_body:'Supply chain delays resolved. If you had a quote that lapsed, reach out and we will honour the original price.', dc_meta:'Posted by Jamie_UW · Yesterday' },
-  { name:'Mooring Systems', type:'Complete Solutions', status:'Active',
-    desc:'Engineered mooring arrangements for ferries, superyachts, and cargo vessels. Full site survey, design, supply, and installation available.',
-    details:'Full turnkey supply. Design-led approach. Compatibility with existing dock infrastructure. CAD drawings provided. Class approval documentation available.',
-    cta:'Request a Quote',
-    dc_channel:'#mooring-systems', dc_title:'Solent Marina install — Series I full setup', dc_body:'Six bollards, D-type fenders on pontoon fingers, heavy-duty cleats. Installed in a single day by a two-person crew.', dc_meta:'Posted by Underway_Official · 2 days ago' },
-  { name:'Dock Hardware', type:'Deck Fittings', status:'Active',
-    desc:'Cleats, fairleads, deck rings, capstans, and chain stoppers. Marine-grade 316L stainless throughout, with optional surface finishes to spec.',
-    details:'316L marine stainless. Investment cast and machined options. Polished, brushed, and matte finishes. 60+ standard SKUs. Bespoke profiles accepted.',
-    cta:'Request a Quote',
-    dc_channel:'#dock-hardware', dc_title:'New heavy-duty cleat range — catalogue updated', dc_body:'Six new SKUs added including a 316L offshore cleat rated to 8T. Full dimensional drawings available in #resources.', dc_meta:'Posted by Jamie_UW · 4 days ago' },
-  { name:'Rigging Lines', type:'Rope & Textile', status:'In Development',
-    desc:'High-modulus mooring lines in HMPE, polyester, and nylon constructions. Working load ratings from 2T to 250T for all berthing applications.',
-    details:'HMPE, polyester, nylon constructions. Eye splice, thimble, and shackle terminations. Swaged fittings on request. Full load test certification.',
-    cta:'Register Interest',
-    dc_channel:'#rigging-lines', dc_title:'Prototype samples out for testing with three partners', dc_body:'First batch of HMPE lines in testing. Feedback so far is strong on the eye splice. Targeting catalogue launch Q4 2026.', dc_meta:'Posted by Underway_Official · 1 week ago' },
-  { name:'Smart Monitoring', type:'IoT / Marine Tech', status:'Coming Soon',
-    desc:'Sensor-equipped bollards and fenders with real-time load monitoring, tidal compensation, and remote alerting via our vessel management dashboard.',
-    details:'Load cells integrated into bollard castings. LoRaWAN & cellular connectivity. Cloud dashboard. API access. Pilot programme launching Q3 2026.',
-    cta:'Join Waitlist',
-    dc_channel:'#smart-monitoring', dc_title:'Pilot programme — 4 spots remaining', dc_body:'6 of 10 spots taken. Pilot partners get 50% off hardware and direct engineering team access. DM us to register interest.', dc_meta:'Posted by Jamie_UW · 3 days ago' }
-];
+function renderComingSoon() {
+  var grid = document.getElementById('products-grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;">' +
+    '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(247,239,230,.2)" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d=\'M12 6v6l4 2\'/></svg>' +
+    '<div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream);letter-spacing:-.01em;">Catalogue Coming Soon</div>' +
+    '<div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range. Check back shortly or join our Discord for first access.</div>' +
+    '<a href=\"#discord\" style=\"margin-top:8px;background:var(--cream);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;padding:12px 28px;text-decoration:none;\">Join Discord &#8594;</a>' +
+  '</div>';
+}
 
 function parseCSV(text) {
   var lines = text.trim().split('\n');
@@ -2249,9 +2353,10 @@ function renderProducts(products) {
   var grid = document.getElementById('products-grid');
   grid.innerHTML = products.map(function(p, i) {
     var num = String(i + 1).padStart(2, '0');
-    var st = p.status || p.Status || '';
-    var nm = p.name || p.Name || '';
-    var ty = p.type || p.Type || '';
+    var lower = {}; Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
+    var st = lower.status || '';
+    var nm = lower.name || '';
+    var ty = lower.type || '';
     return '<div class="product-card anim" data-idx="' + i + '">' +
       '<div class="product-card-header">' +
         '<span class="product-number">' + num + '</span>' +
@@ -2259,7 +2364,7 @@ function renderProducts(products) {
       '</div>' +
       '<div class="product-name">' + nm + '</div>' +
       '<div class="product-type">' + ty + '</div>' +
-      '<p class="product-desc">' + (p.desc || p.Description || '') + '</p>' +
+      '<p class="product-desc">' + (lower.desc || lower.description || '') + '</p>' +
       '<div class="product-card-hint">Click to view</div>' +
     '</div>';
   }).join('');
@@ -2268,19 +2373,27 @@ function renderProducts(products) {
       var idx = parseInt(this.getAttribute('data-idx'));
       var p = PRODUCT_REGISTRY[idx];
       var num = String(idx + 1).padStart(2, '0');
+      // Case-insensitive field lookup
+      function col(p) {
+        var lower = {};
+        Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
+        return lower;
+      }
+      var r = col(p);
       openProductModal(
         num,
-        p.status || p.Status || '',
-        p.name || p.Name || '',
-        p.type || p.Type || '',
-        p.desc || p.Description || '',
-        p.details || p.Details || '',
-        p.cta || p.CTA || 'Request a Quote',
-        p.dc_channel || p.DC_Channel || '',
-        p.dc_title || p.DC_Title || '',
-        p.dc_body || p.DC_Body || '',
-        p.dc_meta || p.DC_Meta || '',
-        p.image || p.Image || p.img || p.Img || ''
+        r.status || '',
+        r.name || '',
+        r.type || '',
+        r.desc || r.description || '',
+        r.details || '',
+        r.cta || 'Request a Quote',
+        r.dc_channel || '',
+        r.dc_title || '',
+        r.dc_body || '',
+        r.dc_meta || '',
+        r.image || '',
+        r.cta_url || ''
       );
     });
   });
@@ -2290,19 +2403,69 @@ function renderProducts(products) {
 }
 
 function loadFromSheets() {
-  Promise.all([fetch(PRODUCTS_URL), fetch(STATUS_URL)])
+  fetch(PRODUCTS_URL)
     .then(function(res) {
-      if (!res[0].ok || !res[1].ok) throw new Error('Fetch failed');
-      return Promise.all([res[0].text(), res[1].text()]);
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.text();
     })
-    .then(function(texts) { renderProducts(parseCSV(texts[0])); })
-    .catch(function() { renderProducts(FALLBACK_PRODUCTS); });
+    .then(function(text) {
+      var products = parseCSV(text);
+      if (products.length === 0) throw new Error('Empty');
+      renderProducts(products);
+    })
+    .catch(function() { renderComingSoon(); });
 }
 
-// ── TEST MODE ── set to false to load live from Google Sheets
+// ── TEST MODE ── set to false to load from Google Sheets
 var TEST_MODE = false;
 if (TEST_MODE) {
-  renderProducts(FALLBACK_PRODUCTS);
+  var testProducts = [
+    {
+      name: 'Harbour Cleat Mk.II',
+      type: 'Deck Hardware',
+      status: 'Active',
+      desc: 'Heavy-duty cast stainless cleat rated to 4,000kg load. Designed for commercial quay installations and high-traffic berths.',
+      details: 'Material: 316L Stainless\nRating: 4,000kg\nMount: 4x M12 bolts\nFinish: Satin\nLength: 250mm',
+      cta: 'Request a Quote',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1200&q=80,https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80,https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+      dc_channel: 'hardware', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'NavChart Pro',
+      type: 'Navigation Software',
+      status: 'Active',
+      desc: 'Offline-capable chart plotter with real-time AIS overlay, tidal data, and voyage logging for professional mariners.',
+      details: 'Platform: iOS / Android / Web\nCharts: BSB4, S-57 ENC\nAIS: Built-in\nOffline: Full chart cache\nLicence: Annual subscription',
+      cta: 'Download Free Trial',
+      cta_url: 'https://example.com',
+      image: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&q=80,https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
+      dc_channel: 'software', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'Storm Mooring Kit',
+      type: 'Safety Equipment',
+      status: 'In Development',
+      desc: 'Emergency mooring system rated for Force 10 conditions. Includes 3x bridle lines, chafe guards, and quick-release shackles.',
+      details: 'Lines: 3x 16mm nylon\nBreaking load: 6,200kg\nChafe guards: Leather + neoprene\nShackles: 316 SS quick-release\nBag: Waterproof roll-top',
+      cta: 'Join Waitlist',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1500514966906-fe245eea9344?w=1200&q=80,https://images.unsplash.com/photo-1530053969600-caed2596d242?w=1200&q=80,https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=1200&q=80,https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=1200&q=80',
+      dc_channel: 'safety', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'Tidal Anchor Pro',
+      type: 'Ground Tackle',
+      status: 'Coming Soon',
+      desc: 'Next-generation scoop anchor with auto-resetting shank. Proven in 200+ commercial deployments across tidal rivers and offshore anchorages.',
+      details: 'Weight: 25kg\nRating: Vessels to 25m\nShank: Hinged auto-reset\nFinish: Hot-dip galvanised\nChain: 10mm calibrated',
+      cta: 'Notify Me',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80,https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+      dc_channel: 'tackle', dc_title: '', dc_body: '', dc_meta: ''
+    }
+  ];
+  renderProducts(testProducts);
 } else {
   loadFromSheets();
 }
