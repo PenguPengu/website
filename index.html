@@ -1718,20 +1718,20 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
     </a>
   </div>
   <div class="videos-section">
-    <div class="videos-header"><p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:28px">Latest from YouTube</p></div>
-    <div class="videos-grid">
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
-        <div class="video-info"><div class="video-title">Bollard Series I — Product Overview</div><div class="video-meta">3 days ago</div></div>
-      </div>
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
-        <div class="video-info"><div class="video-title">Installation Guide — D-Type Fenders</div><div class="video-meta">1 week ago</div></div>
-      </div>
-      <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
-        <div class="video-info"><div class="video-title">Behind the Scenes — Manufacturing</div><div class="video-meta">2 weeks ago</div></div>
-      </div>
+    <div class="videos-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:0">Latest from YouTube</p>
+      <a id="yt-channel-link" href="https://www.youtube.com/channel/vb7I8pciCJq94WzjyoGFeQ" target="_blank" rel="noopener"
+         style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.45;text-decoration:none;display:flex;align-items:center;gap:7px;transition:opacity .2s;"
+         onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.45'">
+        View all videos
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="videos-grid" id="yt-videos-grid">
+      <!-- skeleton loaders -->
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:80%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:40%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:70%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:35%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:75%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:45%"></div></div></div>
     </div>
   </div>
 </section>
@@ -2238,6 +2238,56 @@ function loadFromSheets() {
 }
 
 loadFromSheets();
+
+// ── YOUTUBE LATEST VIDEOS ──
+(function() {
+  var YT_KEY = 'AIzaSyAzNWUALX9uIEXglshzfSAgKoM4qQnSPGI';
+  var YT_CHANNEL = 'vb7I8pciCJq94WzjyoGFeQ';
+
+  function timeAgo(dateStr) {
+    var diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 3600)    return Math.floor(diff / 60) + ' mins ago';
+    if (diff < 86400)   return Math.floor(diff / 3600) + ' hours ago';
+    if (diff < 604800)  return Math.floor(diff / 86400) + ' days ago';
+    if (diff < 2592000) return Math.floor(diff / 604800) + ' weeks ago';
+    return Math.floor(diff / 2592000) + ' months ago';
+  }
+
+  function renderYTVideos(items) {
+    var grid = document.getElementById('yt-videos-grid');
+    if (!items || items.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:32px;text-align:center;font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.35;">No videos found</div>';
+      return;
+    }
+    grid.innerHTML = items.slice(0, 3).map(function(item) {
+      var videoId = item.id.videoId;
+      var title = item.snippet.title;
+      var thumb = (item.snippet.thumbnails.medium || item.snippet.thumbnails.default || {}).url || '';
+      var published = timeAgo(item.snippet.publishedAt);
+      return '<div class="video-card" onclick="openVideoModal(\'https://www.youtube.com/embed/' + videoId + '\')">' +
+        '<div class="video-thumb" style="background-image:url(\'' + thumb + '\');background-size:cover;background-position:center;">' +
+          '<div class="video-thumb-bg" style="background:rgba(25,41,58,.25)"></div>' +
+          '<div class="video-play-btn">&#9654;</div>' +
+        '</div>' +
+        '<div class="video-info">' +
+          '<div class="video-title">' + title + '</div>' +
+          '<div class="video-meta">' + published + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderYTError() {
+    var grid = document.getElementById('yt-videos-grid');
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:32px;text-align:center;font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.35;">Couldn\'t load videos — <a href="https://www.youtube.com/channel/' + YT_CHANNEL + '" target=\"_blank\" style=\"color:var(--navy)\">visit channel</a></div>';
+  }
+
+  fetch('https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&channelId=' + YT_CHANNEL + '&part=snippet&order=date&maxResults=3&type=video')
+    .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(data) { if (data.error) throw new Error(data.error.message); renderYTVideos(data.items); })
+    .catch(function(err) { console.warn('YouTube API:', err); renderYTError(); });
+})();
+
 </script>
 
 <!-- ═══ GALLERY PAGE ═══ -->
