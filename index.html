@@ -820,51 +820,30 @@ nav {
 .partner-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .partner-modal-close:hover { opacity:.9; }
 
-/* Banner mode: full-width, 200px tall */
-.partner-modal-img-banner {
-  width:100%; height:200px;
-  background:rgba(25,41,58,.06);
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden; flex-shrink:0; position:relative;
-  border-bottom:1px solid var(--border);
-}
-.partner-modal-img-banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-
-/* Logo mode: square, centered, smaller */
-.partner-modal-img-logo {
+/* Both image modes are squares — logo is padded/contained, picture is cover cropped */
+.partner-modal-img-square {
   width:160px; height:160px;
-  margin:40px auto 0;
+  flex-shrink:0;
   background:rgba(25,41,58,.06);
   border:1px solid var(--border);
   display:flex; align-items:center; justify-content:center;
-  overflow:hidden; flex-shrink:0; position:relative;
+  overflow:hidden; position:relative;
 }
-.partner-modal-img-logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:12px; }
-
+.partner-modal-img-square.logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:16px; }
+.partner-modal-img-square.picture img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .partner-modal-img-placeholder { font-family:var(--serif); font-size:72px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
-.partner-modal-body { padding:36px 48px 44px; display:flex; flex-direction:column; gap:14px; }
-.partner-modal-initial { font-family:var(--serif); font-size:52px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-8px; }
-.partner-modal-name { font-family:var(--serif); font-size:30px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
+
+/* Body: side by side — image left, text right */
+.partner-modal-body {
+  padding:40px 48px;
+  display:flex; flex-direction:row; gap:32px; align-items:flex-start;
+}
+.partner-modal-body-text { display:flex; flex-direction:column; gap:10px; flex:1; min-width:0; }
+.partner-modal-initial { font-family:var(--serif); font-size:48px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-6px; }
+.partner-modal-name { font-family:var(--serif); font-size:28px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
 .partner-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; }
-
-/* Collapsible desc */
-.partner-modal-desc-toggle {
-  font-size:9px; letter-spacing:.2em; text-transform:uppercase;
-  background:none; border:none; color:var(--navy); cursor:pointer;
-  opacity:.35; padding:0; font-family:var(--mono); display:flex; align-items:center; gap:7px;
-  margin-top:4px; transition:opacity .15s;
-}
-.partner-modal-desc-toggle:hover { opacity:.7; }
-.partner-modal-desc-toggle svg { transition:transform .2s; }
-.partner-modal-desc-toggle.open svg { transform:rotate(180deg); }
-.partner-modal-desc {
-  font-size:12px; line-height:1.85; opacity:.6;
-  border-top:1px solid rgba(25,41,58,.08); padding-top:16px;
-  display:none; margin-top:0;
-}
-.partner-modal-desc.open { display:block; }
-
-.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; border-top:1px solid rgba(25,41,58,.08); padding-top:18px; }
+.partner-modal-desc { font-size:12px; line-height:1.85; opacity:.6; border-top:1px solid rgba(25,41,58,.08); padding-top:14px; margin-top:2px; }
+.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; border-top:1px solid rgba(25,41,58,.08); padding-top:16px; margin-top:2px; }
 .partner-modal-link {
   font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
   color:var(--navy); border:1px solid rgba(25,41,58,.3); padding:10px 20px;
@@ -1820,16 +1799,15 @@ nav.scrolled {
 <div class="partner-modal" id="partner-modal" onclick="closePartnerModal()">
   <div class="partner-modal-inner" onclick="event.stopPropagation()">
     <button class="partner-modal-close" onclick="closePartnerModal()">&#10005;</button>
-    <div id="pm-partner-img-wrap"></div>
     <div class="partner-modal-body">
-      <div class="partner-modal-initial" id="pm-partner-initial"></div>
-      <div class="partner-modal-name" id="pm-partner-name"></div>
-      <div class="partner-modal-type" id="pm-partner-type"></div>
-      <button class="partner-modal-desc-toggle" id="pm-desc-toggle" onclick="togglePartnerDesc()" style="display:none">
-        About <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-      <div class="partner-modal-desc" id="pm-partner-desc"></div>
-      <div class="partner-modal-links" id="pm-partner-links"></div>
+      <div id="pm-partner-img-wrap"></div>
+      <div class="partner-modal-body-text">
+        <div class="partner-modal-initial" id="pm-partner-initial"></div>
+        <div class="partner-modal-name" id="pm-partner-name"></div>
+        <div class="partner-modal-type" id="pm-partner-type"></div>
+        <div class="partner-modal-desc" id="pm-partner-desc"></div>
+        <div class="partner-modal-links" id="pm-partner-links"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2274,53 +2252,35 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-function togglePartnerDesc() {
-  var btn = document.getElementById('pm-desc-toggle');
-  var desc = document.getElementById('pm-partner-desc');
-  btn.classList.toggle('open');
-  desc.classList.toggle('open');
-}
-
 function openPartnerModal(p) {
   var wrap = document.getElementById('pm-partner-img-wrap');
   wrap.innerHTML = '';
 
-  // image_type column: 'logo' = square, anything else = banner
-  var imgType = (p.image_type || '').toLowerCase().trim();
-  var isLogo = imgType === 'logo';
-
+  // image_type: 'logo' = contained (object-fit:contain), anything else = cover-cropped square
+  var isLogo = (p.image_type || '').toLowerCase().trim() === 'logo';
+  var container = document.createElement('div');
+  container.className = 'partner-modal-img-square ' + (isLogo ? 'logo' : 'picture');
   if (p.image) {
-    var container = document.createElement('div');
-    container.className = isLogo ? 'partner-modal-img-logo' : 'partner-modal-img-banner';
     var img = document.createElement('img');
     img.src = p.image;
     container.appendChild(img);
-    wrap.appendChild(container);
   } else {
-    // No image — show placeholder in banner style always
-    var container = document.createElement('div');
-    container.className = 'partner-modal-img-banner';
     var ph = document.createElement('div');
     ph.className = 'partner-modal-img-placeholder';
     ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
     container.appendChild(ph);
-    wrap.appendChild(container);
   }
+  wrap.appendChild(container);
 
   document.getElementById('pm-partner-initial').textContent = p.name ? p.name.charAt(0).toUpperCase() : '';
   document.getElementById('pm-partner-name').textContent = p.name || '';
   document.getElementById('pm-partner-type').textContent = p.type || '';
 
-  // Desc — hide by default, show toggle only if there's content
   var descEl = document.getElementById('pm-partner-desc');
-  var toggleBtn = document.getElementById('pm-desc-toggle');
   var descText = p.desc || p.description || '';
   descEl.textContent = descText;
-  descEl.classList.remove('open');
-  toggleBtn.classList.remove('open');
-  toggleBtn.style.display = descText ? 'flex' : 'none';
+  descEl.style.display = descText ? 'block' : 'none';
 
-  // Links
   var linksEl = document.getElementById('pm-partner-links');
   linksEl.innerHTML = '';
   var hasLinks = false;
@@ -2331,12 +2291,9 @@ function openPartnerModal(p) {
       hasLinks = true;
       var a = document.createElement('a');
       a.className = 'partner-modal-link';
-      // Ensure absolute URL so GitHub Pages doesn't treat it as relative
       var href = url;
       if (href && !href.match(/^https?:\/\//)) href = 'https://' + href;
-      a.href = href;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
+      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
       a.textContent = lbl + ' →';
       linksEl.appendChild(a);
     }
