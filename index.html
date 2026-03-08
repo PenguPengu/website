@@ -1666,7 +1666,7 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
     <div class="section-rule"></div>
   </div>
   <div class="update-announce reveal">
-    <div class="update-announce-text">
+    <div class="update-announce-text" id="ann-text-block">
       <div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div>
       <div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">Today</span></div>
       <div class="update-title">Bollard Series II — First Look</div>
@@ -2168,60 +2168,75 @@ var PARTNERS_URL      = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1
 
 // ── ANNOUNCEMENTS — load from Sheets ──────────────────────────────────────────
 function loadAnnouncements() {
+  console.log('[Underway] Fetching announcements from:', ANNOUNCEMENTS_URL);
   fetch(ANNOUNCEMENTS_URL)
-    .then(function(r) { if (!r.ok) throw new Error('fetch failed'); return r.text(); })
+    .then(function(r) {
+      console.log('[Underway] Announcements fetch status:', r.status);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
     .then(function(text) {
+      console.log('[Underway] Announcements raw CSV (first 300 chars):', text.slice(0, 300));
       var rows = parseCSV(text);
-      if (!rows || rows.length === 0) return;
+      console.log('[Underway] Announcements parsed rows:', rows.length, rows);
+      if (!rows || rows.length === 0) {
+        console.warn('[Underway] No announcement rows found — keeping fallback');
+        return;
+      }
       renderAnnouncements(rows);
     })
-    .catch(function() {
-      // Silently keep hardcoded fallback if sheet not available yet
+    .catch(function(err) {
+      console.error('[Underway] Announcements fetch failed:', err);
     });
 }
 
+
 function renderAnnouncements(rows) {
-  // rows: [{Timestamp, Author, Content, Images}, ...]
-  // Show newest first, max 3
-  var items = rows.slice().reverse().slice(0, 3);
-  if (items.length === 0) return;
+  var items = rows.slice().reverse().slice(0, 1);
+  if (items.length === 0) { console.warn('[Underway] renderAnnouncements: no items'); return; }
 
-  var first = items[0];
-  var lower = {}; Object.keys(first).forEach(function(k){ lower[k.toLowerCase()] = first[k]; });
+  var r = {};
+  Object.keys(items[0]).forEach(function(k){ r[k.toLowerCase()] = items[0][k]; });
+  console.log('[Underway] renderAnnouncements row:', r);
 
-  // Update the main announcement card text
-  var titleEl = document.querySelector('.update-title');
-  var bodyEl  = document.querySelector('.update-body');
-  var dateEl  = document.querySelector('.update-date');
-  var authorEl = document.querySelector('.update-author');
+  var content   = r.content || r.body || '';
+  var author    = r.author  || '';
+  var timestamp = r.timestamp || '';
+  var imagesStr = r.images  || r.image || '';
 
-  if (titleEl) {
-    // First line of content = title, rest = body
-    var lines = (lower.content || '').split('\n').filter(function(l){ return l.trim(); });
-    titleEl.textContent = lines[0] || 'Update';
-    if (bodyEl) bodyEl.textContent = lines.slice(1).join(' ') || '';
-  }
-  if (dateEl && lower.timestamp) {
+  var lines = content.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  var title = lines[0] || 'Update';
+  var body  = lines.slice(1).join(' ').trim();
+
+  var dateStr = '';
+  if (timestamp) {
     try {
-      var d = new Date(lower.timestamp);
-      dateEl.textContent = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    } catch(e) {}
-  }
-  if (authorEl && lower.author) {
-    authorEl.textContent = lower.author + (lower.timestamp ? ' · ' + (function(){
-      try { return new Date(lower.timestamp).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); } catch(e){ return ''; }
-    })() : '');
+      dateStr = new Date(timestamp).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    } catch(e) { dateStr = timestamp; }
   }
 
-  // Update image slider
+  var textBlock = document.getElementById('ann-text-block');
+  if (textBlock) {
+    textBlock.innerHTML =
+      '<div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div>' +
+      '<div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">' + (dateStr || 'Latest') + '</span></div>' +
+      '<div class="update-title">' + title + '</div>' +
+      (body ? '<div class="update-body">' + body + '</div>' : '') +
+      '<div class="update-footer"><span class="update-author">' + author + (dateStr ? ' · ' + dateStr : '') + '</span><div class="update-reactions"></div></div>';
+    console.log('[Underway] Card updated with:', title);
+  } else {
+    console.error('[Underway] #ann-text-block element not found in DOM!');
+  }
+
   var slider = document.getElementById('ann-slider');
   var dotsEl = document.getElementById('ann-dots');
-  if (slider) {
-    var imageUrls = (lower.images || '').split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4; });
+  if (slider && imagesStr) {
+    var imageUrls = imagesStr.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4; });
     if (imageUrls.length > 0) {
       slider.innerHTML = imageUrls.map(function(url, i) {
         return '<div class="update-announce-slide' + (i===0?' active':'') + '">' +
-          '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=\'<div class=update-img-ph>Image unavailable</div>\'" alt="">' +
+          '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;" ' +
+          'onerror="this.parentElement.innerHTML=\'<div class=update-img-ph>Image unavailable</div>\'" alt="">' +
           '</div>';
       }).join('');
       if (dotsEl) {
