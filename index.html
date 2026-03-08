@@ -46,73 +46,6 @@ nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video
 }
 .products-section > * { position: relative; z-index: 1; }
 
-/* ─── GLOBAL NAUTICAL GRID ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(25,41,58,.042) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(25,41,58,.042) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
-nav, .marquee-wrap, section, footer,
-.coord, .cursor-dot, .product-modal, .video-modal {
-  position: relative;
-  z-index: 1;
-}
-/* Cream sections get navy-tinted grid (already showing through body::before) */
-/* Navy sections override with cream-tinted grid */
-.products-section { isolation: isolate; }
-.products-section::before {
-  content: '';
-  position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(247,239,230,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(247,239,230,.05) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
-.products-section > * { position: relative; z-index: 1; }
-
-/* ─── GLOBAL NAUTICAL BG ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(25,41,58,.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(25,41,58,.045) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
-/* All sections sit above bg */
-nav, .marquee-wrap, section, footer, .coord,
-.cursor-dot, .product-modal, .video-modal {
-  position: relative;
-  z-index: 1;
-}
-/* Sections that are navy/dark get their own bg so grid shows through correctly */
-.products-section, .contact-section, .discord-section-dark {
-  isolation: isolate;
-}
-/* On cream sections, grid is navy-tinted; on navy sections it's cream-tinted */
-.products-section::before, footer::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(247,239,230,.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(247,239,230,.04) 1px, transparent 1px);
-  background-size: 120px 120px;
-}
-.products-section > *, footer > * { position: relative; z-index: 1; }
-
-
 .nautical-bg-icons {
   position: fixed;
   inset: 0;
@@ -539,7 +472,6 @@ nav {
   text-transform:uppercase;
   opacity:.35;
 }
-/* Carousel - clean */
 .carousel-controls {
   position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
   display:flex; gap:8px; z-index:10;
@@ -728,42 +660,6 @@ nav {
   color:var(--cream);
   opacity:.55;
 }
-/* Expand overlay */
-.product-expand {
-  position:absolute; inset:0;
-  background:rgba(247,239,230,.97);
-  color:var(--navy);
-  padding:36px;
-  opacity:0;
-  transition: opacity .3s;
-  pointer-events:none;
-  display:flex; flex-direction:column;
-  justify-content:space-between;
-}
-.product-card:hover .product-expand { opacity:1; pointer-events:all; }
-.product-expand-title {
-  font-family:var(--serif);
-  font-size:28px;
-  font-weight:900;
-  letter-spacing:-.01em;
-  margin-bottom:12px;
-}
-.product-expand-details {
-  font-size:11px;
-  line-height:1.8;
-  opacity:.65;
-}
-.product-expand-link {
-  font-size:9px;
-  letter-spacing:.3em;
-  text-transform:uppercase;
-  text-decoration:none;
-  color:var(--navy);
-  display:flex; align-items:center; gap:8px;
-  margin-top:auto;
-  opacity:.55;
-}
-.product-expand-link::after { content:'→'; }
 
 /* ─── STATUS PAGE ─── */
 .status-section { padding:0 0 80px; }
@@ -924,7 +820,6 @@ nav {
 }
 .form-submit:hover { opacity:.85; }
 
-/* Socials row in contact */
 .socials-row {
   display:flex; gap:16px; margin-top:24px;
 }
@@ -948,6 +843,15 @@ footer {
   align-items:center;
   justify-content:space-between;
 }
+footer::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(247,239,230,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247,239,230,.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+}
+footer > * { position: relative; z-index: 1; }
 .footer-logo svg { width:90px; height:auto; }
 .footer-meta {
   font-size:9px;
@@ -1000,7 +904,7 @@ footer {
   .status-pct, .status-badge { display:none; }
   .partners-grid { grid-template-columns:1fr 1fr; margin:0 24px; }
   .contact-section { grid-template-columns:1fr; padding:60px 24px; gap:48px; }
-  .community-channels { grid-template-columns:1fr; margin:0 24px 40px; }
+  .community-channels { grid-template-columns:1fr; margin:0 24px; }
   .videos-grid { grid-template-columns:1fr; margin:0; }
   .videos-section { margin:0 24px; }
   footer { padding:32px 24px; flex-wrap:wrap; gap:16px; }
@@ -1060,12 +964,23 @@ footer {
 .video-modal-frame { aspect-ratio:16/9; width:100%; }
 .video-modal-frame iframe { width:100%; height:100%; display:block; }
 
+/* ─── PRODUCT MODAL ─── */
 .product-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
 .product-modal.open { display:flex; }
-.product-modal-inner { background:var(--cream); color:var(--navy); width:min(1400px,97vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
+.product-modal-inner {
+  background:var(--cream); color:var(--navy);
+  /* Width is auto — driven by grid columns inside */
+  width: fit-content;
+  max-width: 97vw;
+  position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column;
+}
 .product-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .product-modal-close:hover { opacity:.9; }
-.product-modal-layout { display:grid; grid-template-columns:480px 1fr; min-height:480px; }
+.product-modal-layout {
+  display:grid;
+  /* columns set dynamically by JS */
+  min-height:420px;
+}
 .product-modal-images { background:rgba(25,41,58,.05); border-right:1px solid rgba(25,41,58,.1); display:flex; flex-direction:column; position:relative; }
 .product-modal-img-main { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px; position:relative; overflow:hidden; cursor:zoom-in; }
 .product-modal-img-main img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:rgba(25,41,58,.04); }
@@ -1092,7 +1007,8 @@ footer {
 .pm-lightbox-nav.prev { left:20px; }
 .pm-lightbox-nav.next { right:20px; }
 .pm-lightbox-counter { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.5); font-family:var(--mono); font-size:10px; letter-spacing:.2em; }
-.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; max-height:70vh; min-width:380px; }
+
+.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; max-height:70vh; width:420px; flex-shrink:0; }
 .product-modal-content::-webkit-scrollbar { width:3px; }
 .product-modal-content::-webkit-scrollbar-track { background:transparent; }
 .product-modal-content::-webkit-scrollbar-thumb { background:rgba(25,41,58,.15); }
@@ -1105,15 +1021,8 @@ footer {
 .product-modal-cta { display:inline-block; background:var(--navy); color:var(--cream); font-family:var(--mono); font-size:10px; letter-spacing:.25em; text-transform:uppercase; padding:14px 28px; transition:.2s; cursor:pointer; border:none; align-self:flex-start; margin-top:auto; }
 .product-modal-cta:hover { background:var(--mid); }
 
-/* Slide caption overlay */
 .slide-caption { display:none; }
-
-/* Big slide image backgrounds */
-.slide-img {
-  width:100%; height:100%;
-  background-size:cover; background-position:center;
-  display:flex; align-items:center; justify-content:center;
-}
+.slide-img { width:100%; height:100%; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; }
 
 /* ─── CUSTOM CURSOR ─── */
 *, *::before, *::after { cursor: none !important; }
@@ -1129,11 +1038,9 @@ footer {
 .cursor-dot.hovering { width: 11px; height: 11px; }
 .cursor-dot.clicking { width: 4px; height: 4px; }
 
-
 /* ─── DISCORD / UPDATES SECTION ─── */
 .discord-section { padding: 0 0 80px; border-top: 1px solid var(--border); }
 
-/* Shared image placeholder */
 .update-img-ph {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
@@ -1144,7 +1051,6 @@ footer {
 }
 .update-img-ph img { width:100%; height:100%; object-fit:cover; opacity:1; display:block; }
 
-/* Shared pill + meta */
 .update-product-pill {
   display: inline-flex; align-items: center; gap: 8px;
   background: var(--navy); color: var(--cream);
@@ -1166,7 +1072,6 @@ footer {
 .update-reactions { display:flex; gap:10px; }
 .update-reaction { font-size:10px; opacity:.35; }
 
-/* Slider dots */
 .usd {
   width:6px; height:6px; border-radius:50%;
   border:1px solid rgba(25,41,58,.3); background:transparent;
@@ -1174,7 +1079,6 @@ footer {
 }
 .usd.active { background:var(--navy); border-color:var(--navy); }
 
-/* ── ANNOUNCEMENT BLOCK ── */
 .update-announce {
   margin: 0 80px 1px;
   display: grid;
@@ -1202,7 +1106,6 @@ footer {
   display: flex; gap: 7px; z-index: 2;
 }
 
-/* ── PRODUCT ROWS ── */
 .update-rows {
   margin: 0 80px;
   border: 1px solid var(--border);
@@ -1238,14 +1141,12 @@ footer {
   display: flex; gap: 7px; z-index: 2;
 }
 
-/* flash when scrolled-to */
 @keyframes cardFlash {
   0%   { background: rgba(25,41,58,.08); }
   100% { background: transparent; }
 }
 .update-row.flash { animation: cardFlash 1.2s ease-out; }
 
-/* Discord CTA bar */
 .discord-cta-bar {
   margin: 32px 80px 0;
   border: 1px solid var(--border); padding: 24px 36px;
@@ -1270,7 +1171,7 @@ footer {
   .update-row.alt { direction: ltr; }
   .discord-cta-bar { margin: 24px 24px 0; flex-direction:column; align-items:flex-start; }
 }
-/* ─── PRODUCT MODAL — 3 col ─── */
+
 .product-modal-discord {
   border-top: 1px solid rgba(25,41,58,.1);
   padding: 28px 40px;
@@ -1282,63 +1183,35 @@ footer {
 .product-modal-discord::-webkit-scrollbar-track { background: transparent; }
 .product-modal-discord::-webkit-scrollbar-thumb { background: rgba(25,41,58,.2); }
 .product-modal-discord-label {
-  font-size: 8px;
-  letter-spacing: .3em;
-  text-transform: uppercase;
-  opacity: .3;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 8px; letter-spacing: .3em; text-transform: uppercase; opacity: .3;
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
 }
 .product-modal-discord-label::before {
-  content: '';
-  display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--navy);
-  opacity: .3;
+  content: ''; display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--navy); opacity: .3;
 }
-.product-modal-discord-title {
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  line-height: 1.3;
-}
-.product-modal-discord-body {
-  font-size: 11px;
-  line-height: 1.75;
-  opacity: .55;
-}
-.product-modal-discord-meta {
-  font-size: 9px;
-  letter-spacing: .15em;
-  text-transform: uppercase;
-  opacity: .3;
-  margin-top: 12px;
-}
+.product-modal-discord-title { font-size: 12px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+.product-modal-discord-body { font-size: 11px; line-height: 1.75; opacity: .55; }
+.product-modal-discord-meta { font-size: 9px; letter-spacing: .15em; text-transform: uppercase; opacity: .3; margin-top: 12px; }
+
 /* ─── SCROLL REVEAL ANIMATIONS ─── */
 .reveal {
-  opacity: 0;
-  transform: translateY(32px);
+  opacity: 0; transform: translateY(32px);
   transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
 }
 .reveal.revealed { opacity: 1; transform: translateY(0); }
 .reveal-left {
-  opacity: 0;
-  transform: translateX(-40px);
+  opacity: 0; transform: translateX(-40px);
   transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
 }
 .reveal-left.revealed { opacity: 1; transform: translateX(0); }
 .reveal-right {
-  opacity: 0;
-  transform: translateX(40px);
+  opacity: 0; transform: translateX(40px);
   transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
 }
 .reveal-right.revealed { opacity: 1; transform: translateX(0); }
 .reveal-scale {
-  opacity: 0;
-  transform: scale(0.94);
+  opacity: 0; transform: scale(0.94);
   transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
 }
 .reveal-scale.revealed { opacity: 1; transform: scale(1); }
@@ -1348,110 +1221,44 @@ footer {
 .delay-r4 { transition-delay: 0.32s; }
 .delay-r5 { transition-delay: 0.40s; }
 
-/* Nav reveal on scroll */
-nav.scrolled {
-  box-shadow: 0 2px 24px rgba(25,41,58,.08);
-}
-
-/* Parallax hero title */
+nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
 .hero-title { will-change: transform; }
-
-/* Section entrance line */
 .section-rule {
-  transform-origin: left;
-  transform: scaleX(0);
+  transform-origin: left; transform: scaleX(0);
   transition: transform 0.8s cubic-bezier(.16,1,.3,1) 0.3s;
 }
 .section-rule.revealed { transform: scaleX(1); }
-
 </style>
 </head>
 <body>
 
-<!-- Custom cursor -->
 <div class="cursor-dot" id="cursor-dot"></div>
 
-
-<!-- Global nautical background icons -->
 <svg class="nautical-bg-icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <!-- Compass rose top-right (matches hero) -->
   <g transform="translate(88vw, 18vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
-    <line x1="0" y1="-44" x2="0" y2="44"/>
-    <line x1="-44" y1="0" x2="44" y2="0"/>
-    <line x1="-31" y1="-31" x2="31" y2="31"/>
-    <line x1="31" y1="-31" x2="-31" y2="31"/>
-    <circle cx="0" cy="0" r="18"/>
-    <circle cx="0" cy="0" r="4" fill="currentColor"/>
+    <line x1="0" y1="-44" x2="0" y2="44"/><line x1="-44" y1="0" x2="44" y2="0"/>
+    <line x1="-31" y1="-31" x2="31" y2="31"/><line x1="31" y1="-31" x2="-31" y2="31"/>
+    <circle cx="0" cy="0" r="18"/><circle cx="0" cy="0" r="4" fill="currentColor"/>
     <polygon points="0,-44 -5,-20 0,-28 5,-20" fill="currentColor"/>
     <text x="5" y="-48" font-family="monospace" font-size="8" fill="currentColor" stroke="none">N</text>
   </g>
-  <!-- Compass mid-left -->
   <g transform="translate(6vw, 55vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
-    <line x1="0" y1="-32" x2="0" y2="32"/>
-    <line x1="-32" y1="0" x2="32" y2="0"/>
-    <circle cx="0" cy="0" r="14"/>
-    <circle cx="0" cy="0" r="3" fill="currentColor"/>
+    <line x1="0" y1="-32" x2="0" y2="32"/><line x1="-32" y1="0" x2="32" y2="0"/>
+    <circle cx="0" cy="0" r="14"/><circle cx="0" cy="0" r="3" fill="currentColor"/>
     <polygon points="0,-32 -4,-14 0,-20 4,-14" fill="currentColor"/>
   </g>
-  <!-- Compass bottom-right -->
-  <g transform="translate(92vw, 82vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
-    <line x1="0" y1="-28" x2="0" y2="28"/>
-    <line x1="-28" y1="0" x2="28" y2="0"/>
-    <circle cx="0" cy="0" r="12"/>
-    <circle cx="0" cy="0" r="2.5" fill="currentColor"/>
-    <polygon points="0,-28 -3,-12 0,-17 3,-12" fill="currentColor"/>
-  </g>
-  <!-- Anchor mid-right -->
   <g transform="translate(93vw, 42vh)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
-    <circle cx="0" cy="-18" r="6"/>
-    <line x1="0" y1="-12" x2="0" y2="18"/>
+    <circle cx="0" cy="-18" r="6"/><line x1="0" y1="-12" x2="0" y2="18"/>
     <line x1="-14" y1="-8" x2="14" y2="-8"/>
     <path d="M-14,18 Q-20,10 -14,6 M14,18 Q20,10 14,6"/>
     <circle cx="0" cy="18" r="2.5" fill="currentColor"/>
   </g>
-  <!-- Anchor lower-left -->
-  <g transform="translate(8vw, 78vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".04">
-    <circle cx="0" cy="-14" r="5"/>
-    <line x1="0" y1="-9" x2="0" y2="14"/>
-    <line x1="-11" y1="-6" x2="11" y2="-6"/>
-    <path d="M-11,14 Q-16,8 -11,4 M11,14 Q16,8 11,4"/>
-  </g>
-  <!-- Wave symbol upper-left -->
   <g transform="translate(10vw, 28vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
     <path d="M-30,0 Q-20,-12 -10,0 Q0,12 10,0 Q20,-12 30,0"/>
     <path d="M-30,10 Q-20,-2 -10,10 Q0,22 10,10 Q20,-2 30,10" opacity=".5"/>
   </g>
-  <!-- Wave lower-right -->
-  <g transform="translate(80vw, 70vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
-    <path d="M-24,0 Q-16,-9 -8,0 Q0,9 8,0 Q16,-9 24,0"/>
-    <path d="M-24,7 Q-16,-2 -8,7 Q0,16 8,7 Q16,-2 24,7" opacity=".5"/>
-  </g>
-  <!-- Sounding mark / depth cross -->
-  <g transform="translate(52vw, 90vh)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".04">
-    <line x1="-20" y1="0" x2="20" y2="0"/>
-    <line x1="0" y1="-20" x2="0" y2="20"/>
-    <line x1="-14" y1="-14" x2="14" y2="14" opacity=".4"/>
-    <line x1="14" y1="-14" x2="-14" y2="14" opacity=".4"/>
-    <circle cx="0" cy="0" r="8" opacity=".5"/>
-  </g>
-  <!-- Small compass top-center -->
-  <g transform="translate(50vw, 8vh)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".035">
-    <line x1="-24" y1="0" x2="24" y2="0"/>
-    <line x1="0" y1="-24" x2="0" y2="24"/>
-    <circle cx="0" cy="0" r="10"/>
-    <polygon points="0,-24 -3,-10 0,-15 3,-10" fill="currentColor"/>
-  </g>
-  <!-- Meridian tick marks left edge -->
-  <g transform="translate(2vw, 0)" stroke="currentColor" stroke-width=".5" opacity=".04">
-    <line x1="0" y1="15vh" x2="12" y2="15vh"/>
-    <line x1="0" y1="30vh" x2="8" y2="30vh"/>
-    <line x1="0" y1="45vh" x2="12" y2="45vh"/>
-    <line x1="0" y1="60vh" x2="8" y2="60vh"/>
-    <line x1="0" y1="75vh" x2="12" y2="75vh"/>
-    <line x1="0" y1="90vh" x2="8" y2="90vh"/>
-  </g>
 </svg>
-<!-- Corner coordinates -->
+
 <div class="coord coord-bl">59°54'N 10°44'E — UNDERWAY-MK2</div>
 <div class="coord coord-br">EST. 2021</div>
 
@@ -1480,24 +1287,16 @@ nav.scrolled {
 <section class="hero" id="home">
   <svg class="hero-bg-lines" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
     <g stroke="#19293a" stroke-width=".5" fill="none">
-      <line x1="0" y1="150" x2="1440" y2="150"/>
-      <line x1="0" y1="300" x2="1440" y2="300"/>
-      <line x1="0" y1="450" x2="1440" y2="450"/>
-      <line x1="0" y1="600" x2="1440" y2="600"/>
-      <line x1="0" y1="750" x2="1440" y2="750"/>
-      <line x1="240" y1="0" x2="240" y2="900"/>
-      <line x1="480" y1="0" x2="480" y2="900"/>
-      <line x1="720" y1="0" x2="720" y2="900"/>
-      <line x1="960" y1="0" x2="960" y2="900"/>
-      <line x1="1200" y1="0" x2="1200" y2="900"/>
+      <line x1="0" y1="150" x2="1440" y2="150"/><line x1="0" y1="300" x2="1440" y2="300"/>
+      <line x1="0" y1="450" x2="1440" y2="450"/><line x1="0" y1="600" x2="1440" y2="600"/>
+      <line x1="0" y1="750" x2="1440" y2="750"/><line x1="240" y1="0" x2="240" y2="900"/>
+      <line x1="480" y1="0" x2="480" y2="900"/><line x1="720" y1="0" x2="720" y2="900"/>
+      <line x1="960" y1="0" x2="960" y2="900"/><line x1="1200" y1="0" x2="1200" y2="900"/>
     </g>
     <g transform="translate(1300,200)" stroke="#19293a" stroke-width="1" fill="none">
-      <line x1="0" y1="-50" x2="0" y2="50"/>
-      <line x1="-50" y1="0" x2="50" y2="0"/>
-      <line x1="-35" y1="-35" x2="35" y2="35"/>
-      <line x1="35" y1="-35" x2="-35" y2="35"/>
-      <circle cx="0" cy="0" r="22"/>
-      <circle cx="0" cy="0" r="5" fill="#19293a"/>
+      <line x1="0" y1="-50" x2="0" y2="50"/><line x1="-50" y1="0" x2="50" y2="0"/>
+      <line x1="-35" y1="-35" x2="35" y2="35"/><line x1="35" y1="-35" x2="-35" y2="35"/>
+      <circle cx="0" cy="0" r="22"/><circle cx="0" cy="0" r="5" fill="#19293a"/>
       <polygon points="0,-50 -6,-24 0,-32 6,-24" fill="#19293a"/>
       <text x="6" y="-54" font-family="monospace" font-size="9" fill="#19293a">N</text>
     </g>
@@ -1507,10 +1306,7 @@ nav.scrolled {
 
   <div class="hero-left">
     <p class="hero-eyebrow anim">Marine · Industrial · Equipment</p>
-    <h1 class="hero-title anim delay-1">
-      UNDER<br>WAY
-      <em>built for the<br>long haul.</em>
-    </h1>
+    <h1 class="hero-title anim delay-1">UNDER<br>WAY<em>built for the<br>long haul.</em></h1>
     <p class="hero-tagline anim delay-2">Professional-grade marine solutions since 2021</p>
     <div class="hero-btns anim delay-3">
       <a href="#products" class="btn-primary">View Products</a>
@@ -1520,66 +1316,36 @@ nav.scrolled {
 
   <div class="hero-right anim delay-2">
     <div class="carousel-frame" id="carousel">
-      <!-- Slides — replace with real product photos by swapping background-image URLs -->
       <div class="carousel-slide active" id="slide-0">
         <div class="slide-placeholder">
-          <svg viewBox="0 0 620 279" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#19293a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/>
-          </svg>
+          <svg viewBox="0 0 620 279" xmlns="http://www.w3.org/2000/svg"><path fill="#19293a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg>
           <span class="slide-label">Marine Bollards — Series I</span>
         </div>
-        <div class="slide-caption">Series I — Marine Bollards</div>
       </div>
       <div class="carousel-slide" id="slide-1">
         <div class="slide-placeholder">
-          <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
-            <rect x="10" y="30" width="80" height="8" rx="2" fill="#19293a" opacity=".2"/>
-            <rect x="25" y="18" width="50" height="12" rx="2" fill="#19293a" opacity=".15"/>
-            <rect x="40" y="8" width="20" height="10" rx="2" fill="#19293a" opacity=".12"/>
-            <circle cx="20" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/>
-            <circle cx="80" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/>
-          </svg>
+          <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="30" width="80" height="8" rx="2" fill="#19293a" opacity=".2"/><rect x="25" y="18" width="50" height="12" rx="2" fill="#19293a" opacity=".15"/><rect x="40" y="8" width="20" height="10" rx="2" fill="#19293a" opacity=".12"/><circle cx="20" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/><circle cx="80" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/></svg>
           <span class="slide-label">Dock Hardware — Range</span>
         </div>
-        <div class="slide-caption">Dock Hardware — Full Range</div>
       </div>
       <div class="carousel-slide" id="slide-2">
         <div class="slide-placeholder">
-          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-            <polygon points="40,5 75,30 75,55 40,75 5,55 5,30" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/>
-            <circle cx="40" cy="40" r="18" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".2"/>
-            <circle cx="40" cy="40" r="5" fill="#19293a" opacity=".18"/>
-          </svg>
+          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><polygon points="40,5 75,30 75,55 40,75 5,55 5,30" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/><circle cx="40" cy="40" r="18" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".2"/><circle cx="40" cy="40" r="5" fill="#19293a" opacity=".18"/></svg>
           <span class="slide-label">Mooring Systems</span>
         </div>
-        <div class="slide-caption">Mooring Systems — Custom</div>
       </div>
       <div class="carousel-slide" id="slide-3">
         <div class="slide-placeholder">
-          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-            <rect x="5" y="40" width="70" height="15" rx="1" fill="#19293a" opacity=".15"/>
-            <rect x="15" y="20" width="50" height="20" rx="1" fill="#19293a" opacity=".12"/>
-            <line x1="20" y1="5" x2="20" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/>
-            <line x1="40" y1="5" x2="40" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/>
-            <line x1="60" y1="5" x2="60" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/>
-          </svg>
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="40" width="70" height="15" rx="1" fill="#19293a" opacity=".15"/><rect x="15" y="20" width="50" height="20" rx="1" fill="#19293a" opacity=".12"/><line x1="20" y1="5" x2="20" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/><line x1="40" y1="5" x2="40" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/><line x1="60" y1="5" x2="60" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/></svg>
           <span class="slide-label">Fender Systems</span>
         </div>
-        <div class="slide-caption">Fender Systems — Industrial</div>
       </div>
       <div class="carousel-slide" id="slide-4">
         <div class="slide-placeholder">
-          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10,70 Q40,10 70,70" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/>
-            <circle cx="10" cy="70" r="5" fill="#19293a" opacity=".2"/>
-            <circle cx="70" cy="70" r="5" fill="#19293a" opacity=".2"/>
-            <path d="M25,50 L40,20 L55,50" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".15"/>
-          </svg>
-          <span class="slide-label">Rigging & Lines</span>
+          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><path d="M10,70 Q40,10 70,70" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/><circle cx="10" cy="70" r="5" fill="#19293a" opacity=".2"/><circle cx="70" cy="70" r="5" fill="#19293a" opacity=".2"/><path d="M25,50 L40,20 L55,50" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".15"/></svg>
+          <span class="slide-label">Rigging &amp; Lines</span>
         </div>
-        <div class="slide-caption">Rigging & Lines — Marine Grade</div>
       </div>
-
       <button class="carousel-prev" onclick="carouselMove(-1)">←</button>
       <button class="carousel-next" onclick="carouselMove(1)">→</button>
       <div class="carousel-controls" id="carousel-dots"></div>
@@ -1596,22 +1362,10 @@ nav.scrolled {
     <a href="#products" class="btn-primary" style="margin-top:12px">Explore Catalogue →</a>
   </div>
   <div class="intro-stats reveal-right">
-    <div class="stat-block reveal delay-r1">
-      <div class="stat-num">320+</div>
-      <div class="stat-label">Products in Range</div>
-    </div>
-    <div class="stat-block reveal delay-r2">
-      <div class="stat-num">48</div>
-      <div class="stat-label">Active Partners</div>
-    </div>
-    <div class="stat-block reveal delay-r3">
-      <div class="stat-num">12+</div>
-      <div class="stat-label">Countries Served</div>
-    </div>
-    <div class="stat-block reveal delay-r4">
-      <div class="stat-num">4yr</div>
-      <div class="stat-label">In Operation</div>
-    </div>
+    <div class="stat-block reveal delay-r1"><div class="stat-num">320+</div><div class="stat-label">Products in Range</div></div>
+    <div class="stat-block reveal delay-r2"><div class="stat-num">48</div><div class="stat-label">Active Partners</div></div>
+    <div class="stat-block reveal delay-r3"><div class="stat-num">12+</div><div class="stat-label">Countries Served</div></div>
+    <div class="stat-block reveal delay-r4"><div class="stat-num">4yr</div><div class="stat-label">In Operation</div></div>
   </div>
 </section>
 
@@ -1622,20 +1376,8 @@ nav.scrolled {
     <h2 class="section-title">The <em>Catalogue</em></h2>
     <div class="section-rule"></div>
   </div>
-
-  <div class="sheets-config-notice" id="sheets-notice">
-    ⚙️ <strong>Google Sheets not connected yet.</strong> Showing placeholder data.<br>
-    To connect: <a href="#" onclick="document.getElementById('sheets-instructions').style.display='block';return false;">see setup instructions</a> · then paste your Sheet ID into the <code>SHEET_ID</code> variable in this file's script.
-    <div id="sheets-instructions" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e0c040;">
-      1. Create a Google Sheet with tabs named <strong>Products</strong> and <strong>Status</strong><br>
-      2. <strong>Products</strong> columns: <code>Name · Type · Status · Description · Details · CTA</code><br>
-      3. <strong>Status</strong> columns: <code>Name · StockPct · LeadTime · Badge · BarColor</code><br>
-      4. File → Share → Publish to web → CSV (do for both tabs)<br>
-      5. Copy your Sheet ID from the URL and paste it below in the script
-    </div>
-  </div>
+  <div class="sheets-config-notice" id="sheets-notice"></div>
   <div class="products-grid" id="products-grid">
-    <!-- Populated from Google Sheet -->
     <div class="sheets-loading">Loading products…</div>
   </div>
 </section>
@@ -1647,31 +1389,56 @@ nav.scrolled {
     <h2 class="section-title">Current <em>Entries</em></h2>
     <div class="section-rule"></div>
   </div>
-
-  <!-- Current comp info bar -->
   <div class="comp-info-bar reveal">
     <div class="comp-info-left">
       <span class="comp-label">Active Prompt</span>
       <div class="comp-prompt-text">"Golden Hour — catch Underway equipment at its most atmospheric"</div>
     </div>
     <div class="comp-info-right">
-      <div class="comp-deadline">{CAL_SVG} Closes 31 Mar 2026</div>
+      <div class="comp-deadline">Closes 31 Mar 2026</div>
       <button class="btn-primary" onclick="openGallery()">View Full Gallery</button>
     </div>
   </div>
-
-  <!-- 3 most recent current-comp entries -->
   <div class="photos-grid photos-grid-teaser" id="photos-teaser-grid">
-    {photo_card(0,'golden-hour','@saltwater_marina','Golden Hour — Solent','Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.',142,38)}
-    {photo_card(1,'golden-hour','@northsea_ports','Holding Fast — North Sea','Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.',204,157)}
-    {photo_card(2,'golden-hour','@coastal_eng','Pilot Unit at Dawn','First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.',93,88)}
+    <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span></div>
+      <div class="photo-info">
+        <div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div>
+        <div class="photo-title">Golden Hour — Solent</div>
+        <div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span></button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">38</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span></div>
+      <div class="photo-info">
+        <div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div>
+        <div class="photo-title">Holding Fast — North Sea</div>
+        <div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span></button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">157</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span></div>
+      <div class="photo-info">
+        <div class="photo-meta-row"><span class="photo-author">@coastal_eng</span></div>
+        <div class="photo-title">Pilot Unit at Dawn</div>
+        <div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span></button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button>
+        </div>
+      </div>
+    </div>
   </div>
-
   <div class="photos-teaser-cta reveal">
-    <button class="photos-see-all" onclick="openGallery()">
-      See all entries &amp; past winners
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-    </button>
+    <button class="photos-see-all" onclick="openGallery()">See all entries &amp; past winners <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
   </div>
 </section>
 
@@ -1685,18 +1452,10 @@ nav.scrolled {
   <div class="update-announce reveal">
     <div class="update-announce-text">
       <div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div>
-      <div class="update-card-top">
-        <span class="update-tag tag-announce">New</span>
-        <span class="update-date">Today</span>
-      </div>
+      <div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">Today</span></div>
       <div class="update-title">Bollard Series II — First Look</div>
-      <div class="update-body">
-        Redesigned base casting, <strong>40% improvement in corrosion resistance</strong>, and a new anti-rotation collar installers have been asking for since day one. Rolling out to distributors Q3 2026. Full spec sheet dropping this week.
-      </div>
-      <div class="update-footer">
-        <span class="update-author">Underway_Official &nbsp;·&nbsp; Today</span>
-        <div class="update-reactions"></div>
-      </div>
+      <div class="update-body">Redesigned base casting, <strong>40% improvement in corrosion resistance</strong>, and a new anti-rotation collar installers have been asking for since day one. Rolling out to distributors Q3 2026. Full spec sheet dropping this week.</div>
+      <div class="update-footer"><span class="update-author">Underway_Official · Today</span><div class="update-reactions"></div></div>
     </div>
     <div class="update-announce-images">
       <div class="update-announce-slider" id="ann-slider">
@@ -1727,68 +1486,40 @@ nav.scrolled {
     <h2 class="section-title">The <em>Community</em></h2>
     <div class="section-rule"></div>
   </div>
-
   <div class="community-channels">
     <a href="#" class="channel-card reveal-scale" target="_blank" rel="noopener">
-      <div class="channel-icon">
-        <svg width="32" height="23" viewBox="0 0 32 23" fill="none"><rect width="32" height="23" rx="5" fill="#FF0000"/><polygon points="13,6 26,11.5 13,17" fill="white"/></svg>
-      </div>
+      <div class="channel-icon"><svg width="32" height="23" viewBox="0 0 32 23" fill="none"><rect width="32" height="23" rx="5" fill="#FF0000"/><polygon points="13,6 26,11.5 13,17" fill="white"/></svg></div>
       <div class="channel-name">YouTube</div>
       <div class="channel-desc">Product walkthroughs, installation guides and behind the scenes footage.</div>
       <div class="channel-cta">Watch Now</div>
     </a>
     <a href="#" class="channel-card reveal-scale delay-r1" target="_blank" rel="noopener">
-      <div class="channel-icon">
-        <svg width="30" height="23" viewBox="0 0 30 23" fill="none"><path d="M25.5 2A24.8 24.8 0 0 0 20 .6a17 17 0 0 0-.76 1.58 23 23 0 0 0-6.84 0A16.5 16.5 0 0 0 11.6.6 24.7 24.7 0 0 0 5.5 2C1.5 7.7.44 13.3 1.04 18.8a24.9 24.9 0 0 0 7.6 3.85c.61-.84 1.16-1.73 1.63-2.67a16.2 16.2 0 0 1-2.56-1.23l.62-.49a17.7 17.7 0 0 0 15.27 0l.62.49a16.2 16.2 0 0 1-2.57 1.23c.47.94 1.01 1.83 1.63 2.67A24.8 24.8 0 0 0 29 18.8c.72-6.4-1.13-12-4.5-16.8ZM10.6 15.5c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Zm8.8 0c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Z" fill="#5865F2"/></svg>
-      </div>
+      <div class="channel-icon"><svg width="30" height="23" viewBox="0 0 30 23" fill="none"><path d="M25.5 2A24.8 24.8 0 0 0 20 .6a17 17 0 0 0-.76 1.58 23 23 0 0 0-6.84 0A16.5 16.5 0 0 0 11.6.6 24.7 24.7 0 0 0 5.5 2C1.5 7.7.44 13.3 1.04 18.8a24.9 24.9 0 0 0 7.6 3.85c.61-.84 1.16-1.73 1.63-2.67a16.2 16.2 0 0 1-2.56-1.23l.62-.49a17.7 17.7 0 0 0 15.27 0l.62.49a16.2 16.2 0 0 1-2.57 1.23c.47.94 1.01 1.83 1.63 2.67A24.8 24.8 0 0 0 29 18.8c.72-6.4-1.13-12-4.5-16.8ZM10.6 15.5c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Zm8.8 0c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Z" fill="#5865F2"/></svg></div>
       <div class="channel-name">Discord</div>
       <div class="channel-desc">Chat with the team, ask questions and connect with other operators.</div>
       <div class="channel-cta">Join Server</div>
     </a>
     <a href="#" class="channel-card reveal-scale delay-r2" target="_blank" rel="noopener">
-      <div class="channel-icon">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="13" fill="#1b2b3a"/><path d="M13 4.5C8.31 4.5 4.5 8.31 4.5 13a8.48 8.48 0 0 0 4.8 7.6l1.82-4.38a2.83 2.83 0 1 1 3.77-2.65l4.43-1.82A8.5 8.5 0 0 0 13 4.5Z" fill="#c7d5e0"/><circle cx="11" cy="15.5" r="2.3" fill="#1b2b3a"/></svg>
-      </div>
+      <div class="channel-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="13" fill="#1b2b3a"/><path d="M13 4.5C8.31 4.5 4.5 8.31 4.5 13a8.48 8.48 0 0 0 4.8 7.6l1.82-4.38a2.83 2.83 0 1 1 3.77-2.65l4.43-1.82A8.5 8.5 0 0 0 13 4.5Z" fill="#c7d5e0"/><circle cx="11" cy="15.5" r="2.3" fill="#1b2b3a"/></svg></div>
       <div class="channel-name">Steam</div>
       <div class="channel-desc">Follow our page for updates, announcements and community posts.</div>
       <div class="channel-cta">View Page</div>
     </a>
   </div>
-
   <div class="videos-section">
-    <div class="videos-header">
-      <p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:28px">Latest from YouTube</p>
-    </div>
+    <div class="videos-header"><p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:28px">Latest from YouTube</p></div>
     <div class="videos-grid">
       <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb">
-          <div class="video-thumb-bg"></div>
-          <div class="video-play-btn">&#9654;</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">Bollard Series I — Product Overview</div>
-          <div class="video-meta">3 days ago</div>
-        </div>
+        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
+        <div class="video-info"><div class="video-title">Bollard Series I — Product Overview</div><div class="video-meta">3 days ago</div></div>
       </div>
       <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb">
-          <div class="video-thumb-bg"></div>
-          <div class="video-play-btn">&#9654;</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">Installation Guide — D-Type Fenders</div>
-          <div class="video-meta">1 week ago</div>
-        </div>
+        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
+        <div class="video-info"><div class="video-title">Installation Guide — D-Type Fenders</div><div class="video-meta">1 week ago</div></div>
       </div>
       <div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/dQw4w9WgXcQ')">
-        <div class="video-thumb">
-          <div class="video-thumb-bg"></div>
-          <div class="video-play-btn">&#9654;</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">Behind the Scenes — Manufacturing</div>
-          <div class="video-meta">2 weeks ago</div>
-        </div>
+        <div class="video-thumb"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>
+        <div class="video-info"><div class="video-title">Behind the Scenes — Manufacturing</div><div class="video-meta">2 weeks ago</div></div>
       </div>
     </div>
   </div>
@@ -1801,52 +1532,17 @@ nav.scrolled {
     <h2 class="section-title">Trusted <em>Partners</em></h2>
     <div class="section-rule"></div>
   </div>
-
   <div class="partners-grid">
-    <div class="partner-card reveal-scale">
-      <div class="partner-initial">A</div>
-      <div class="partner-name">Albatross Marine Ltd</div>
-      <div class="partner-type">Supply · Distribution</div>
-    </div>
-    <div class="partner-card reveal-scale delay-r1">
-      <div class="partner-initial">N</div>
-      <div class="partner-name">Northsea Ports Group</div>
-      <div class="partner-type">Port Authority</div>
-    </div>
-    <div class="partner-card reveal-scale delay-r2">
-      <div class="partner-initial">H</div>
-      <div class="partner-name">Halcyon Yacht Works</div>
-      <div class="partner-type">Refit & Build</div>
-    </div>
-    <div class="partner-card reveal-scale delay-r3">
-      <div class="partner-initial">K</div>
-      <div class="partner-name">Kirkland Heavy Marine</div>
-      <div class="partner-type">Commercial Fleet</div>
-    </div>
-    <div class="partner-card">
-      <div class="partner-initial">C</div>
-      <div class="partner-name">Coastal Eng. Solutions</div>
-      <div class="partner-type">Engineering</div>
-    </div>
-    <div class="partner-card">
-      <div class="partner-initial">S</div>
-      <div class="partner-name">Stonebridge Dock Co.</div>
-      <div class="partner-type">Infrastructure</div>
-    </div>
-    <div class="partner-card">
-      <div class="partner-initial">M</div>
-      <div class="partner-name">Maritime Supply INT</div>
-      <div class="partner-type">Global Distributor</div>
-    </div>
-    <div class="partner-card">
-      <div class="partner-initial">T</div>
-      <div class="partner-name">Tidal Basin Authority</div>
-      <div class="partner-type">Regulatory Partner</div>
-    </div>
+    <div class="partner-card reveal-scale"><div class="partner-initial">A</div><div class="partner-name">Albatross Marine Ltd</div><div class="partner-type">Supply · Distribution</div></div>
+    <div class="partner-card reveal-scale delay-r1"><div class="partner-initial">N</div><div class="partner-name">Northsea Ports Group</div><div class="partner-type">Port Authority</div></div>
+    <div class="partner-card reveal-scale delay-r2"><div class="partner-initial">H</div><div class="partner-name">Halcyon Yacht Works</div><div class="partner-type">Refit &amp; Build</div></div>
+    <div class="partner-card reveal-scale delay-r3"><div class="partner-initial">K</div><div class="partner-name">Kirkland Heavy Marine</div><div class="partner-type">Commercial Fleet</div></div>
+    <div class="partner-card"><div class="partner-initial">C</div><div class="partner-name">Coastal Eng. Solutions</div><div class="partner-type">Engineering</div></div>
+    <div class="partner-card"><div class="partner-initial">S</div><div class="partner-name">Stonebridge Dock Co.</div><div class="partner-type">Infrastructure</div></div>
+    <div class="partner-card"><div class="partner-initial">M</div><div class="partner-name">Maritime Supply INT</div><div class="partner-type">Global Distributor</div></div>
+    <div class="partner-card"><div class="partner-initial">T</div><div class="partner-name">Tidal Basin Authority</div><div class="partner-type">Regulatory Partner</div></div>
   </div>
 </section>
-
-
 
 <!-- Product Modal -->
 <div class="product-modal" id="product-modal" onclick="closeProductModal()">
@@ -1898,9 +1594,7 @@ nav.scrolled {
 <!-- ─── FOOTER ─── -->
 <footer>
   <a href="#home">
-    <svg viewBox="0 0 620 279" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#f7efe6" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/>
-    </svg>
+    <svg viewBox="0 0 620 279" xmlns="http://www.w3.org/2000/svg"><path fill="#f7efe6" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg>
   </a>
   <span class="footer-meta">© 2025 Underway. Built for the Long Haul.</span>
   <ul class="footer-links">
@@ -1914,12 +1608,11 @@ nav.scrolled {
 
 <!-- ─── SCRIPTS ─── -->
 <script>
-// Marquee - JS driven so it never stops
+// Marquee
 (function(){
   var BOLL_PATH = "M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z";
   var ITEMS = ["Est. 2021", "Built for the Long Haul", "Est. 2021", "Built for the Long Haul"];
   var track = document.getElementById('mq-track');
-  // Build 4x for smooth infinite loop
   for (var r = 0; r < 4; r++) {
     ITEMS.forEach(function(txt) {
       var unit = document.createElement('div');
@@ -1928,10 +1621,7 @@ nav.scrolled {
       track.appendChild(unit);
     });
   }
-  // JS-driven scroll so it never stops
-  var pos = 0;
-  var speed = 0.5;
-  var halfW = 0;
+  var pos = 0, speed = 0.5, halfW = 0;
   function getHalf() { return track.scrollWidth / 2; }
   function tick() {
     pos += speed;
@@ -1942,19 +1632,12 @@ nav.scrolled {
   requestAnimationFrame(tick);
 })();
 
-
-// Custom cursor — dot only
+// Custom cursor
 (function() {
   var dot = document.getElementById('cursor-dot');
   document.addEventListener('mousemove', function(e) {
     dot.style.left = e.clientX + 'px';
     dot.style.top = e.clientY + 'px';
-  });
-  ['a','button','.product-card','.channel-card','.video-card','.discord-post'].forEach(function(sel) {
-    document.querySelectorAll(sel).forEach(function(el) {
-      el.addEventListener('mouseenter', function() { dot.classList.add('hovering'); });
-      el.addEventListener('mouseleave', function() { dot.classList.remove('hovering'); });
-    });
   });
   document.addEventListener('mousedown', function() { dot.classList.add('clicking'); });
   document.addEventListener('mouseup', function() { dot.classList.remove('clicking'); });
@@ -1969,7 +1652,6 @@ nav.scrolled {
     });
   }, { threshold: 0.1 });
   revealEls.forEach(function(el) { ro.observe(el); });
-
   var nav = document.querySelector('nav');
   var heroTitle = document.querySelector('.hero-title');
   window.addEventListener('scroll', function() {
@@ -1980,52 +1662,25 @@ nav.scrolled {
   }, { passive: true });
 })();
 
+// Gallery
+function openGallery() { document.getElementById('gallery-page').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function closeGallery() { document.getElementById('gallery-page').style.display = 'none'; document.body.style.overflow = ''; }
 
-
-
-// Gallery open/close
-function openGallery() {
-  document.getElementById('gallery-page').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  window.scrollTo(0,0);
-}
-function closeGallery() {
-  document.getElementById('gallery-page').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-// Gallery prompt filter
 var galleryCurrentPrompt = 'golden-hour';
 function galleryFilter(prompt, btn) {
   document.querySelectorAll('.gp-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
   galleryCurrentPrompt = prompt;
   var cards = document.querySelectorAll('#gallery-grid .photo-card');
-  cards.forEach(function(c) {
-    var p = c.getAttribute('data-prompt');
-    if (prompt === 'all' || p === prompt) {
-      c.style.display = 'flex';
-    } else {
-      c.style.display = 'none';
-    }
-  });
-  // Update heading
+  cards.forEach(function(c) { c.style.display = (prompt === 'all' || c.getAttribute('data-prompt') === prompt) ? 'flex' : 'none'; });
   var names = {'golden-hour':'Golden Hour','heavy-weather':'Heavy Weather','installation':'The Install','detail':'Close Quarters','all':'All Entries'};
-  var quotes = {
-    'golden-hour':'"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."',
-    'heavy-weather':'"Document Underway equipment performing in severe conditions."',
-    'installation':'"Capture the install — before, during, or the moment it goes live."',
-    'detail':'"Get close. The craftsmanship is the shot."',
-    'all':'All competition entries across every prompt.'
-  };
-  var isActive = prompt === 'golden-hour';
+  var quotes = {'golden-hour':'"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."','heavy-weather':'"Document Underway equipment performing in severe conditions."','installation':'"Capture the install — before, during, or the moment it goes live."','detail':'"Get close. The craftsmanship is the shot."','all':'All competition entries across every prompt.'};
   var h = document.getElementById('gallery-prompt-heading');
-  h.querySelector('.gallery-prompt-eyebrow').textContent = isActive ? 'Current Prompt' : 'Past Prompt';
+  h.querySelector('.gallery-prompt-eyebrow').textContent = prompt === 'golden-hour' ? 'Current Prompt' : 'Past Prompt';
   h.querySelector('.gallery-prompt-title').textContent = names[prompt] || prompt;
   h.querySelector('.gallery-prompt-quote').textContent = quotes[prompt] || '';
 }
 
-// Gallery sort
 function gallerySort(type, btn) {
   document.querySelectorAll('.gsort-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
@@ -2041,19 +1696,13 @@ function gallerySort(type, btn) {
   cards.forEach(function(c) { grid.appendChild(c); });
 }
 
-// Like / fire toggle
 function toggleLike(btn) {
   var type = btn.getAttribute('data-type');
-  var cls  = 'liked-' + type;
+  var cls = 'liked-' + type;
   var countEl = btn.querySelector('.like-count');
   var n = parseInt(countEl.textContent);
-  if (btn.classList.contains(cls)) {
-    btn.classList.remove(cls);
-    countEl.textContent = n - 1;
-  } else {
-    btn.classList.add(cls);
-    countEl.textContent = n + 1;
-  }
+  if (btn.classList.contains(cls)) { btn.classList.remove(cls); countEl.textContent = n - 1; }
+  else { btn.classList.add(cls); countEl.textContent = n + 1; }
 }
 
 // Announcement slider
@@ -2061,46 +1710,9 @@ var annCurrent = 0;
 function annSlide(n) {
   var slides = document.querySelectorAll('#ann-slider .update-announce-slide');
   var dots = document.querySelectorAll('#ann-dots .usd');
-  slides[annCurrent].classList.remove('active');
-  dots[annCurrent].classList.remove('active');
+  slides[annCurrent].classList.remove('active'); dots[annCurrent].classList.remove('active');
   annCurrent = n;
-  slides[annCurrent].classList.add('active');
-  dots[annCurrent].classList.add('active');
-}
-
-// Product row sliders — each row has its own slider
-function rowSlide(dotBtn, n) {
-  var dotsWrap = dotBtn.parentElement;
-  var slider = dotsWrap.previousElementSibling;
-  var slides = slider.querySelectorAll('.update-row-slide');
-  var dots = dotsWrap.querySelectorAll('.usd');
-  var cur = 0;
-  dots.forEach(function(d,i){ if(d.classList.contains('active')) cur = i; });
-  slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
-  slides[n].classList.add('active'); dots[n].classList.add('active');
-  // stop event bubbling so row click-to-scroll doesn't fire
-  event.stopPropagation();
-}
-
-// Scroll to product in catalogue and flash the matching update card
-function scrollToProduct(name) {
-  var grid = document.getElementById('products-grid');
-  var cards = grid ? grid.querySelectorAll('.product-card') : [];
-  var target = null;
-  cards.forEach(function(c) {
-    if (c.querySelector('.product-name') && c.querySelector('.product-name').textContent.trim() === name) {
-      target = c;
-    }
-  });
-  if (target) {
-    var section = document.getElementById('products');
-    section.scrollIntoView({ behavior: 'smooth' });
-    setTimeout(function() {
-      target.style.transition = 'background .15s';
-      target.style.background = 'rgba(247,239,230,.18)';
-      setTimeout(function() { target.style.background = ''; }, 900);
-    }, 600);
-  }
+  slides[annCurrent].classList.add('active'); dots[annCurrent].classList.add('active');
 }
 
 // Carousel
@@ -2133,21 +1745,7 @@ document.querySelectorAll('.anim').forEach(function(el) {
   el.style.animationPlayState = 'paused'; observer.observe(el);
 });
 
-// Status bar observer (still used for any injected status rows)
-var statusObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(e) {
-    if (e.isIntersecting) {
-      e.target.querySelectorAll('.status-bar').forEach(function(bar) {
-        var target = bar.getAttribute('data-target') || bar.style.width;
-        bar.style.width = '0';
-        setTimeout(function() { bar.style.width = target; }, 80);
-      });
-      statusObserver.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1 });
-
-// Product Modal — multi-image gallery + lightbox
+// ── PRODUCT MODAL — image-ratio-driven left column ──
 var pmImages = [];
 var pmCurrentImg = 0;
 
@@ -2157,17 +1755,17 @@ function pmShowImage(idx) {
   pmCurrentImg = idx;
   var main = document.getElementById('pm-img-main');
   var img = main.querySelector('img.pm-main-img');
+  var RIGHT_W = 420;
   if (img) {
     img.src = pmImages[idx];
     img.onload = function() {
-      if (!img.naturalWidth) return;
+      if (!img.naturalWidth || !img.naturalHeight) return;
       var ratio = img.naturalWidth / img.naturalHeight;
-      var contentW = 420;
       var layout = document.querySelector('.product-modal-layout');
-      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
-      var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
-      layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
-      var maxH = Math.round(window.innerHeight * 0.7);
+      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - RIGHT_W, 960);
+      var imgColW = Math.max(240, Math.min(Math.round(RIGHT_W * ratio), maxImgW));
+      layout.style.gridTemplateColumns = imgColW + 'px ' + RIGHT_W + 'px';
+      var maxH = Math.round(window.innerHeight * 0.72);
       main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
     };
   }
@@ -2196,11 +1794,8 @@ function pmLightboxNav(dir) {
   pmShowImage(idx);
 }
 
-function pmLightboxClose() {
-  document.getElementById('pm-lightbox').classList.remove('open');
-}
+function pmLightboxClose() { document.getElementById('pm-lightbox').classList.remove('open'); }
 
-// Product Modal
 function openProductModal(num, status, name, type, desc, details, cta, dc_channel, dc_title, dc_body, dc_meta, imageStr, cta_url) {
   var sc = { 'Active':'status-active', 'In Development':'status-dev', 'Coming Soon':'status-soon', 'In Dev':'status-dev' };
   document.getElementById('pm-num').textContent = num;
@@ -2212,22 +1807,21 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.getElementById('pm-desc').textContent = desc;
   document.getElementById('pm-details').textContent = details;
 
-  // CTA button — use sheet text and url
   var ctaBtn = document.getElementById('pm-cta');
   ctaBtn.textContent = (cta || 'Request a Quote') + ' ->';
   ctaBtn.onclick = function() {
     if (cta_url) { window.open(cta_url, '_blank'); } else { closeProductModal(); }
   };
 
-  // Parse images — comma-separated URLs, strip blanks and obviously invalid entries
+  // Parse images
   pmImages = imageStr ? imageStr.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4 && s.indexOf('.') !== -1; }) : [];
   pmCurrentImg = 0;
 
   var main = document.getElementById('pm-img-main');
   var thumbStrip = document.getElementById('pm-thumb-strip');
-
   var layout = document.querySelector('.product-modal-layout');
-  var contentW = 420; // right side always stays this wide
+  var RIGHT_W = 420; // right content column fixed width
+
   if (pmImages.length > 0) {
     main.style.cursor = 'zoom-in';
     var showNav = pmImages.length > 1;
@@ -2238,26 +1832,28 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
       (showNav ? '<button class="pm-img-nav next" onclick="event.stopPropagation();pmShowImage(pmCurrentImg+1)">&#8594;</button>' : '') +
       (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
     main.onclick = function() { pmOpenLightbox(pmCurrentImg); };
-    // Set a sensible default width immediately, then refine once image loads
-    layout.style.gridTemplateColumns = '480px ' + contentW + 'px';
-    main.style.minHeight = '480px';
-    setTimeout(function(){
-      var img = main.querySelector('.pm-main-img');
-      if (!img) return;
-      function applyRatio() {
-        if (!img.naturalWidth) return;
-        var ratio = img.naturalWidth / img.naturalHeight;
-        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
-        var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
-        layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
-        var maxH = Math.round(window.innerHeight * 0.7);
-        main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
-      }
+
+    // Start square as fallback, then resize once image natural dimensions are known
+    layout.style.gridTemplateColumns = RIGHT_W + 'px ' + RIGHT_W + 'px';
+    main.style.minHeight = RIGHT_W + 'px';
+
+    var img = main.querySelector('.pm-main-img');
+    function applyRatio() {
+      if (!img || !img.naturalWidth || !img.naturalHeight) return;
+      var ratio = img.naturalWidth / img.naturalHeight;
+      // Left column width = RIGHT_W height * image ratio, capped at viewport
+      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - RIGHT_W, 960);
+      var minImgW = 240;
+      var imgColW = Math.max(minImgW, Math.min(Math.round(RIGHT_W * ratio), maxImgW));
+      layout.style.gridTemplateColumns = imgColW + 'px ' + RIGHT_W + 'px';
+      var maxH = Math.round(window.innerHeight * 0.72);
+      main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+    }
+    if (img) {
       if (img.complete && img.naturalWidth) { applyRatio(); }
       else { img.addEventListener('load', applyRatio); }
-    }, 0);
+    }
 
-    // Thumbnail strip
     if (pmImages.length > 1) {
       thumbStrip.style.display = 'flex';
       thumbStrip.innerHTML = pmImages.map(function(url, i) {
@@ -2267,9 +1863,9 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
       thumbStrip.style.display = 'none';
     }
   } else {
-    // No images — square placeholder, equal columns
-    layout.style.gridTemplateColumns = contentW + 'px ' + contentW + 'px';
-    main.style.minHeight = contentW + 'px';
+    // No images — both columns equal square (420 × 420)
+    layout.style.gridTemplateColumns = RIGHT_W + 'px ' + RIGHT_W + 'px';
+    main.style.minHeight = RIGHT_W + 'px';
     main.style.cursor = 'default';
     main.onclick = null;
     main.innerHTML = '<div class="pm-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:72px;opacity:.1"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span></div>';
@@ -2288,13 +1884,13 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
 function closeProductModal() {
   document.getElementById('product-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
 
-// Video Modal
-function openVideoModal(url, title) {
+function openVideoModal(url) {
   document.getElementById('video-iframe').src = url + '?autoplay=1';
   document.getElementById('video-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -2305,24 +1901,23 @@ function closeVideoModal() {
   document.body.style.overflow = '';
 }
 
-// Close modals on Escape
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeProductModal(); closeVideoModal(); pmLightboxClose(); }
   if (e.key === 'ArrowLeft' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(-1);
   if (e.key === 'ArrowRight' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(1);
 });
 
-// Google Sheets
+// Google Sheets URLs
 var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
-var STATUS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
+var STATUS_URL   = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
 
 function renderComingSoon() {
   var grid = document.getElementById('products-grid');
   grid.innerHTML = '<div style="grid-column:1/-1;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;">' +
-    '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(247,239,230,.2)" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d=\'M12 6v6l4 2\'/></svg>' +
+    '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(247,239,230,.2)" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>' +
     '<div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream);letter-spacing:-.01em;">Catalogue Coming Soon</div>' +
     '<div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range. Check back shortly or join our Discord for first access.</div>' +
-    '<a href=\"#discord\" style=\"margin-top:8px;background:var(--cream);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;padding:12px 28px;text-decoration:none;\">Join Discord &#8594;</a>' +
+    '<a href="#discord" style="margin-top:8px;background:var(--cream);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;padding:12px 28px;text-decoration:none;">Join Discord &#8594;</a>' +
   '</div>';
 }
 
@@ -2372,16 +1967,10 @@ function renderProducts(products) {
     card.addEventListener('click', function() {
       var idx = parseInt(this.getAttribute('data-idx'));
       var p = PRODUCT_REGISTRY[idx];
-      var num = String(idx + 1).padStart(2, '0');
-      // Case-insensitive field lookup
-      function col(p) {
-        var lower = {};
-        Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
-        return lower;
-      }
-      var r = col(p);
+      var r = {};
+      Object.keys(p).forEach(function(k){ r[k.toLowerCase()] = p[k]; });
       openProductModal(
-        num,
+        String(idx + 1).padStart(2, '0'),
         r.status || '',
         r.name || '',
         r.type || '',
@@ -2404,10 +1993,7 @@ function renderProducts(products) {
 
 function loadFromSheets() {
   fetch(PRODUCTS_URL)
-    .then(function(res) {
-      if (!res.ok) throw new Error('Fetch failed');
-      return res.text();
-    })
+    .then(function(res) { if (!res.ok) throw new Error('Fetch failed'); return res.text(); })
     .then(function(text) {
       var products = parseCSV(text);
       if (products.length === 0) throw new Error('Empty');
@@ -2416,62 +2002,16 @@ function loadFromSheets() {
     .catch(function() { renderComingSoon(); });
 }
 
-// ── TEST MODE ── set to false to load from Google Sheets
+// ── TEST_MODE = false — loads from Google Sheets ──
 var TEST_MODE = false;
 if (TEST_MODE) {
-  var testProducts = [
-    {
-      name: 'Harbour Cleat Mk.II',
-      type: 'Deck Hardware',
-      status: 'Active',
-      desc: 'Heavy-duty cast stainless cleat rated to 4,000kg load. Designed for commercial quay installations and high-traffic berths.',
-      details: 'Material: 316L Stainless\nRating: 4,000kg\nMount: 4x M12 bolts\nFinish: Satin\nLength: 250mm',
-      cta: 'Request a Quote',
-      cta_url: '',
-      image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1200&q=80,https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80,https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
-      dc_channel: 'hardware', dc_title: '', dc_body: '', dc_meta: ''
-    },
-    {
-      name: 'NavChart Pro',
-      type: 'Navigation Software',
-      status: 'Active',
-      desc: 'Offline-capable chart plotter with real-time AIS overlay, tidal data, and voyage logging for professional mariners.',
-      details: 'Platform: iOS / Android / Web\nCharts: BSB4, S-57 ENC\nAIS: Built-in\nOffline: Full chart cache\nLicence: Annual subscription',
-      cta: 'Download Free Trial',
-      cta_url: 'https://example.com',
-      image: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&q=80,https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
-      dc_channel: 'software', dc_title: '', dc_body: '', dc_meta: ''
-    },
-    {
-      name: 'Storm Mooring Kit',
-      type: 'Safety Equipment',
-      status: 'In Development',
-      desc: 'Emergency mooring system rated for Force 10 conditions. Includes 3x bridle lines, chafe guards, and quick-release shackles.',
-      details: 'Lines: 3x 16mm nylon\nBreaking load: 6,200kg\nChafe guards: Leather + neoprene\nShackles: 316 SS quick-release\nBag: Waterproof roll-top',
-      cta: 'Join Waitlist',
-      cta_url: '',
-      image: 'https://images.unsplash.com/photo-1500514966906-fe245eea9344?w=1200&q=80,https://images.unsplash.com/photo-1530053969600-caed2596d242?w=1200&q=80,https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=1200&q=80,https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=1200&q=80',
-      dc_channel: 'safety', dc_title: '', dc_body: '', dc_meta: ''
-    },
-    {
-      name: 'Tidal Anchor Pro',
-      type: 'Ground Tackle',
-      status: 'Coming Soon',
-      desc: 'Next-generation scoop anchor with auto-resetting shank. Proven in 200+ commercial deployments across tidal rivers and offshore anchorages.',
-      details: 'Weight: 25kg\nRating: Vessels to 25m\nShank: Hinged auto-reset\nFinish: Hot-dip galvanised\nChain: 10mm calibrated',
-      cta: 'Notify Me',
-      cta_url: '',
-      image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80,https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
-      dc_channel: 'tackle', dc_title: '', dc_body: '', dc_meta: ''
-    }
-  ];
-  renderProducts(testProducts);
+  // test data removed
 } else {
   loadFromSheets();
 }
 </script>
 
-<!-- ═══ GALLERY PAGE (SPA) ═══ -->
+<!-- ═══ GALLERY PAGE ═══ -->
 <div id="gallery-page" style="display:none">
   <div class="gallery-nav">
     <button class="gallery-back" onclick="closeGallery()">
@@ -2485,12 +2025,8 @@ if (TEST_MODE) {
       <a href="#" class="btn-gallery-submit">Submit a Photo</a>
     </div>
   </div>
-
   <div class="gallery-body">
-
-    <!-- ── SIDEBAR ── -->
     <div class="gallery-sidebar">
-
       <div class="gallery-sidebar-section">
         <div class="gallery-sidebar-label">Current Competition</div>
         <div class="gallery-comp-active">
@@ -2500,71 +2036,25 @@ if (TEST_MODE) {
           <div class="gallery-comp-prize"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg> Prize: Series II Bollard + Feature</div>
         </div>
       </div>
-
       <div class="gallery-sidebar-section">
         <div class="gallery-sidebar-label">Browse Prompts</div>
         <div class="gallery-prompt-list">
-          <button class="gp-btn active" onclick="galleryFilter('golden-hour', this)">
-            <span class="gp-dot active-dot"></span>
-            <span class="gp-name">Golden Hour</span>
-            <span class="gp-count">12 entries</span>
-          </button>
-          <button class="gp-btn past" onclick="galleryFilter('heavy-weather', this)">
-            <span class="gp-dot"></span>
-            <span class="gp-name">Heavy Weather</span>
-            <span class="gp-count">past · 9 entries</span>
-          </button>
-          <button class="gp-btn past" onclick="galleryFilter('installation', this)">
-            <span class="gp-dot"></span>
-            <span class="gp-name">The Install</span>
-            <span class="gp-count">past · 14 entries</span>
-          </button>
-          <button class="gp-btn past" onclick="galleryFilter('detail', this)">
-            <span class="gp-dot"></span>
-            <span class="gp-name">Close Quarters</span>
-            <span class="gp-count">past · 7 entries</span>
-          </button>
-          <button class="gp-btn" onclick="galleryFilter('all', this)">
-            <span class="gp-dot"></span>
-            <span class="gp-name">All Entries</span>
-            <span class="gp-count">42 total</span>
-          </button>
+          <button class="gp-btn active" onclick="galleryFilter('golden-hour', this)"><span class="gp-dot active-dot"></span><span class="gp-name">Golden Hour</span><span class="gp-count">12 entries</span></button>
+          <button class="gp-btn past" onclick="galleryFilter('heavy-weather', this)"><span class="gp-dot"></span><span class="gp-name">Heavy Weather</span><span class="gp-count">past · 9 entries</span></button>
+          <button class="gp-btn past" onclick="galleryFilter('installation', this)"><span class="gp-dot"></span><span class="gp-name">The Install</span><span class="gp-count">past · 14 entries</span></button>
+          <button class="gp-btn past" onclick="galleryFilter('detail', this)"><span class="gp-dot"></span><span class="gp-name">Close Quarters</span><span class="gp-count">past · 7 entries</span></button>
+          <button class="gp-btn" onclick="galleryFilter('all', this)"><span class="gp-dot"></span><span class="gp-name">All Entries</span><span class="gp-count">42 total</span></button>
         </div>
       </div>
-
       <div class="gallery-sidebar-section">
         <div class="gallery-sidebar-label">Hall of Winners</div>
         <div class="gallery-winners-list">
-          <div class="gallery-winner-row">
-            <div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
-            <div class="gallery-winner-info">
-              <div class="gallery-winner-name">Heavy Weather</div>
-              <div class="gallery-winner-author">@northsea_ports</div>
-              <div class="gallery-winner-title">"Holding Fast — North Sea"</div>
-            </div>
-          </div>
-          <div class="gallery-winner-row">
-            <div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
-            <div class="gallery-winner-info">
-              <div class="gallery-winner-name">The Install</div>
-              <div class="gallery-winner-author">@halcyon_yachts</div>
-              <div class="gallery-winner-title">"D-Type Run — Hamble"</div>
-            </div>
-          </div>
-          <div class="gallery-winner-row">
-            <div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
-            <div class="gallery-winner-info">
-              <div class="gallery-winner-name">Close Quarters</div>
-              <div class="gallery-winner-author">@underway_jamie</div>
-              <div class="gallery-winner-title">"Series I — Base Detail"</div>
-            </div>
-          </div>
+          <div class="gallery-winner-row"><div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="gallery-winner-info"><div class="gallery-winner-name">Heavy Weather</div><div class="gallery-winner-author">@northsea_ports</div><div class="gallery-winner-title">"Holding Fast — North Sea"</div></div></div>
+          <div class="gallery-winner-row"><div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="gallery-winner-info"><div class="gallery-winner-name">The Install</div><div class="gallery-winner-author">@halcyon_yachts</div><div class="gallery-winner-title">"D-Type Run — Hamble"</div></div></div>
+          <div class="gallery-winner-row"><div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="gallery-winner-info"><div class="gallery-winner-name">Close Quarters</div><div class="gallery-winner-author">@underway_jamie</div><div class="gallery-winner-title">"Series I — Base Detail"</div></div></div>
         </div>
       </div>
-
     </div>
-
-    <!-- ── MAIN GRID ── -->
     <div class="gallery-main">
       <div class="gallery-main-header">
         <div id="gallery-prompt-heading">
@@ -2578,293 +2068,17 @@ if (TEST_MODE) {
           <button class="gsort-btn" onclick="gallerySort('recent', this)">Recent</button>
         </div>
       </div>
-
       <div class="gallery-grid" id="gallery-grid">
-
-            <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@saltwater_marina</span>
-        </div>
-        <div class="photo-title">Golden Hour — Solent</div>
-        <div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">38</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@northsea_ports</span>
-        </div>
-        <div class="photo-title">Holding Fast — North Sea</div>
-        <div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">157</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@coastal_eng</span>
-        </div>
-        <div class="photo-title">Pilot Unit at Dawn</div>
-        <div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">88</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Med Berth — Dusk</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@maritime_supply_int</span>
-        </div>
-        <div class="photo-title">Med Berth — Dusk</div>
-        <div class="photo-desc">Superyacht mooring setup, polished stainless in the last light. Worth every penny.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">118</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">43</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Bollard — Low Sun</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@kirkland_marine</span>
-        </div>
-        <div class="photo-title">Bollard — Low Sun</div>
-        <div class="photo-desc">Long shadow across the dock. Series II prototype at the yard, late afternoon light.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">76</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">31</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Dawn Patrol — Solent</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@tidal_basin</span>
-        </div>
-        <div class="photo-title">Dawn Patrol — Solent</div>
-        <div class="photo-desc">Fenders still wet from the night tide. Caught this ten minutes before the crew arrived.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">59</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">19</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-            <div class="photo-card" data-prompt="heavy-weather">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Storm Hold — Tyne</span>
-        <span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span>
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@northsea_ports</span>
-        </div>
-        <div class="photo-title">Storm Hold — Tyne</div>
-        <div class="photo-desc">Full gale. Every bollard held. Taken from the dock office window.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">187</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">142</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="heavy-weather">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Swell Running — Blyth</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@saltwater_marina</span>
-        </div>
-        <div class="photo-title">Swell Running — Blyth</div>
-        <div class="photo-desc">D-type fenders doing exactly what they should. Force 6, building.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">94</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">67</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="heavy-weather">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Rain Night — Aberdeen</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@stonebridge_dock</span>
-        </div>
-        <div class="photo-title">Rain Night — Aberdeen</div>
-        <div class="photo-desc">3am. The mooring lines taut and rain hammering the dock.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">71</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">44</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-            <div class="photo-card" data-prompt="installation">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>D-Type Run — Hamble</span>
-        <span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span>
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@halcyon_yachts</span>
-        </div>
-        <div class="photo-title">D-Type Run — Hamble</div>
-        <div class="photo-desc">Full fender run along the pontoon finger. Single afternoon.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">134</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">88</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="installation">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>First Bollard Down</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@coastal_eng</span>
-        </div>
-        <div class="photo-title">First Bollard Down</div>
-        <div class="photo-desc">Series I going in at first light. Four hours start to finish.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">82</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">51</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="installation">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Cleat Set — Falmouth</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@albatross_marine</span>
-        </div>
-        <div class="photo-title">Cleat Set — Falmouth</div>
-        <div class="photo-desc">Twelve cleats, one morning. The deck looks the part.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">67</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">29</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-            <div class="photo-card" data-prompt="detail">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Series I — Base Casting</span>
-        <span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span>
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@underway_jamie</span>
-        </div>
-        <div class="photo-title">Series I — Base Casting</div>
-        <div class="photo-desc">The new anti-rotation collar. You have to see it in person.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">112</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">95</span>
-          </button>
-        </div>
-      </div>
-    </div>
-            <div class="photo-card" data-prompt="detail">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Shackle — Close</span>
-        
-      </div>
-      <div class="photo-info">
-        <div class="photo-meta-row">
-          <span class="photo-author">@northsea_ports</span>
-        </div>
-        <div class="photo-title">Shackle — Close</div>
-        <div class="photo-desc">Load-rated shackle on the mooring line, just before the tide turned.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
-            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">58</span>
-          </button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
-            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">33</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Golden Hour — Solent</div><div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">38</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Holding Fast — North Sea</div><div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">157</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@coastal_eng</span></div><div class="photo-title">Pilot Unit at Dawn</div><div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Med Berth — Dusk</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@maritime_supply_int</span></div><div class="photo-title">Med Berth — Dusk</div><div class="photo-desc">Superyacht mooring setup, polished stainless in the last light. Worth every penny.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">118</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">43</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Bollard — Low Sun</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@kirkland_marine</span></div><div class="photo-title">Bollard — Low Sun</div><div class="photo-desc">Long shadow across the dock. Series II prototype at the yard, late afternoon light.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">76</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">31</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Dawn Patrol — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@tidal_basin</span></div><div class="photo-title">Dawn Patrol — Solent</div><div class="photo-desc">Fenders still wet from the night tide. Caught this ten minutes before the crew arrived.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">59</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">19</span></button></div></div></div>
+        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Storm Hold — Tyne</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Storm Hold — Tyne</div><div class="photo-desc">Full gale. Every bollard held. Taken from the dock office window.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">187</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">142</span></button></div></div></div>
+        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Swell Running — Blyth</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Swell Running — Blyth</div><div class="photo-desc">D-type fenders doing exactly what they should. Force 6, building.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">94</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">67</span></button></div></div></div>
+        <div class="photo-card" data-prompt="installation"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>D-Type Run — Hamble</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@halcyon_yachts</span></div><div class="photo-title">D-Type Run — Hamble</div><div class="photo-desc">Full fender run along the pontoon finger. Single afternoon.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">134</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
+        <div class="photo-card" data-prompt="detail"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Series I — Base Casting</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@underway_jamie</span></div><div class="photo-title">Series I — Base Casting</div><div class="photo-desc">The new anti-rotation collar. You have to see it in person.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">112</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">95</span></button></div></div></div>
       </div>
     </div>
   </div>
