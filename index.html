@@ -2253,6 +2253,20 @@ loadFromSheets();
     return Math.floor(diff / 2592000) + ' months ago';
   }
 
+  // Parse ISO 8601 duration (PT1M30S etc) to seconds
+  function parseDuration(iso) {
+    var match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+    if (!match) return 0;
+    return ((parseInt(match[1]) || 0) * 3600) +
+           ((parseInt(match[2]) || 0) * 60)   +
+            (parseInt(match[3]) || 0);
+  }
+
+  function bestThumb(thumbnails) {
+    // Prefer maxres > standard > high > medium > default
+    return (thumbnails.maxres || thumbnails.standard || thumbnails.high || thumbnails.medium || thumbnails.default || {}).url || '';
+  }
+
   function renderYTVideos(items) {
     var grid = document.getElementById('yt-videos-grid');
     if (!items || items.length === 0) {
@@ -2260,13 +2274,13 @@ loadFromSheets();
       return;
     }
     grid.innerHTML = items.slice(0, 3).map(function(item) {
-      var videoId = item.id.videoId;
-      var title = item.snippet.title;
-      var thumb = (item.snippet.thumbnails.medium || item.snippet.thumbnails.default || {}).url || '';
-      var published = timeAgo(item.snippet.publishedAt);
-      return '<div class="video-card" onclick="openVideoModal(\'https://www.youtube.com/embed/' + videoId + '\')">' +
-        '<div class="video-thumb" style="background-image:url(\'' + thumb + '\');background-size:cover;background-position:center;">' +
-          '<div class="video-thumb-bg" style="background:rgba(25,41,58,.25)"></div>' +
+      var videoId = item.videoId;
+      var title = item.title;
+      var thumb = item.thumb;
+      var published = timeAgo(item.publishedAt);
+      return '<div class="video-card" onclick="openVideoModal('https://www.youtube.com/embed/' + videoId + '?autoplay=1')">' +
+        '<div class="video-thumb" style="background-image:url(' + JSON.stringify(thumb) + ');background-size:cover;background-position:center;">' +
+          '<div class="video-thumb-bg" style="background:rgba(25,41,58,.2)"></div>' +
           '<div class="video-play-btn">&#9654;</div>' +
         '</div>' +
         '<div class="video-info">' +
@@ -2279,12 +2293,39 @@ loadFromSheets();
 
   function renderYTError() {
     var grid = document.getElementById('yt-videos-grid');
-    grid.innerHTML = '<div style="grid-column:1/-1;padding:32px;text-align:center;font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.35;">Couldn\'t load videos — <a href="https://www.youtube.com/channel/' + YT_CHANNEL + '" target=\"_blank\" style=\"color:var(--navy)\">visit channel</a></div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:32px;text-align:center;font-size:10px;letter-spacing:.15em;text-transform:uppercase;opacity:.35;">Couldn't load videos — <a href="https://www.youtube.com/channel/' + YT_CHANNEL + '" target="_blank" style="color:var(--navy)">visit channel</a></div>';
   }
 
-  fetch('https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&channelId=' + YT_CHANNEL + '&part=snippet&order=date&maxResults=3&type=video')
+  // Step 1: fetch 10 most recent videos
+  fetch('https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY +
+        '&channelId=' + YT_CHANNEL +
+        '&part=snippet&order=date&maxResults=10&type=video')
     .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function(data) { if (data.error) throw new Error(data.error.message); renderYTVideos(data.items); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error.message);
+      var ids = data.items.map(function(i) { return i.id.videoId; }).join(',');
+      var snippetMap = {};
+      data.items.forEach(function(i) { snippetMap[i.id.videoId] = i.snippet; });
+
+      // Step 2: fetch durations to filter out Shorts (< 60s)
+      return fetch('https://www.googleapis.com/youtube/v3/videos?key=' + YT_KEY +
+                   '&id=' + ids + '&part=contentDetails')
+        .then(function(r) { return r.json(); })
+        .then(function(details) {
+          var longform = details.items
+            .filter(function(v) { return parseDuration(v.contentDetails.duration) >= 60; })
+            .map(function(v) {
+              var s = snippetMap[v.id];
+              return {
+                videoId: v.id,
+                title: s.title,
+                thumb: bestThumb(s.thumbnails),
+                publishedAt: s.publishedAt
+              };
+            });
+          renderYTVideos(longform);
+        });
+    })
     .catch(function(err) { console.warn('YouTube API:', err); renderYTError(); });
 })();
 
