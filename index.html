@@ -1616,42 +1616,7 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
     </div>
   </div>
   <div class="photos-grid photos-grid-teaser" id="photos-teaser-grid">
-    <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span></div>
-      <div class="photo-info">
-        <div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div>
-        <div class="photo-title">Golden Hour — Solent</div>
-        <div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span></button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">38</span></button>
-        </div>
-      </div>
-    </div>
-    <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span></div>
-      <div class="photo-info">
-        <div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div>
-        <div class="photo-title">Holding Fast — North Sea</div>
-        <div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span></button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">157</span></button>
-        </div>
-      </div>
-    </div>
-    <div class="photo-card" data-prompt="golden-hour">
-      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span></div>
-      <div class="photo-info">
-        <div class="photo-meta-row"><span class="photo-author">@coastal_eng</span></div>
-        <div class="photo-title">Pilot Unit at Dawn</div>
-        <div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div>
-        <div class="photo-actions">
-          <button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span></button>
-          <button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button>
-        </div>
-      </div>
-    </div>
+    <div style="grid-column:1/-1;padding:48px 0;text-align:center;opacity:.35;font-size:13px;letter-spacing:.08em;text-transform:uppercase;">Loading submissions...</div>
   </div>
   <div class="photos-teaser-cta reveal">
     <button class="photos-see-all" onclick="openGallery()">See all entries &amp; past winners <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
@@ -2288,7 +2253,7 @@ function renderGalleryFromSheet(rows) {
   var FIRE_SVG  = '<svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg>';
   var IMG_SVG   = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
 
-  grid.innerHTML = sorted.map(function(row) {
+  function buildCard(row, prompt) {
     var r = {}; Object.keys(row).forEach(function(k){ r[k.toLowerCase()] = row[k]; });
     var imgUrl   = r.image || '';
     var title    = r.title || 'Untitled';
@@ -2296,7 +2261,6 @@ function renderGalleryFromSheet(rows) {
     var userId   = r.userid || r.user_id || '';
     var hearts   = parseInt(r.hearts) || 0;
     var fire     = parseInt(r.fire) || 0;
-    var prompt   = (theme || 'current').toLowerCase().replace(/\s+/g,'-');
 
     var imgHtml = imgUrl
       ? '<img src="' + imgUrl + '" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;" onerror="this.style.display=\'none\'" alt="' + title + '">' + IMG_SVG
@@ -2305,7 +2269,7 @@ function renderGalleryFromSheet(rows) {
     return '<div class="photo-card" data-prompt="' + prompt + '">' +
       '<div class="photo-img">' + imgHtml + '</div>' +
       '<div class="photo-info">' +
-        '<div class="photo-meta-row"><span class="photo-author">' + (userId ? '<@' + userId + '>' : 'Unknown') + '</span></div>' +
+        '<div class="photo-meta-row"><span class="photo-author">' + (userId ? '#' + userId : 'Discord User') + '</span></div>' +
         '<div class="photo-title">' + title + '</div>' +
         '<div class="photo-desc">' + desc + '</div>' +
         '<div class="photo-actions">' +
@@ -2314,7 +2278,23 @@ function renderGalleryFromSheet(rows) {
         '</div>' +
       '</div>' +
     '</div>';
-  }).join('');
+  }
+
+  var prompt = (theme || 'current').toLowerCase().replace(/\s+/g,'-');
+
+  // Full gallery grid
+  grid.innerHTML = sorted.map(function(row) { return buildCard(row, prompt); }).join('');
+
+  // Teaser grid — top 3 by score on main page
+  var teaser = document.getElementById('photos-teaser-grid');
+  if (teaser) {
+    var top3 = sorted.slice(0, 3);
+    if (top3.length > 0) {
+      teaser.innerHTML = top3.map(function(row) { return buildCard(row, prompt); }).join('');
+    } else {
+      teaser.innerHTML = '<div style="grid-column:1/-1;padding:48px 0;text-align:center;opacity:.35;font-size:13px;letter-spacing:.08em;text-transform:uppercase;">No submissions yet — be the first to enter</div>';
+    }
+  }
 }
 
 // Load on page init — refresh every 60s
