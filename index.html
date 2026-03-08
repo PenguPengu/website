@@ -19,7 +19,7 @@
   --serif: 'Playfair Display', serif;
   --mono: 'Space Mono', monospace;
 }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
 body {
   background: var(--cream);
   color: var(--navy);
@@ -927,9 +927,11 @@ footer > * { position: relative; z-index: 1; }
 /* ─── RESPONSIVE ─── */
 @media(max-width:900px) {
 
-  /* ── Cursor off on touch ── */
+  /* ── Scroll offset ── */
+  html { scroll-padding-top: 60px; }
+
+  /* ── Cursor ── */
   .cursor-dot { display: none; }
-  *, *::before, *::after { cursor: auto !important; }
 
   /* ── Nav ── */
   nav { padding: 0 20px; height: 60px; }
@@ -939,138 +941,124 @@ footer > * { position: relative; z-index: 1; }
   .mobile-nav-drawer { display: block; top: 60px; }
   .marquee-wrap { display: none; }
 
-  /* ── Scroll offset so anchors land below fixed nav ── */
-  html { scroll-padding-top: 60px; }
-  #home, #about, #products, #photos, #discord, #community, #partners, #contact { scroll-margin-top: 60px; }
-
-  /* ── Hero ── */
+  /* ── Hero — stack ── */
   .hero { grid-template-columns: 1fr; padding-top: 60px; min-height: auto; }
-  .hero-left { padding: 48px 24px 40px; gap: 24px; }
-  .hero-title { font-size: clamp(44px, 11vw, 68px); }
+  .hero-left { padding: 48px 20px 40px; gap: 24px; }
+  .hero-title { font-size: clamp(38px, 10vw, 56px); }
   .hero-right { display: none; }
   .hero-btns { flex-direction: column; gap: 12px; }
-  .btn-primary, .btn-ghost { width: 100%; text-align: center; padding: 16px 24px; }
+  .btn-primary, .btn-ghost { width: 100%; text-align: center; padding: 16px 20px; box-sizing: border-box; }
 
   /* ── Section headers ── */
-  .section-header { padding: 56px 24px 36px; }
+  .section-header { padding: 48px 20px 28px; }
+  .section-title { font-size: clamp(24px, 7vw, 36px); }
 
-  /* ── Intro ── */
+  /* ── Intro — stack ── */
   .intro { grid-template-columns: 1fr; }
-  .intro-text { padding: 48px 24px; border-right: none; border-bottom: 1px solid var(--border); }
-  .intro-text h2 { font-size: 28px; }
-  .intro-stats { padding: 40px 24px; grid-template-columns: 1fr 1fr; gap: 28px; }
-  .stat-num { font-size: 32px; }
+  .intro-text { padding: 40px 20px; border-right: none; border-bottom: 1px solid var(--border); }
+  .intro-text h2 { font-size: 26px; }
+  .intro-stats { padding: 36px 20px; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .stat-num { font-size: 28px; }
 
-  /* ── Products ── */
+  /* ── Products grid — 1 col ── */
   .products-grid { grid-template-columns: 1fr; margin: 0 16px; }
   .product-card { padding: 28px 20px; }
 
-  /* ── Product modal ── */
+  /* ── Product modal — bottom sheet, stacked ── */
   .product-modal { padding: 0; align-items: flex-end; }
   .product-modal-inner {
-    width: 100%; max-width: 100%; max-height: 92vh;
-    border-radius: 0; overflow-y: auto;
+    width: 100% !important; max-width: 100% !important;
+    max-height: 94vh; border-radius: 0;
+    display: flex; flex-direction: column; overflow-y: auto;
   }
-  .product-modal-layout { grid-template-columns: 1fr !important; min-height: auto; }
-  .product-modal-images { border-right: none; border-bottom: 1px solid rgba(25,41,58,.1); }
-  .product-modal-img-main { min-height: 240px !important; }
-  .product-modal-content {
-    width: 100% !important; max-height: none; padding: 24px 20px;
-    overflow-y: visible;
+  .product-modal-layout {
+    display: flex !important; flex-direction: column !important;
+    grid-template-columns: unset !important; min-height: auto;
   }
-  .product-modal-name { font-size: 24px; }
-  .product-modal-desc { font-size: 12px; }
-  .product-modal-details { font-size: 11px; }
+  .product-modal-images { border-right: none !important; border-bottom: 1px solid rgba(25,41,58,.1); flex-shrink: 0; }
+  .product-modal-img-main { min-height: 220px !important; }
+  .product-modal-content { width: 100% !important; max-height: none !important; padding: 24px 20px; overflow-y: visible; flex-shrink: 0; }
+  .product-modal-name { font-size: 22px; }
   .product-modal-discord { padding: 20px; }
-  .pm-thumb-strip { padding: 6px; gap: 4px; }
-  .pm-thumb { width: 44px; height: 44px; }
-  .pm-img-nav { opacity: .7 !important; width: 32px; height: 32px; }
+  .pm-thumb { width: 42px; height: 42px; }
   .product-modal-close { top: 12px; right: 14px; }
 
-  /* ── Status ── */
+  /* ── Status — 1 col ── */
   .status-grid { margin: 0 16px; }
-  .status-row { grid-template-columns: 1fr 1fr; padding: 14px 16px; gap: 10px; }
+  .status-row { grid-template-columns: 1fr 1fr; padding: 12px 16px; }
   .status-pct, .status-badge { display: none; }
 
-  /* ── Photos section ── */
-  .comp-info-bar { margin: 0 16px 24px; flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
-  .comp-info-right { align-items: flex-start; width: 100%; }
+  /* ── Photos ── */
+  .comp-info-bar { margin: 0 16px 20px; flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
+  .comp-info-right { flex-direction: column; align-items: flex-start; width: 100%; }
   .comp-info-right .btn-primary { width: 100%; text-align: center; }
-  .comp-prompt-text { font-size: 15px; }
   .photos-grid { grid-template-columns: 1fr; margin: 0 16px; }
   .photos-teaser-cta { margin: 0 16px; }
-  .photo-info { padding: 14px 16px 18px; }
 
-  /* ── Announcements ── */
-  .update-announce, .update-rows { margin: 0 16px; }
-  .update-announce { grid-template-columns: 1fr; }
-  .update-announce-images { min-height: 200px; border-top: 1px solid var(--border); }
-  .update-row { grid-template-columns: 1fr; }
-  .update-row-images { min-height: 220px; }
-  .update-row.alt { direction: ltr; }
-  .discord-cta-bar { margin: 20px 16px 0; flex-direction: column; align-items: flex-start; padding: 20px; }
-  .btn-discord { width: 100%; text-align: center; }
+  /* ── Announcements — stack ── */
+  .update-announce { margin: 0 16px 1px; grid-template-columns: 1fr; }
+  .update-rows { margin: 0 16px; }
   .update-announce-text { padding: 28px 20px; border-right: none; border-bottom: 1px solid var(--border); }
+  .update-announce-images { min-height: 200px; }
+  .update-row { grid-template-columns: 1fr; }
   .update-row-text { padding: 28px 20px; }
-  .update-title { font-size: 20px; }
+  .update-row-images { min-height: 200px; border-left: none !important; }
+  .update-row.alt { direction: ltr; }
+  .update-title { font-size: 19px; }
+  .discord-cta-bar { margin: 20px 16px 0; flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
+  .btn-discord { width: 100%; text-align: center; }
 
   /* ── Community ── */
   .community-channels { grid-template-columns: 1fr; margin: 0 16px 40px; }
-  .channel-card { padding: 32px 24px; }
+  .channel-card { padding: 28px 20px; }
   .videos-section { margin: 0 16px; }
-  .videos-grid { grid-template-columns: 1fr; gap: 16px; }
+  .videos-grid { grid-template-columns: 1fr; gap: 14px; }
 
-  /* ── Partners ── */
+  /* ── Partners grid — 2 col ── */
   .partners-grid { grid-template-columns: 1fr 1fr; margin: 0 16px; }
-  .partner-card { padding: 24px 16px; }
-  .partner-initial { font-size: 28px; }
-  .partner-name { font-size: 11px; }
+  .partner-card { padding: 22px 14px; }
 
-  /* ── Partner modal ── */
+  /* ── Partner modal — bottom sheet, stacked ── */
   .partner-modal { padding: 0; align-items: flex-end; }
   .partner-modal-inner {
-    width: 100%; max-width: 100%; max-height: 88vh;
-    border-radius: 0; overflow-y: auto;
+    width: 100% !important; max-width: 100% !important;
+    max-height: 90vh; border-radius: 0;
+    display: flex; flex-direction: column; overflow-y: auto;
   }
-  .partner-modal-img-banner { height: 160px; }
-  .partner-modal-body { padding: 24px 20px; gap: 10px; }
-  .partner-modal-body-row { gap: 16px; }
-  .partner-modal-img-logo { width: 100px; height: 100px; }
+  .partner-modal-img-banner { height: 150px; }
+  .partner-modal-body { padding: 24px 20px; gap: 12px; }
+  .partner-modal-body-row { flex-direction: column !important; gap: 14px; }
+  .partner-modal-img-logo { width: 80px; height: 80px; }
   .partner-modal-name { font-size: 22px; }
   .partner-modal-desc { font-size: 12px; }
-  .partner-modal-links { gap: 8px; }
-  .partner-modal-link { padding: 10px 16px; font-size: 9px; }
+  .partner-modal-links { flex-direction: column; gap: 8px; }
+  .partner-modal-link { width: 100%; text-align: center; box-sizing: border-box; }
   .partner-modal-close { top: 12px; right: 14px; }
 
-  /* ── Contact ── */
-  .contact-section { grid-template-columns: 1fr; padding: 56px 20px; gap: 40px; }
-  .contact-left h2 { font-size: 28px; }
+  /* ── Contact — stack ── */
+  .contact-section { grid-template-columns: 1fr; padding: 48px 20px; gap: 36px; }
+  .contact-left h2 { font-size: 26px; }
 
-  /* ── Footer ── */
+  /* ── Footer — stack ── */
   footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; gap: 16px; }
-  .footer-links { flex-wrap: wrap; gap: 14px 18px; }
+  .footer-links { flex-wrap: wrap; gap: 12px 16px; }
 
   /* ── Gallery ── */
-  .gallery-nav { padding: 0 16px; gap: 12px; }
+  .gallery-nav { padding: 0 16px; }
   .gallery-nav-label { display: none; }
   .gallery-sidebar { display: none; }
-  .gallery-main-header { padding: 20px 16px 18px; flex-direction: column; align-items: flex-start; gap: 14px; }
-  .gallery-prompt-title { font-size: 22px; }
+  .gallery-main-header { padding: 18px 16px; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .gallery-prompt-title { font-size: 20px; }
   .gallery-grid { grid-template-columns: 1fr 1fr; }
 
-  /* ── Coords off ── */
+  /* ── Hide decorative ── */
   .coord { display: none; }
 }
 
 @media(max-width:480px) {
   .gallery-grid { grid-template-columns: 1fr; }
-  .partners-grid { grid-template-columns: 1fr; }
-  .intro-stats { grid-template-columns: 1fr 1fr; gap: 20px; }
-  .hero-title { font-size: clamp(38px, 10vw, 52px); }
-  .section-title { font-size: clamp(26px, 8vw, 38px); }
-  .product-modal-content { padding: 20px 16px; }
-  .partner-modal-body { padding: 20px 16px; }
-  .partner-modal-body-row { flex-direction: column; gap: 12px; }
+  .partners-grid { grid-template-columns: 1fr 1fr; }
+  .photos-grid { grid-template-columns: 1fr; }
 }
 
 /* ─── ANIMATIONS ─── */
