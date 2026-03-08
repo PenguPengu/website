@@ -814,27 +814,58 @@ nav {
 .partner-modal.open { display:flex; }
 .partner-modal-inner {
   background:var(--cream); color:var(--navy);
-  width:min(760px,95vw);
+  width:min(680px,95vw);
   position:relative; max-height:90vh; overflow-y:auto;
   display:flex; flex-direction:column;
 }
 .partner-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
 .partner-modal-close:hover { opacity:.9; }
-.partner-modal-img {
-  width:100%; height:220px;
+
+/* Banner mode: full-width, 200px tall */
+.partner-modal-img-banner {
+  width:100%; height:200px;
   background:rgba(25,41,58,.06);
   display:flex; align-items:center; justify-content:center;
   overflow:hidden; flex-shrink:0; position:relative;
   border-bottom:1px solid var(--border);
 }
-.partner-modal-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.partner-modal-img-placeholder { font-family:var(--serif); font-size:80px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
-.partner-modal-body { padding:44px 48px; display:flex; flex-direction:column; gap:16px; }
+.partner-modal-img-banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+/* Logo mode: square, centered, smaller */
+.partner-modal-img-logo {
+  width:160px; height:160px;
+  margin:40px auto 0;
+  background:rgba(25,41,58,.06);
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; flex-shrink:0; position:relative;
+}
+.partner-modal-img-logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:12px; }
+
+.partner-modal-img-placeholder { font-family:var(--serif); font-size:72px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
+.partner-modal-body { padding:36px 48px 44px; display:flex; flex-direction:column; gap:14px; }
 .partner-modal-initial { font-family:var(--serif); font-size:52px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-8px; }
-.partner-modal-name { font-family:var(--serif); font-size:32px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
+.partner-modal-name { font-family:var(--serif); font-size:30px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
 .partner-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; }
-.partner-modal-desc { font-size:12px; line-height:1.85; opacity:.6; border-top:1px solid rgba(25,41,58,.08); padding-top:18px; margin-top:4px; }
-.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:8px; }
+
+/* Collapsible desc */
+.partner-modal-desc-toggle {
+  font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  background:none; border:none; color:var(--navy); cursor:pointer;
+  opacity:.35; padding:0; font-family:var(--mono); display:flex; align-items:center; gap:7px;
+  margin-top:4px; transition:opacity .15s;
+}
+.partner-modal-desc-toggle:hover { opacity:.7; }
+.partner-modal-desc-toggle svg { transition:transform .2s; }
+.partner-modal-desc-toggle.open svg { transform:rotate(180deg); }
+.partner-modal-desc {
+  font-size:12px; line-height:1.85; opacity:.6;
+  border-top:1px solid rgba(25,41,58,.08); padding-top:16px;
+  display:none; margin-top:0;
+}
+.partner-modal-desc.open { display:block; }
+
+.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; border-top:1px solid rgba(25,41,58,.08); padding-top:18px; }
 .partner-modal-link {
   font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
   color:var(--navy); border:1px solid rgba(25,41,58,.3); padding:10px 20px;
@@ -1790,13 +1821,14 @@ nav.scrolled {
 <div class="partner-modal" id="partner-modal" onclick="closePartnerModal()">
   <div class="partner-modal-inner" onclick="event.stopPropagation()">
     <button class="partner-modal-close" onclick="closePartnerModal()">&#10005;</button>
-    <div class="partner-modal-img" id="pm-partner-img">
-      <div class="partner-modal-img-placeholder" id="pm-partner-placeholder"></div>
-    </div>
+    <div id="pm-partner-img-wrap"></div>
     <div class="partner-modal-body">
       <div class="partner-modal-initial" id="pm-partner-initial"></div>
       <div class="partner-modal-name" id="pm-partner-name"></div>
       <div class="partner-modal-type" id="pm-partner-type"></div>
+      <button class="partner-modal-desc-toggle" id="pm-desc-toggle" onclick="togglePartnerDesc()" style="display:none">
+        About <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
       <div class="partner-modal-desc" id="pm-partner-desc"></div>
       <div class="partner-modal-links" id="pm-partner-links"></div>
     </div>
@@ -2243,30 +2275,61 @@ function openProductModal(num, status, name, type, desc, details, cta, dc_channe
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+function togglePartnerDesc() {
+  var btn = document.getElementById('pm-desc-toggle');
+  var desc = document.getElementById('pm-partner-desc');
+  btn.classList.toggle('open');
+  desc.classList.toggle('open');
+}
+
 function openPartnerModal(p) {
-  var imgEl = document.getElementById('pm-partner-img');
-  var ph = document.getElementById('pm-partner-placeholder');
-  var existImg = imgEl.querySelector('img');
-  if (existImg) existImg.remove();
+  var wrap = document.getElementById('pm-partner-img-wrap');
+  wrap.innerHTML = '';
+
+  // image_type column: 'logo' = square, anything else = banner
+  var imgType = (p.image_type || '').toLowerCase().trim();
+  var isLogo = imgType === 'logo';
+
   if (p.image) {
+    var container = document.createElement('div');
+    container.className = isLogo ? 'partner-modal-img-logo' : 'partner-modal-img-banner';
     var img = document.createElement('img');
     img.src = p.image;
-    imgEl.appendChild(img);
-    ph.style.display = 'none';
+    container.appendChild(img);
+    wrap.appendChild(container);
   } else {
-    ph.style.display = 'block';
+    // No image — show placeholder in banner style always
+    var container = document.createElement('div');
+    container.className = 'partner-modal-img-banner';
+    var ph = document.createElement('div');
+    ph.className = 'partner-modal-img-placeholder';
     ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+    container.appendChild(ph);
+    wrap.appendChild(container);
   }
+
   document.getElementById('pm-partner-initial').textContent = p.name ? p.name.charAt(0).toUpperCase() : '';
   document.getElementById('pm-partner-name').textContent = p.name || '';
   document.getElementById('pm-partner-type').textContent = p.type || '';
-  document.getElementById('pm-partner-desc').textContent = p.desc || p.description || '';
+
+  // Desc — hide by default, show toggle only if there's content
+  var descEl = document.getElementById('pm-partner-desc');
+  var toggleBtn = document.getElementById('pm-desc-toggle');
+  var descText = p.desc || p.description || '';
+  descEl.textContent = descText;
+  descEl.classList.remove('open');
+  toggleBtn.classList.remove('open');
+  toggleBtn.style.display = descText ? 'flex' : 'none';
+
+  // Links
   var linksEl = document.getElementById('pm-partner-links');
   linksEl.innerHTML = '';
+  var hasLinks = false;
   for (var n = 1; n <= 3; n++) {
     var lbl = p['link' + n + '_label'];
     var url = p['link' + n + '_url'];
     if (lbl && url) {
+      hasLinks = true;
       var a = document.createElement('a');
       a.className = 'partner-modal-link';
       a.href = url; a.target = '_blank'; a.rel = 'noopener';
@@ -2274,6 +2337,3053 @@ function openPartnerModal(p) {
       linksEl.appendChild(a);
     }
   }
+  linksEl.style.display = hasLinks ? 'flex' : 'none';
+
+  document.getElementById('partner-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePartnerModal() {
+  document.getElementById('partner-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeProductModal() {
+  document.getElementById('product-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Video Modal
+function openVideoModal(url, title) {
+  document.getElementById('video-iframe').src = url + '?autoplay=1';
+  document.getElementById('video-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeVideoModal() {
+  document.getElementById('video-iframe').src = '';
+  document.getElementById('video-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close modals on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeProductModal(); closeVideoModal(); pmLightboxClose(); }
+  if (e.key === 'ArrowLeft' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(-1);
+  if (e.key === 'ArrowRight' && document.getElementById('pm-lightbox').classList.contains('open')) pmLightboxNav(1);
+});
+
+// Google Sheets
+var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
+var PARTNERS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
+var STATUS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1296739068&single=true&output=csv';
+
+function renderComingSoon() {
+  var grid = document.getElementById('products-grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;">' +
+    '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(247,239,230,.2)" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d=\'M12 6v6l4 2\'/></svg>' +
+    '<div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream);letter-spacing:-.01em;">Catalogue Coming Soon</div>' +
+    '<div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range. Check back shortly or join our Discord for first access.</div>' +
+    '<a href=\"#discord\" style=\"margin-top:8px;background:var(--cream);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;padding:12px 28px;text-decoration:none;\">Join Discord &#8594;</a>' +
+  '</div>';
+}
+
+function parseCSV(text) {
+  var lines = text.trim().split('\n');
+  var headers = lines[0].split(',').map(function(h) { return h.trim().replace(/^"|"$/g, ''); });
+  return lines.slice(1).map(function(line) {
+    var vals = line.match(/(".*?"|[^,]+)(?=,|$)/g) || [];
+    var obj = {};
+    headers.forEach(function(h, i) { obj[h] = (vals[i] || '').replace(/^"|"$/g, '').trim(); });
+    return obj;
+  });
+}
+
+function statusClass(s) {
+  var m = { 'Active':'status-active','In Development':'status-dev','Coming Soon':'status-soon','In Dev':'status-dev','Low Stock':'status-dev','In Stock':'status-active','To Order':'status-active' };
+  return m[s] || 'status-active';
+}
+function statusIcon(s) {
+  if (s === 'Active' || s === 'In Stock' || s === 'To Order') return '&#9679;';
+  if (s === 'In Development' || s === 'In Dev') return '&#9680;';
+  return '&#9676;';
+}
+
+var PRODUCT_REGISTRY = [];
+function renderProducts(products) {
+  PRODUCT_REGISTRY = products;
+  var grid = document.getElementById('products-grid');
+  grid.innerHTML = products.map(function(p, i) {
+    var num = String(i + 1).padStart(2, '0');
+    var lower = {}; Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
+    var st = lower.status || '';
+    var nm = lower.name || '';
+    var ty = lower.type || '';
+    return '<div class="product-card anim" data-idx="' + i + '">' +
+      '<div class="product-card-header">' +
+        '<span class="product-number">' + num + '</span>' +
+        '<span class="product-status ' + statusClass(st) + '">' + statusIcon(st) + ' ' + st + '</span>' +
+      '</div>' +
+      '<div class="product-name">' + nm + '</div>' +
+      '<div class="product-type">' + ty + '</div>' +
+      '<p class="product-desc">' + (lower.desc || lower.description || '') + '</p>' +
+      '<div class="product-card-hint">Click to view</div>' +
+    '</div>';
+  }).join('');
+  grid.querySelectorAll('.product-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      var idx = parseInt(this.getAttribute('data-idx'));
+      var p = PRODUCT_REGISTRY[idx];
+      var num = String(idx + 1).padStart(2, '0');
+      // Case-insensitive field lookup
+      function col(p) {
+        var lower = {};
+        Object.keys(p).forEach(function(k){ lower[k.toLowerCase()] = p[k]; });
+        return lower;
+      }
+      var r = col(p);
+      openProductModal(
+        num,
+        r.status || '',
+        r.name || '',
+        r.type || '',
+        r.desc || r.description || '',
+        r.details || '',
+        r.cta || 'Request a Quote',
+        r.dc_channel || '',
+        r.dc_title || '',
+        r.dc_body || '',
+        r.dc_meta || '',
+        r.image || '',
+        r.cta_url || ''
+      );
+    });
+  });
+  grid.querySelectorAll('.anim').forEach(function(el) {
+    el.style.animationPlayState = 'paused'; observer.observe(el);
+  });
+}
+
+function loadFromSheets() {
+  fetch(PRODUCTS_URL)
+    .then(function(res) {
+      if (!res.ok) throw new Error('Fetch failed');
+      return res.text();
+    })
+    .then(function(text) {
+      var products = parseCSV(text);
+      if (products.length === 0) throw new Error('Empty');
+      renderProducts(products);
+    })
+    .catch(function() { renderComingSoon(); });
+}
+
+// ── PARTNERS ──
+var PARTNER_REGISTRY = [];
+function renderPartners(partners) {
+  var grid = document.getElementById('partners-grid');
+  if (!grid) return;
+  if (!partners || partners.length === 0) {
+    grid.innerHTML = '<div style="padding:40px;opacity:.4;font-size:11px;letter-spacing:.15em;text-transform:uppercase;grid-column:1/-1">Partners coming soon</div>';
+    return;
+  }
+  // Normalise keys
+  PARTNER_REGISTRY = partners.map(function(p) {
+    var r = {};
+    Object.keys(p).forEach(function(k){ r[k.toLowerCase().trim()] = (p[k] || '').trim(); });
+    return r;
+  });
+  grid.innerHTML = PARTNER_REGISTRY.map(function(r, i) {
+    var nm      = r.name || '';
+    var ty      = r.type || '';
+    var initial = nm ? nm.charAt(0).toUpperCase() : '?';
+    return '<div class="partner-card" data-idx="' + i + '">' +
+      '<div class="partner-initial">' + initial + '</div>' +
+      '<div class="partner-name">' + nm + '</div>' +
+      (ty ? '<div class="partner-type">' + ty + '</div>' : '') +
+      '<div class="partner-hint" style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div>' +
+    '</div>';
+  }).join('');
+  grid.querySelectorAll('.partner-card').forEach(function(card) {
+    card.style.opacity = '1';
+    card.addEventListener('click', function() {
+      openPartnerModal(PARTNER_REGISTRY[parseInt(this.getAttribute('data-idx'))]);
+    });
+  });
+}
+
+function loadPartners() {
+  fetch(PARTNERS_URL)
+    .then(function(res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.text(); })
+    .then(function(text) {
+      var rows = parseCSV(text);
+      console.log('Partners loaded:', rows.length, 'rows', rows[0] ? Object.keys(rows[0]) : '');
+      renderPartners(rows);
+    })
+    .catch(function(err) {
+      console.error('Partners fetch error:', err);
+      var grid = document.getElementById('partners-grid');
+      if (grid) grid.innerHTML = '<div style="padding:40px;grid-column:1/-1;font-size:10px;opacity:.4;letter-spacing:.1em">Partners loading failed — check console.</div>';
+    });
+}
+
+// ── TEST MODE ── set to false to load from Google Sheets
+var TEST_MODE = false;
+if (TEST_MODE) {
+  var testProducts = [
+    {
+      name: 'Harbour Cleat Mk.II',
+      type: 'Deck Hardware',
+      status: 'Active',
+      desc: 'Heavy-duty cast stainless cleat rated to 4,000kg load. Designed for commercial quay installations and high-traffic berths.',
+      details: 'Material: 316L Stainless\nRating: 4,000kg\nMount: 4x M12 bolts\nFinish: Satin\nLength: 250mm',
+      cta: 'Request a Quote',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1200&q=80,https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80,https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+      dc_channel: 'hardware', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'NavChart Pro',
+      type: 'Navigation Software',
+      status: 'Active',
+      desc: 'Offline-capable chart plotter with real-time AIS overlay, tidal data, and voyage logging for professional mariners.',
+      details: 'Platform: iOS / Android / Web\nCharts: BSB4, S-57 ENC\nAIS: Built-in\nOffline: Full chart cache\nLicence: Annual subscription',
+      cta: 'Download Free Trial',
+      cta_url: 'https://example.com',
+      image: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=1200&q=80,https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1200&q=80',
+      dc_channel: 'software', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'Storm Mooring Kit',
+      type: 'Safety Equipment',
+      status: 'In Development',
+      desc: 'Emergency mooring system rated for Force 10 conditions. Includes 3x bridle lines, chafe guards, and quick-release shackles.',
+      details: 'Lines: 3x 16mm nylon\nBreaking load: 6,200kg\nChafe guards: Leather + neoprene\nShackles: 316 SS quick-release\nBag: Waterproof roll-top',
+      cta: 'Join Waitlist',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1500514966906-fe245eea9344?w=1200&q=80,https://images.unsplash.com/photo-1530053969600-caed2596d242?w=1200&q=80,https://images.unsplash.com/photo-1518623489648-a173ef7824f3?w=1200&q=80,https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=1200&q=80',
+      dc_channel: 'safety', dc_title: '', dc_body: '', dc_meta: ''
+    },
+    {
+      name: 'Tidal Anchor Pro',
+      type: 'Ground Tackle',
+      status: 'Coming Soon',
+      desc: 'Next-generation scoop anchor with auto-resetting shank. Proven in 200+ commercial deployments across tidal rivers and offshore anchorages.',
+      details: 'Weight: 25kg\nRating: Vessels to 25m\nShank: Hinged auto-reset\nFinish: Hot-dip galvanised\nChain: 10mm calibrated',
+      cta: 'Notify Me',
+      cta_url: '',
+      image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1200&q=80,https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80',
+      dc_channel: 'tackle', dc_title: '', dc_body: '', dc_meta: ''
+    }
+  ];
+  renderProducts(testProducts);
+} else {
+  loadFromSheets();
+}
+loadPartners();
+
+// ── YOUTUBE LATEST VIDEOS ──
+document.addEventListener('DOMContentLoaded', function() {
+  var YT_KEY = (typeof UNDERWAY_CONFIG !== 'undefined') ? UNDERWAY_CONFIG.ytKey : '';
+  var YT_CHANNEL = (typeof UNDERWAY_CONFIG !== 'undefined') ? UNDERWAY_CONFIG.ytChannelId : '';
+
+  function timeAgo(dateStr) {
+    var diff = (Date.now() - new Date(dateStr)) / 1000;
+    if (diff < 3600)    return Math.floor(diff / 60) + ' mins ago';
+    if (diff < 86400)   return Math.floor(diff / 3600) + ' hours ago';
+    if (diff < 604800)  return Math.floor(diff / 86400) + ' days ago';
+    if (diff < 2592000) return Math.floor(diff / 604800) + ' weeks ago';
+    return Math.floor(diff / 2592000) + ' months ago';
+  }
+
+  function renderYTVideos(items) {
+    var grid = document.getElementById('yt-videos-grid');
+    if (!items || items.length === 0) { grid.innerHTML = ''; return; }
+    grid.innerHTML = '';
+    items.slice(0, 3).forEach(function(item) {
+      var videoId = item.id.videoId;
+      var title = item.snippet.title;
+      var thumb = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
+      var published = timeAgo(item.snippet.publishedAt);
+      var card = document.createElement('div');
+      card.className = 'video-card';
+      var thumbDiv = document.createElement('div');
+      thumbDiv.className = 'video-thumb';
+      thumbDiv.style.position = 'relative';
+      var img = document.createElement('img');
+      img.src = thumb;
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;';
+      img.alt = title;
+      var overlay = document.createElement('div');
+      overlay.className = 'video-thumb-bg';
+      var playBtn = document.createElement('div');
+      playBtn.className = 'video-play-btn';
+      playBtn.innerHTML = '&#9654;';
+      thumbDiv.appendChild(img);
+      thumbDiv.appendChild(overlay);
+      thumbDiv.appendChild(playBtn);
+      var infoDiv = document.createElement('div');
+      infoDiv.className = 'video-info';
+      infoDiv.innerHTML = '<div class="video-title">' + title + '</div><div class="video-meta">' + published + '</div>';
+      card.appendChild(thumbDiv);
+      card.appendChild(infoDiv);
+      card.addEventListener('click', (function(id) {
+        return function() { openVideoModal('https://www.youtube.com/embed/' + id); };
+      })(videoId));
+      grid.appendChild(card);
+    });
+  }
+
+  var el = document.getElementById('yt-channel-link');
+  if (el && YT_CHANNEL) el.href = 'https://www.youtube.com/channel/' + YT_CHANNEL;
+
+  if (!YT_KEY || !YT_CHANNEL) return;
+  fetch('https://www.googleapis.com/youtube/v3/search?key=' + YT_KEY + '&channelId=' + YT_CHANNEL + '&part=snippet&order=date&maxResults=3&type=video')
+    .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(data) { if (data.error) throw new Error(data.error.message); renderYTVideos(data.items); })
+    .catch(function(err) { console.warn('YouTube API:', err); });
+});
+</script>
+
+<!-- ═══ GALLERY PAGE (SPA) ═══ -->
+<div id="gallery-page" style="display:none">
+  <div class="gallery-nav">
+    <button class="gallery-back" onclick="closeGallery()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg> Back to Underway
+    </button>
+    <a href="#" class="gallery-nav-logo">
+      <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="height:26px;width:auto;"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z"/></svg>
+    </a>
+    <div class="gallery-nav-right">
+      <span class="gallery-nav-label">Photo Competition</span>
+      <a href="#" class="btn-gallery-submit">Submit a Photo</a>
+    </div>
+  </div>
+
+  <div class="gallery-body">
+
+    <!-- ── SIDEBAR ── -->
+    <div class="gallery-sidebar">
+
+      <div class="gallery-sidebar-section">
+        <div class="gallery-sidebar-label">Current Competition</div>
+        <div class="gallery-comp-active">
+          <div class="gallery-comp-name">Golden Hour</div>
+          <div class="gallery-comp-prompt">"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."</div>
+          <div class="gallery-comp-meta"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg> Closes 31 Mar 2026</div>
+          <div class="gallery-comp-prize"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg> Prize: Series II Bollard + Feature</div>
+        </div>
+      </div>
+
+      <div class="gallery-sidebar-section">
+        <div class="gallery-sidebar-label">Browse Prompts</div>
+        <div class="gallery-prompt-list">
+          <button class="gp-btn active" onclick="galleryFilter('golden-hour', this)">
+            <span class="gp-dot active-dot"></span>
+            <span class="gp-name">Golden Hour</span>
+            <span class="gp-count">12 entries</span>
+          </button>
+          <button class="gp-btn past" onclick="galleryFilter('heavy-weather', this)">
+            <span class="gp-dot"></span>
+            <span class="gp-name">Heavy Weather</span>
+            <span class="gp-count">past · 9 entries</span>
+          </button>
+          <button class="gp-btn past" onclick="galleryFilter('installation', this)">
+            <span class="gp-dot"></span>
+            <span class="gp-name">The Install</span>
+            <span class="gp-count">past · 14 entries</span>
+          </button>
+          <button class="gp-btn past" onclick="galleryFilter('detail', this)">
+            <span class="gp-dot"></span>
+            <span class="gp-name">Close Quarters</span>
+            <span class="gp-count">past · 7 entries</span>
+          </button>
+          <button class="gp-btn" onclick="galleryFilter('all', this)">
+            <span class="gp-dot"></span>
+            <span class="gp-name">All Entries</span>
+            <span class="gp-count">42 total</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="gallery-sidebar-section">
+        <div class="gallery-sidebar-label">Hall of Winners</div>
+        <div class="gallery-winners-list">
+          <div class="gallery-winner-row">
+            <div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+            <div class="gallery-winner-info">
+              <div class="gallery-winner-name">Heavy Weather</div>
+              <div class="gallery-winner-author">@northsea_ports</div>
+              <div class="gallery-winner-title">"Holding Fast — North Sea"</div>
+            </div>
+          </div>
+          <div class="gallery-winner-row">
+            <div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+            <div class="gallery-winner-info">
+              <div class="gallery-winner-name">The Install</div>
+              <div class="gallery-winner-author">@halcyon_yachts</div>
+              <div class="gallery-winner-title">"D-Type Run — Hamble"</div>
+            </div>
+          </div>
+          <div class="gallery-winner-row">
+            <div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+            <div class="gallery-winner-info">
+              <div class="gallery-winner-name">Close Quarters</div>
+              <div class="gallery-winner-author">@underway_jamie</div>
+              <div class="gallery-winner-title">"Series I — Base Detail"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── MAIN GRID ── -->
+    <div class="gallery-main">
+      <div class="gallery-main-header">
+        <div id="gallery-prompt-heading">
+          <div class="gallery-prompt-eyebrow">Current Prompt</div>
+          <div class="gallery-prompt-title">Golden Hour</div>
+          <div class="gallery-prompt-quote">"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."</div>
+        </div>
+        <div class="gallery-sort">
+          <span class="gallery-sort-label">Sort</span>
+          <button class="gsort-btn active" onclick="gallerySort('popular', this)">Most Liked</button>
+          <button class="gsort-btn" onclick="gallerySort('recent', this)">Recent</button>
+        </div>
+      </div>
+
+      <div class="gallery-grid" id="gallery-grid">
+
+            <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@saltwater_marina</span>
+        </div>
+        <div class="photo-title">Golden Hour — Solent</div>
+        <div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">38</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@northsea_ports</span>
+        </div>
+        <div class="photo-title">Holding Fast — North Sea</div>
+        <div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">157</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@coastal_eng</span>
+        </div>
+        <div class="photo-title">Pilot Unit at Dawn</div>
+        <div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">88</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Med Berth — Dusk</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@maritime_supply_int</span>
+        </div>
+        <div class="photo-title">Med Berth — Dusk</div>
+        <div class="photo-desc">Superyacht mooring setup, polished stainless in the last light. Worth every penny.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">118</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">43</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Bollard — Low Sun</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@kirkland_marine</span>
+        </div>
+        <div class="photo-title">Bollard — Low Sun</div>
+        <div class="photo-desc">Long shadow across the dock. Series II prototype at the yard, late afternoon light.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">76</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">31</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="golden-hour">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Dawn Patrol — Solent</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@tidal_basin</span>
+        </div>
+        <div class="photo-title">Dawn Patrol — Solent</div>
+        <div class="photo-desc">Fenders still wet from the night tide. Caught this ten minutes before the crew arrived.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">59</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">19</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+            <div class="photo-card" data-prompt="heavy-weather">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Storm Hold — Tyne</span>
+        <span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span>
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@northsea_ports</span>
+        </div>
+        <div class="photo-title">Storm Hold — Tyne</div>
+        <div class="photo-desc">Full gale. Every bollard held. Taken from the dock office window.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">187</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">142</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="heavy-weather">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Swell Running — Blyth</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@saltwater_marina</span>
+        </div>
+        <div class="photo-title">Swell Running — Blyth</div>
+        <div class="photo-desc">D-type fenders doing exactly what they should. Force 6, building.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">94</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">67</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="heavy-weather">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Rain Night — Aberdeen</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@stonebridge_dock</span>
+        </div>
+        <div class="photo-title">Rain Night — Aberdeen</div>
+        <div class="photo-desc">3am. The mooring lines taut and rain hammering the dock.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">71</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">44</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+            <div class="photo-card" data-prompt="installation">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>D-Type Run — Hamble</span>
+        <span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span>
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@halcyon_yachts</span>
+        </div>
+        <div class="photo-title">D-Type Run — Hamble</div>
+        <div class="photo-desc">Full fender run along the pontoon finger. Single afternoon.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">134</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">88</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="installation">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>First Bollard Down</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@coastal_eng</span>
+        </div>
+        <div class="photo-title">First Bollard Down</div>
+        <div class="photo-desc">Series I going in at first light. Four hours start to finish.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">82</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">51</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="installation">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Cleat Set — Falmouth</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@albatross_marine</span>
+        </div>
+        <div class="photo-title">Cleat Set — Falmouth</div>
+        <div class="photo-desc">Twelve cleats, one morning. The deck looks the part.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">67</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">29</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+            <div class="photo-card" data-prompt="detail">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Series I — Base Casting</span>
+        <span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span>
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@underway_jamie</span>
+        </div>
+        <div class="photo-title">Series I — Base Casting</div>
+        <div class="photo-desc">The new anti-rotation collar. You have to see it in person.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">112</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">95</span>
+          </button>
+        </div>
+      </div>
+    </div>
+            <div class="photo-card" data-prompt="detail">
+      <div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Shackle — Close</span>
+        
+      </div>
+      <div class="photo-info">
+        <div class="photo-meta-row">
+          <span class="photo-author">@northsea_ports</span>
+        </div>
+        <div class="photo-title">Shackle — Close</div>
+        <div class="photo-desc">Load-rated shackle on the mooring line, just before the tide turned.</div>
+        <div class="photo-actions">
+          <button class="photo-like" data-type="heart" onclick="toggleLike(this)">
+            <svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">58</span>
+          </button>
+          <button class="photo-like" data-type="fire" onclick="toggleLike(this)">
+            <svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/><path d="M12 18a3 3 0 0 1-3-3c0-2 3-4 3-4s3 2 3 4a3 3 0 0 1-3 3Z" opacity=".5"/></svg><span class="like-count">33</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Underway — Built for the Long Haul</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --navy: #19293a;
+  --cream: #f7efe6;
+  --rust: #b84c2e;
+  --gold: #c9a84c;
+  --mid: #4a6478;
+  --border: rgba(25,41,58,0.18);
+  --serif: 'Playfair Display', serif;
+  --mono: 'Space Mono', monospace;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--cream);
+  color: var(--navy);
+  font-family: var(--mono);
+  overflow-x: hidden;
+}
+
+/* ─── GLOBAL NAUTICAL GRID ─── */
+body {
+  background-image:
+    linear-gradient(rgba(25,41,58,.042) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(25,41,58,.042) 1px, transparent 1px);
+  background-size: 120px 120px;
+  background-attachment: local;
+}
+nav, .marquee-wrap, section, footer, .coord, .cursor-dot, .product-modal, .video-modal { position: relative; z-index: 1; }
+.products-section { isolation: isolate; }
+.products-section::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(247,239,230,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247,239,230,.05) 1px, transparent 1px);
+  background-size: 120px 120px;
+}
+.products-section > * { position: relative; z-index: 1; }
+/* All sections sit above bg */
+nav, .marquee-wrap, section, footer, .coord,
+.cursor-dot, .product-modal, .video-modal {
+  position: relative;
+  z-index: 1;
+}
+/* Sections that are navy/dark get their own bg so grid shows through correctly */
+.products-section, .contact-section, .discord-section-dark {
+  isolation: isolate;
+}
+/* On cream sections, grid is navy-tinted; on navy sections it's cream-tinted */
+.products-section::before, footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(247,239,230,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(247,239,230,.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+}
+.products-section > *, footer > * { position: relative; z-index: 1; }
+
+
+.nautical-bg-icons {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  color: var(--navy);
+  overflow: visible;
+}
+
+/* ─── PHOTOS SECTION (teaser) ─── */
+.photos-section { padding: 0 0 60px; border-top: 1px solid var(--border); }
+
+.comp-info-bar {
+  margin: 0 80px 40px;
+  border: 1px solid var(--border);
+  padding: 28px 36px;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+}
+.comp-info-left { flex: 1; }
+.comp-label { font-size: 8px; letter-spacing: .3em; text-transform: uppercase; opacity: .35; display: block; margin-bottom: 8px; }
+.comp-prompt-text { font-family: var(--serif); font-size: 18px; font-style: italic; font-weight: 700; line-height: 1.3; }
+.comp-info-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; flex-shrink: 0; }
+.comp-deadline { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; opacity: .4; display: flex; align-items: center; gap: 7px; }
+
+.photos-grid {
+  margin: 0 80px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.photos-grid-teaser { margin-bottom: 0; }
+.photo-card {
+  background: var(--cream);
+  display: flex; flex-direction: column;
+  transition: background .2s;
+  cursor: default;
+}
+.photo-card:hover { background: #f0e8de; }
+.photo-card.hidden { display: none; }
+
+.photo-img {
+  aspect-ratio: 4/3;
+  background: rgba(25,41,58,.05);
+  border-bottom: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; color: var(--navy); opacity: .3;
+  font-size: 9px; letter-spacing: .15em; text-transform: uppercase;
+  overflow: hidden; position: relative;
+}
+.photo-img img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:1; }
+.photo-winner-badge {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--navy); color: var(--cream);
+  font-family: var(--mono); font-size: 8px; letter-spacing: .2em; text-transform: uppercase;
+  padding: 4px 10px 4px 8px;
+  display: flex; align-items: center; gap: 6px;
+  opacity: 1;
+}
+.photo-winner-badge svg { stroke: var(--cream); flex-shrink: 0; }
+
+.photo-info { padding: 20px 24px 24px; display: flex; flex-direction: column; flex: 1; }
+.photo-meta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.photo-author { font-size: 9px; letter-spacing: .1em; opacity: .3; }
+.photo-title { font-family: var(--serif); font-size: 16px; font-weight: 700; line-height: 1.2; margin-bottom: 7px; }
+.photo-desc { font-size: 10px; line-height: 1.8; opacity: .5; margin-bottom: 14px; flex: 1; }
+.photo-actions { display: flex; gap: 8px; margin-top: auto; }
+.photo-like {
+  display: flex; align-items: center; gap: 7px;
+  background: none; border: 1px solid var(--border); color: var(--navy);
+  font-family: var(--mono); font-size: 10px; padding: 6px 13px;
+  cursor: pointer; transition: .15s; letter-spacing: .05em;
+}
+.photo-like:hover { border-color: var(--navy); background: rgba(25,41,58,.04); }
+.photo-like.liked-heart { background: var(--navy); color: var(--cream); border-color: var(--navy); }
+.photo-like.liked-fire  { background: #b84c2e; color: var(--cream); border-color: #b84c2e; }
+.photo-like.liked-heart svg, .photo-like.liked-fire svg { stroke: var(--cream); }
+.photo-like svg { flex-shrink: 0; }
+
+.photos-teaser-cta { margin: 0 80px; border: 1px solid var(--border); border-top: none; }
+.photos-see-all {
+  width: 100%; padding: 18px 36px;
+  background: none; border: none; color: var(--navy);
+  font-family: var(--mono); font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: background .15s; opacity: .55;
+}
+.photos-see-all:hover { background: rgba(25,41,58,.04); opacity: 1; }
+
+/* ─── GALLERY PAGE ─── */
+#gallery-page {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--cream); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.gallery-nav {
+  height: 60px; flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; background: var(--cream); gap: 24px;
+}
+.gallery-back {
+  background: none; border: none; color: var(--navy);
+  font-family: var(--mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  cursor: pointer; display: flex; align-items: center; gap: 9px;
+  opacity: .5; transition: opacity .15s; white-space: nowrap;
+}
+.gallery-back:hover { opacity: 1; }
+.gallery-back svg { stroke: var(--navy); }
+.gallery-nav-logo { display: flex; }
+.gallery-nav-right { display: flex; align-items: center; gap: 20px; flex-shrink: 0; }
+.gallery-nav-label { font-size: 9px; letter-spacing: .25em; text-transform: uppercase; opacity: .3; }
+.btn-gallery-submit {
+  background: var(--navy); color: var(--cream);
+  font-family: var(--mono); font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+  padding: 10px 22px; border: none; cursor: pointer; text-decoration: none; display: inline-block;
+  transition: background .15s;
+}
+.btn-gallery-submit:hover { background: var(--mid); }
+
+.gallery-body {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* Sidebar */
+.gallery-sidebar {
+  width: 280px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 32px 0;
+}
+.gallery-sidebar::-webkit-scrollbar { width: 3px; }
+.gallery-sidebar::-webkit-scrollbar-thumb { background: rgba(25,41,58,.15); }
+
+.gallery-sidebar-section { padding: 0 28px 28px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.gallery-sidebar-section:last-child { border-bottom: none; }
+.gallery-sidebar-label { font-size: 8px; letter-spacing: .3em; text-transform: uppercase; opacity: .3; margin-bottom: 14px; }
+
+.gallery-comp-active { display: flex; flex-direction: column; gap: 9px; }
+.gallery-comp-name { font-family: var(--serif); font-size: 18px; font-weight: 700; }
+.gallery-comp-prompt { font-size: 10px; line-height: 1.7; opacity: .5; font-style: italic; }
+.gallery-comp-meta, .gallery-comp-prize {
+  font-size: 9px; letter-spacing: .12em; text-transform: uppercase; opacity: .4;
+  display: flex; align-items: center; gap: 7px;
+}
+.gallery-comp-meta svg, .gallery-comp-prize svg { stroke: var(--navy); opacity: .6; flex-shrink: 0; }
+
+.gallery-prompt-list { display: flex; flex-direction: column; gap: 2px; }
+.gp-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: none; border: none; color: var(--navy);
+  font-family: var(--mono); font-size: 9px;
+  padding: 9px 10px; cursor: pointer; text-align: left;
+  transition: background .15s; border-radius: 2px; width: 100%;
+}
+.gp-btn:hover { background: rgba(25,41,58,.05); }
+.gp-btn.active { background: rgba(25,41,58,.07); }
+.gp-dot { width: 6px; height: 6px; border-radius: 50%; border: 1px solid rgba(25,41,58,.3); flex-shrink: 0; }
+.gp-btn.active .active-dot, .gp-btn:hover .gp-dot { background: var(--navy); border-color: var(--navy); }
+.gp-name { flex: 1; letter-spacing: .12em; text-transform: uppercase; }
+.gp-count { font-size: 8px; opacity: .35; letter-spacing: .05em; white-space: nowrap; }
+.gp-btn.past .gp-name { opacity: .45; }
+
+.gallery-winners-list { display: flex; flex-direction: column; gap: 16px; }
+.gallery-winner-row { display: flex; gap: 12px; align-items: center; }
+.gallery-winner-img {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: rgba(25,41,58,.06); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy); opacity: .3;
+}
+.gallery-winner-info { display: flex; flex-direction: column; gap: 2px; }
+.gallery-winner-name { font-size: 8px; letter-spacing: .18em; text-transform: uppercase; opacity: .4; }
+.gallery-winner-author { font-size: 9px; font-weight: 700; letter-spacing: .05em; }
+.gallery-winner-title { font-size: 9px; opacity: .4; font-style: italic; }
+
+/* Main gallery area */
+.gallery-main { flex: 1; overflow-y: auto; padding: 0; }
+.gallery-main::-webkit-scrollbar { width: 3px; }
+.gallery-main::-webkit-scrollbar-thumb { background: rgba(25,41,58,.15); }
+
+.gallery-main-header {
+  padding: 32px 40px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+}
+.gallery-prompt-eyebrow { font-size: 8px; letter-spacing: .3em; text-transform: uppercase; opacity: .3; margin-bottom: 8px; }
+.gallery-prompt-title { font-family: var(--serif); font-size: 28px; font-weight: 900; letter-spacing: -.01em; margin-bottom: 6px; }
+.gallery-prompt-quote { font-size: 11px; opacity: .45; font-style: italic; line-height: 1.5; max-width: 480px; }
+.gallery-sort { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.gallery-sort-label { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; opacity: .3; }
+.gsort-btn {
+  background: none; border: 1px solid var(--border); color: var(--navy);
+  font-family: var(--mono); font-size: 9px; letter-spacing: .15em; text-transform: uppercase;
+  padding: 7px 14px; cursor: pointer; transition: .15s;
+}
+.gsort-btn.active { background: var(--navy); color: var(--cream); border-color: var(--navy); }
+.gsort-btn:hover:not(.active) { border-color: var(--navy); }
+
+.gallery-grid {
+  padding: 1px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+
+@media(max-width:900px) {
+  .comp-info-bar { margin: 0 24px 32px; flex-direction: column; align-items: flex-start; }
+  .comp-info-right { align-items: flex-start; }
+  .photos-grid, .photos-teaser-cta { margin: 0 24px; }
+  .gallery-sidebar { display: none; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+  .gallery-nav { padding: 0 20px; }
+  .gallery-main-header { flex-direction: column; align-items: flex-start; }
+}
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--navy); border-radius:3px; }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 56px;
+  height: 72px;
+  background: rgba(247,239,230,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  display:flex; align-items:center; gap:16px;
+  text-decoration:none;
+}
+.nav-logo svg { width:110px; height:auto; }
+.nav-logo-tag {
+  font-family: var(--mono);
+  font-size:9px;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--navy);
+  opacity:.45;
+  padding-left:16px;
+  border-left: 1px solid var(--border);
+}
+.nav-links {
+  display:flex; align-items:center; gap:40px;
+  list-style:none;
+}
+.nav-links a {
+  font-size:10px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  text-decoration:none;
+  color:var(--navy);
+  opacity:.65;
+  transition: opacity .2s;
+}
+.nav-links a:hover { opacity:1; }
+.nav-cta {
+  background:var(--navy) !important;
+  color:var(--cream) !important;
+  opacity:1 !important;
+  padding:10px 20px;
+}
+.nav-cta:hover { background:var(--mid) !important; }
+
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  position:fixed; top:72px; left:0; right:0; z-index:99;
+  background:var(--navy);
+  border-bottom: 1px solid rgba(247,239,230,0.12);
+  overflow:hidden;
+  height: 42px;
+}
+.marquee-track {
+  display:flex; align-items:center;
+  width:max-content;
+  height:42px;
+  will-change: transform;
+}
+@keyframes marq { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.mq-unit {
+  display:flex; align-items:center;
+  padding:0 36px;
+  gap:0;
+  flex-shrink:0;
+}
+.mq-dot {
+  width:4px; height:4px;
+  border-radius:50%;
+  background:rgba(247,239,230,0.3);
+  margin:0 28px;
+  flex-shrink:0;
+}
+.mq-boll { display:flex; align-items:center; }
+.mq-boll svg { width:44px; height:auto; }
+.mq-word {
+  font-family: var(--serif);
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--cream);
+  padding-left:14px;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  padding-top: 114px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg-lines {
+  position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+}
+.hero-left {
+  position:relative; z-index:2;
+  padding: 80px 64px 80px 80px;
+  display:flex; flex-direction:column; justify-content:center;
+  gap:32px;
+}
+.hero-eyebrow {
+  font-size:9px;
+  letter-spacing:0.4em;
+  text-transform:uppercase;
+  color:var(--navy);
+  opacity:.45;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(52px, 6vw, 88px);
+  font-weight:900;
+  line-height:.92;
+  letter-spacing:-.02em;
+  color:var(--navy);
+}
+.hero-title em {
+  display:block;
+  font-style:italic;
+  font-weight:400;
+  font-size:.65em;
+  opacity:.4;
+  line-height:1.2;
+}
+.hero-tagline {
+  font-size:12px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--navy);
+  opacity:.55;
+  border-top:1px solid rgba(25,41,58,.15);
+  padding-top:20px;
+  width: fit-content;
+}
+.hero-btns {
+  display:flex; gap:16px; flex-wrap:wrap;
+}
+.btn-primary {
+  background:var(--navy);
+  color:var(--cream);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  padding:14px 28px;
+  border:none; cursor:pointer;
+  text-decoration:none;
+  transition: background .2s;
+  display:inline-block;
+}
+.btn-primary:hover { background:var(--mid); }
+.btn-ghost {
+  background:transparent;
+  color:var(--navy);
+  border:1.5px solid rgba(25,41,58,.3);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  padding:14px 28px;
+  cursor:pointer; text-decoration:none;
+  transition:all .2s;
+  display:inline-block;
+}
+.btn-ghost:hover { border-color:var(--navy); }
+
+/* Hero right — carousel */
+.hero-right {
+  position:relative; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  padding:80px 80px 80px 64px;
+}
+.carousel-frame {
+  width:100%;
+  aspect-ratio:4/3;
+  position:relative;
+  overflow:hidden;
+  background:rgba(25,41,58,.06);
+}
+.carousel-slide {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0;
+  transition: opacity .7s ease;
+}
+.carousel-slide.active { opacity:1; }
+.slide-placeholder {
+  width:100%; height:100%;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:16px;
+}
+.slide-placeholder svg { width:120px; height:auto; opacity:.2; }
+.slide-label {
+  font-size:9px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  opacity:.35;
+}
+/* Carousel - clean */
+.carousel-controls {
+  position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+  display:flex; gap:8px; z-index:10;
+}
+.carousel-dot {
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--navy);
+  opacity:.25;
+  cursor:pointer; border:none;
+  transition:.2s;
+}
+.carousel-dot.active { opacity:.9; transform:scale(1.3); }
+.carousel-prev, .carousel-next {
+  position:absolute; top:50%; transform:translateY(-50%);
+  background:rgba(247,239,230,.85);
+  border:1px solid var(--border);
+  width:40px; height:40px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; z-index:10;
+  transition:.2s;
+}
+.carousel-prev { left:16px; }
+.carousel-next { right:16px; }
+.carousel-prev:hover, .carousel-next:hover { background:var(--navy); color:var(--cream); }
+
+/* ─── SECTION HEADERS ─── */
+.section-header {
+  text-align:center;
+  padding:80px 40px 48px;
+}
+.section-eyebrow {
+  font-size:9px;
+  letter-spacing:.4em;
+  text-transform:uppercase;
+  opacity:.4;
+  margin-bottom:16px;
+}
+.section-title {
+  font-family:var(--serif);
+  font-size:clamp(32px,4vw,52px);
+  font-weight:900;
+  letter-spacing:-.02em;
+  line-height:.95;
+}
+.section-title em {
+  font-style:italic;
+  font-weight:400;
+  opacity:.4;
+}
+.section-rule {
+  width:48px; height:2px;
+  background:var(--navy);
+  margin:24px auto 0;
+  opacity:.25;
+}
+
+/* ─── ABOUT / INTRO ─── */
+.intro {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.intro-text {
+  padding:80px 64px 80px 80px;
+  border-right:1px solid var(--border);
+}
+.intro-text h2 {
+  font-family:var(--serif);
+  font-size:38px;
+  font-weight:900;
+  letter-spacing:-.02em;
+  line-height:1.05;
+  margin-bottom:24px;
+}
+.intro-text p {
+  font-size:12px;
+  line-height:1.9;
+  opacity:.65;
+  margin-bottom:18px;
+}
+.intro-stats {
+  padding:80px 80px 80px 64px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  align-content:start;
+}
+.stat-block {
+  border-left:2px solid rgba(25,41,58,.15);
+  padding-left:20px;
+}
+.stat-num {
+  font-family:var(--serif);
+  font-size:42px;
+  font-weight:900;
+  letter-spacing:-.02em;
+  line-height:1;
+  color:var(--navy);
+}
+.stat-label {
+  font-size:9px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  opacity:.45;
+  margin-top:6px;
+}
+
+/* ─── PRODUCTS ─── */
+.products-section {
+  background:var(--navy);
+  padding:0 0 80px;
+}
+.products-section .section-header { color:var(--cream); }
+.products-section .section-eyebrow { color:var(--cream); }
+.products-section .section-title { color:var(--cream); }
+.products-section .section-rule { background:var(--cream); }
+.products-grid {
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:1px;
+  background:rgba(247,239,230,.1);
+  margin:0 80px;
+}
+.product-card {
+  background:var(--navy);
+  padding:44px 36px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition: background .25s;
+  border:1px solid rgba(247,239,230,.08);
+}
+.product-card:hover { background:#f0e9df; }
+.product-card:hover .product-name { color:var(--navy); }
+.product-card:hover .product-number { color:var(--navy); }
+.product-card:hover .product-type { color:var(--navy); }
+.product-card:hover .product-desc { color:var(--navy); }
+.product-card:hover .product-status { border-color:rgba(25,41,58,.3); }
+.product-card:hover .status-active { color:#2d8a5a; }
+.product-card:hover .status-dev { color:#b8860b; }
+.product-card-hint { font-size:8px; letter-spacing:.2em; text-transform:uppercase; color:rgba(247,239,230,.3); margin-top:20px; transition:.2s; }
+.product-card:hover .product-card-hint { color:rgba(25,41,58,.3); }
+.product-card-header {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom:24px;
+}
+.product-number {
+  font-size:9px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--cream);
+  opacity:.3;
+}
+.product-status {
+  font-size:8px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  padding:4px 10px;
+  border:1px solid;
+}
+.status-active { color:#6fcf97; border-color:rgba(111,207,151,.35); }
+.status-dev    { color:#f2c94c; border-color:rgba(242,201,76,.35); }
+.status-soon   { color:var(--cream); border-color:rgba(247,239,230,.25); opacity:.5; }
+.product-name {
+  font-family:var(--serif);
+  font-size:26px;
+  font-weight:700;
+  color:var(--cream);
+  margin-bottom:8px;
+  letter-spacing:-.01em;
+}
+.product-type {
+  font-size:9px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  color:var(--cream);
+  opacity:.35;
+  margin-bottom:18px;
+}
+.product-desc {
+  font-size:11px;
+  line-height:1.75;
+  color:var(--cream);
+  opacity:.55;
+}
+/* Expand overlay */
+.product-expand {
+  position:absolute; inset:0;
+  background:rgba(247,239,230,.97);
+  color:var(--navy);
+  padding:36px;
+  opacity:0;
+  transition: opacity .3s;
+  pointer-events:none;
+  display:flex; flex-direction:column;
+  justify-content:space-between;
+}
+.product-card:hover .product-expand { opacity:1; pointer-events:all; }
+.product-expand-title {
+  font-family:var(--serif);
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:-.01em;
+  margin-bottom:12px;
+}
+.product-expand-details {
+  font-size:11px;
+  line-height:1.8;
+  opacity:.65;
+}
+.product-expand-link {
+  font-size:9px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  text-decoration:none;
+  color:var(--navy);
+  display:flex; align-items:center; gap:8px;
+  margin-top:auto;
+  opacity:.55;
+}
+.product-expand-link::after { content:'→'; }
+
+/* ─── STATUS PAGE ─── */
+.status-section { padding:0 0 80px; }
+.status-grid {
+  margin:0 80px;
+  border:1px solid var(--border);
+}
+.status-row {
+  display:grid;
+  grid-template-columns:200px 1fr 120px 150px;
+  align-items:center;
+  padding:20px 28px;
+  border-bottom:1px solid var(--border);
+  gap:24px;
+}
+.status-row:last-child { border-bottom:none; }
+.status-row-header {
+  font-size:8px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  opacity:.35;
+  background:rgba(25,41,58,.03);
+}
+.status-name { font-size:12px; font-weight:700; }
+.status-bar-wrap { height:6px; background:rgba(25,41,58,.08); position:relative; }
+.status-bar { height:100%; transition:.4s; }
+.sheets-loading { grid-column:1/-1; padding:32px; text-align:center; font-family:var(--mono); font-size:11px; letter-spacing:.15em; color:rgba(25,41,58,.4); text-transform:uppercase; }
+.sheets-error { grid-column:1/-1; padding:24px; text-align:center; font-family:var(--mono); font-size:11px; color:#c0392b; }
+.sheets-config-notice { display:none !important; }
+.bar-green { background:#6fcf97; }
+.bar-yellow { background:#f2c94c; }
+.bar-blue { background:#56a8e0; }
+.status-pct { font-size:10px; text-align:right; opacity:.5; }
+.status-badge {
+  font-size:8px; letter-spacing:.2em; text-transform:uppercase;
+  padding:4px 10px; text-align:center;
+  border:1px solid;
+}
+
+/* ─── PARTNERS ─── */
+.partners-section {
+  padding:80px 0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.partners-grid-wrap {
+  margin:0 80px;
+  background:rgba(25,41,58,.04);
+  border:1px solid var(--border);
+  display:inline-grid;
+  width:calc(100% - 160px);
+}
+.partners-grid {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:1px;
+  background:var(--border);
+  width:100%;
+}
+.partner-card {
+  background:var(--cream);
+  padding:40px 32px;
+  display:flex; flex-direction:column;
+  gap:12px;
+  cursor:pointer;
+  transition:background .2s;
+}
+.partner-card:hover { background:#f0e8de; }
+.partner-initial {
+  font-family:var(--serif);
+  font-size:36px;
+  font-weight:900;
+  opacity:.1;
+  letter-spacing:-.02em;
+  transition:opacity .2s;
+}
+.partner-name {
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.05em;
+}
+.partner-type {
+  font-size:9px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  opacity:.4;
+}
+.partner-card:hover .partner-initial { opacity:.2; }
+
+/* ─── PARTNER MODAL ─── */
+.partner-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
+.partner-modal.open { display:flex; }
+.partner-modal-inner {
+  background:var(--cream); color:var(--navy);
+  width:min(680px,95vw);
+  position:relative; max-height:90vh; overflow-y:auto;
+  display:flex; flex-direction:column;
+}
+.partner-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
+.partner-modal-close:hover { opacity:.9; }
+
+/* Banner mode: full-width, 200px tall */
+.partner-modal-img-banner {
+  width:100%; height:200px;
+  background:rgba(25,41,58,.06);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; flex-shrink:0; position:relative;
+  border-bottom:1px solid var(--border);
+}
+.partner-modal-img-banner img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+/* Logo mode: square, centered, smaller */
+.partner-modal-img-logo {
+  width:160px; height:160px;
+  margin:40px auto 0;
+  background:rgba(25,41,58,.06);
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; flex-shrink:0; position:relative;
+}
+.partner-modal-img-logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:12px; }
+
+.partner-modal-img-placeholder { font-family:var(--serif); font-size:72px; font-weight:900; opacity:.06; letter-spacing:-.02em; }
+.partner-modal-body { padding:36px 48px 44px; display:flex; flex-direction:column; gap:14px; }
+.partner-modal-initial { font-family:var(--serif); font-size:52px; font-weight:900; opacity:.08; letter-spacing:-.02em; line-height:1; margin-bottom:-8px; }
+.partner-modal-name { font-family:var(--serif); font-size:30px; font-weight:900; letter-spacing:-.02em; line-height:1.05; }
+.partner-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; }
+
+/* Collapsible desc */
+.partner-modal-desc-toggle {
+  font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  background:none; border:none; color:var(--navy); cursor:pointer;
+  opacity:.35; padding:0; font-family:var(--mono); display:flex; align-items:center; gap:7px;
+  margin-top:4px; transition:opacity .15s;
+}
+.partner-modal-desc-toggle:hover { opacity:.7; }
+.partner-modal-desc-toggle svg { transition:transform .2s; }
+.partner-modal-desc-toggle.open svg { transform:rotate(180deg); }
+.partner-modal-desc {
+  font-size:12px; line-height:1.85; opacity:.6;
+  border-top:1px solid rgba(25,41,58,.08); padding-top:16px;
+  display:none; margin-top:0;
+}
+.partner-modal-desc.open { display:block; }
+
+.partner-modal-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; border-top:1px solid rgba(25,41,58,.08); padding-top:18px; }
+.partner-modal-link {
+  font-family:var(--mono); font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--navy); border:1px solid rgba(25,41,58,.3); padding:10px 20px;
+  text-decoration:none; transition:.15s; display:inline-block;
+}
+.partner-modal-link:hover { background:var(--navy); color:var(--cream); }
+
+.partner-links {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:4px;
+}
+.partner-link {
+  font-family:var(--mono);
+  font-size:8px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--navy);
+  border:1px solid rgba(25,41,58,.25);
+  padding:5px 10px;
+  text-decoration:none;
+  transition:.15s;
+}
+.partner-link:hover { background:var(--navy); color:var(--cream); }
+/* ─── CONTACT ─── */
+.contact-section {
+  background:var(--navy);
+  color:var(--cream);
+  padding:100px 80px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+}
+.contact-left h2 {
+  font-family:var(--serif);
+  font-size:clamp(32px,4vw,56px);
+  font-weight:900;
+  letter-spacing:-.02em;
+  line-height:.95;
+  margin-bottom:32px;
+}
+.contact-left h2 em {
+  font-style:italic; font-weight:400; opacity:.4;
+}
+.contact-left p {
+  font-size:12px;
+  line-height:1.9;
+  opacity:.55;
+  margin-bottom:40px;
+}
+.contact-info-list {
+  list-style:none;
+  display:flex; flex-direction:column; gap:18px;
+}
+.contact-info-list li {
+  display:flex; align-items:flex-start; gap:16px;
+  font-size:11px;
+  opacity:.65;
+}
+.contact-info-list .ci-label {
+  font-size:8px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  opacity:.5;
+  margin-top:2px;
+  min-width:56px;
+}
+.contact-right { display:flex; flex-direction:column; gap:20px; }
+.form-group { display:flex; flex-direction:column; gap:8px; }
+.form-label {
+  font-size:8px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  opacity:.45;
+}
+.form-input, .form-textarea {
+  background:rgba(247,239,230,.07);
+  border:1px solid rgba(247,239,230,.15);
+  color:var(--cream);
+  font-family:var(--mono);
+  font-size:12px;
+  padding:14px 16px;
+  outline:none;
+  transition:border .2s;
+  width:100%;
+}
+.form-input::placeholder, .form-textarea::placeholder { opacity:.3; }
+.form-input:focus, .form-textarea:focus { border-color:rgba(247,239,230,.45); }
+.form-textarea { resize:vertical; min-height:100px; }
+.form-submit {
+  background:var(--cream);
+  color:var(--navy);
+  border:none;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.25em;
+  text-transform:uppercase;
+  padding:16px 32px;
+  cursor:pointer;
+  transition:opacity .2s;
+  align-self:flex-start;
+  margin-top:8px;
+}
+.form-submit:hover { opacity:.85; }
+
+/* Socials row in contact */
+.socials-row {
+  display:flex; gap:16px; margin-top:24px;
+}
+.social-link {
+  width:38px; height:38px;
+  border:1px solid rgba(247,239,230,.2);
+  display:flex; align-items:center; justify-content:center;
+  text-decoration:none; color:var(--cream);
+  font-size:11px;
+  opacity:.55;
+  transition:.2s;
+}
+.social-link:hover { opacity:1; border-color:rgba(247,239,230,.6); }
+
+/* ─── FOOTER ─── */
+footer {
+  background:var(--navy);
+  border-top:1px solid rgba(247,239,230,.08);
+  padding:40px 80px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.footer-logo svg { width:90px; height:auto; }
+.footer-meta {
+  font-size:9px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--cream);
+  opacity:.3;
+}
+.footer-links {
+  display:flex; gap:28px; list-style:none;
+}
+.footer-links a {
+  font-size:9px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--cream);
+  opacity:.3;
+  text-decoration:none;
+  transition:.2s;
+}
+.footer-links a:hover { opacity:.7; }
+
+/* ─── COORDS ─── */
+.coord {
+  position:fixed;
+  font-size:7px;
+  letter-spacing:.15em;
+  color:var(--navy);
+  opacity:.2;
+  z-index:50;
+  font-family:var(--mono);
+  pointer-events:none;
+}
+.coord-bl { bottom:12px; left:16px; }
+.coord-br { bottom:12px; right:16px; }
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px) {
+  nav { padding:0 24px; }
+  .nav-links { display:none; }
+  .hero { grid-template-columns:1fr; }
+  .hero-right { display:none; }
+  .hero-left { padding:60px 28px; }
+  .intro { grid-template-columns:1fr; }
+  .intro-text { border-right:none; border-bottom:1px solid var(--border); padding:48px 28px; }
+  .intro-stats { padding:48px 28px; }
+  .products-grid { grid-template-columns:1fr; margin:0 24px; }
+  .status-grid { margin:0 24px; }
+  .status-row { grid-template-columns:140px 1fr; }
+  .status-pct, .status-badge { display:none; }
+  .partners-grid-wrap { margin:0 16px; width:calc(100% - 32px); }
+  .partners-grid { grid-template-columns:1fr 1fr; }
+  .contact-section { grid-template-columns:1fr; padding:60px 24px; gap:48px; }
+  .community-channels { grid-template-columns:1fr; margin:0 24px 40px; }
+  .videos-grid { grid-template-columns:1fr; margin:0; }
+  .videos-section { margin:0 24px; }
+  footer { padding:32px 24px; flex-wrap:wrap; gap:16px; }
+  .marquee-wrap { display:none; }
+  body { padding-top:0; }
+  .hero { padding-top:72px; }
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.anim { opacity:0; animation: fadeUp .7s cubic-bezier(.16,1,.3,1) both; }
+.delay-1 { animation-delay:.12s; }
+.delay-2 { animation-delay:.24s; }
+.delay-3 { animation-delay:.36s; }
+.delay-4 { animation-delay:.48s; }
+
+/* ─── COMMUNITY ─── */
+.community-section { padding:0 0 80px; }
+.community-channels {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--border); margin:0 80px 64px;
+}
+.channel-card {
+  background:var(--cream); padding:48px 40px;
+  text-decoration:none; color:var(--navy);
+  display:flex; flex-direction:column; gap:12px;
+  transition:background .2s;
+}
+.channel-card:hover { background:var(--navy); color:var(--cream); }
+.channel-name { font-family:var(--serif); font-size:26px; font-weight:700; letter-spacing:-.01em; }
+.channel-desc { font-size:11px; line-height:1.75; opacity:.55; }
+.channel-cta { font-size:9px; letter-spacing:.3em; text-transform:uppercase; opacity:.4; margin-top:auto; padding-top:20px; }
+.channel-card:hover .channel-cta { opacity:.7; }
+
+.videos-section { margin:0 80px; }
+.videos-header { margin-bottom:28px; }
+.videos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+.video-card { cursor:pointer; border:1px solid var(--border); overflow:hidden; transition:.2s; }
+.video-card:hover { border-color:var(--navy); }
+.video-thumb { aspect-ratio:16/9; background:rgba(25,41,58,.06); position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.video-thumb-bg { position:absolute; inset:0; background:linear-gradient(135deg,rgba(25,41,58,.08) 0%,rgba(25,41,58,.15) 100%); }
+.video-thumb-placeholder { display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
+.video-play-btn { position:absolute; width:44px; height:44px; background:var(--navy); color:var(--cream); display:flex; align-items:center; justify-content:center; font-size:14px; opacity:0; transition:.2s; padding-left:3px; }
+.video-card:hover .video-play-btn { opacity:1; }
+.video-info { padding:16px 18px; }
+.video-title { font-size:12px; font-weight:700; line-height:1.4; margin-bottom:6px; }
+.video-meta { font-size:9px; letter-spacing:.15em; text-transform:uppercase; opacity:.35; }
+
+.video-modal { display:none; position:fixed; inset:0; z-index:500; background:rgba(25,41,58,.85); align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+.video-modal.open { display:flex; }
+.video-modal-inner { position:relative; width:min(860px,90vw); background:var(--navy); }
+.video-modal-close { position:absolute; top:-44px; right:0; background:none; border:none; color:var(--cream); font-size:18px; cursor:pointer; opacity:.6; font-family:var(--mono); padding:8px; }
+.video-modal-close:hover { opacity:1; }
+.video-modal-frame { aspect-ratio:16/9; width:100%; }
+.video-modal-frame iframe { width:100%; height:100%; display:block; }
+
+.product-modal { display:none; position:fixed; inset:0; z-index:400; background:rgba(25,41,58,.8); align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:24px; }
+.product-modal.open { display:flex; }
+.product-modal-inner { background:var(--cream); color:var(--navy); width:min(1400px,97vw); position:relative; max-height:92vh; overflow-y:auto; display:flex; flex-direction:column; }
+.product-modal-close { position:absolute; top:16px; right:20px; background:none; border:none; font-size:18px; cursor:pointer; opacity:.35; font-family:var(--mono); color:var(--navy); z-index:10; line-height:1; padding:4px; }
+.product-modal-close:hover { opacity:.9; }
+.product-modal-layout { display:grid; grid-template-columns:480px 1fr; min-height:480px; }
+.product-modal-images { background:rgba(25,41,58,.05); border-right:1px solid rgba(25,41,58,.1); display:flex; flex-direction:column; position:relative; }
+.product-modal-img-main { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px; position:relative; overflow:hidden; cursor:zoom-in; }
+.product-modal-img-main img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:rgba(25,41,58,.04); }
+.product-modal-img-main .pm-placeholder { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:40px; width:100%; height:100%; }
+.pm-img-nav { position:absolute; top:50%; transform:translateY(-50%); background:var(--navy); color:var(--cream); border:none; width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:5; opacity:0; transition:opacity .2s; font-size:16px; font-family:var(--mono); }
+.product-modal-images:hover .pm-img-nav { opacity:.8; }
+.pm-img-nav:hover { opacity:1 !important; }
+.pm-img-nav.prev { left:10px; }
+.pm-img-nav.next { right:10px; }
+.pm-img-counter { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(25,41,58,.6); color:var(--cream); font-family:var(--mono); font-size:9px; letter-spacing:.15em; padding:4px 10px; z-index:5; pointer-events:none; }
+.pm-thumb-strip { display:flex; gap:4px; padding:8px; border-top:1px solid rgba(25,41,58,.1); background:rgba(25,41,58,.03); flex-wrap:wrap; }
+.pm-thumb { width:48px; height:48px; object-fit:cover; cursor:pointer; border:2px solid transparent; opacity:.6; transition:.15s; flex-shrink:0; }
+.pm-thumb.active { border-color:var(--navy); opacity:1; }
+.pm-thumb:hover { opacity:1; }
+
+/* ── Lightbox ── */
+.pm-lightbox { display:none; position:fixed; inset:0; z-index:9000; background:rgba(10,16,22,.96); align-items:center; justify-content:center; }
+.pm-lightbox.open { display:flex; }
+.pm-lightbox-img { max-width:92vw; max-height:90vh; object-fit:contain; display:block; }
+.pm-lightbox-close { position:absolute; top:20px; right:28px; background:none; border:none; color:#fff; font-size:26px; cursor:pointer; font-family:var(--mono); opacity:.6; line-height:1; padding:4px 8px; }
+.pm-lightbox-close:hover { opacity:1; }
+.pm-lightbox-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.12); color:#fff; border:none; width:52px; height:52px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:22px; transition:.15s; font-family:var(--mono); }
+.pm-lightbox-nav:hover { background:rgba(255,255,255,.22); }
+.pm-lightbox-nav.prev { left:20px; }
+.pm-lightbox-nav.next { right:20px; }
+.pm-lightbox-counter { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,.5); font-family:var(--mono); font-size:10px; letter-spacing:.2em; }
+.product-modal-content { padding:44px 40px; display:flex; flex-direction:column; overflow-y:auto; max-height:70vh; min-width:380px; }
+.product-modal-content::-webkit-scrollbar { width:3px; }
+.product-modal-content::-webkit-scrollbar-track { background:transparent; }
+.product-modal-content::-webkit-scrollbar-thumb { background:rgba(25,41,58,.15); }
+.product-modal-num { font-size:9px; letter-spacing:.3em; text-transform:uppercase; opacity:.3; margin-bottom:10px; }
+.product-modal-status { font-size:8px; letter-spacing:.2em; text-transform:uppercase; padding:4px 10px; border:1px solid; display:inline-block; margin-bottom:22px; }
+.product-modal-name { font-family:var(--serif); font-size:32px; font-weight:900; letter-spacing:-.02em; margin-bottom:4px; line-height:1.05; }
+.product-modal-type { font-size:9px; letter-spacing:.25em; text-transform:uppercase; opacity:.35; margin-bottom:18px; }
+.product-modal-desc { font-size:12px; line-height:1.8; opacity:.65; margin-bottom:18px; }
+.product-modal-details { font-size:11px; line-height:1.85; opacity:.45; border-top:1px solid rgba(25,41,58,.1); padding-top:18px; margin-bottom:28px; }
+.product-modal-cta { display:inline-block; background:var(--navy); color:var(--cream); font-family:var(--mono); font-size:10px; letter-spacing:.25em; text-transform:uppercase; padding:14px 28px; transition:.2s; cursor:pointer; border:none; align-self:flex-start; margin-top:auto; }
+.product-modal-cta:hover { background:var(--mid); }
+
+/* Slide caption overlay */
+.slide-caption { display:none; }
+
+/* Big slide image backgrounds */
+.slide-img {
+  width:100%; height:100%;
+  background-size:cover; background-position:center;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ─── CUSTOM CURSOR ─── */
+*, *::before, *::after { cursor: none !important; }
+.cursor-dot {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  mix-blend-mode: difference;
+  transition: width 0.12s, height 0.12s;
+}
+.cursor-dot.hovering { width: 11px; height: 11px; }
+.cursor-dot.clicking { width: 4px; height: 4px; }
+
+
+/* ─── DISCORD / UPDATES SECTION ─── */
+.discord-section { padding: 0 0 80px; border-top: 1px solid var(--border); }
+
+/* Shared image placeholder */
+.update-img-ph {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px;
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--navy); opacity: .3;
+  background: rgba(25,41,58,.04);
+}
+.update-img-ph img { width:100%; height:100%; object-fit:cover; opacity:1; display:block; }
+
+/* Shared pill + meta */
+.update-product-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--navy); color: var(--cream);
+  font-family: var(--mono); font-size: 8px; letter-spacing: .25em; text-transform: uppercase;
+  padding: 5px 12px 5px 8px; margin-bottom: 16px; align-self: flex-start;
+}
+.update-product-pill-dot { width:6px; height:6px; border-radius:50%; background:var(--cream); opacity:.5; flex-shrink:0; }
+.update-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+.update-tag { font-size:8px; letter-spacing:.25em; text-transform:uppercase; color:var(--navy); opacity:.4; }
+.update-tag.tag-announce { opacity:.75; }
+.update-tag.tag-product  { color:var(--mid); opacity:.9; }
+.update-tag.tag-update   { opacity:.55; }
+.update-date { font-size:9px; letter-spacing:.12em; text-transform:uppercase; opacity:.25; }
+.update-title { font-family:var(--serif); font-size:24px; font-weight:700; line-height:1.1; letter-spacing:-.01em; margin-bottom:14px; }
+.update-body { font-size:11px; line-height:1.85; opacity:.55; }
+.update-body strong { opacity:1; color:var(--navy); font-weight:700; }
+.update-footer { display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:18px; border-top:1px solid rgba(25,41,58,.07); }
+.update-author { font-size:9px; letter-spacing:.12em; text-transform:uppercase; opacity:.3; }
+.update-reactions { display:flex; gap:10px; }
+.update-reaction { font-size:10px; opacity:.35; }
+
+/* Slider dots */
+.usd {
+  width:6px; height:6px; border-radius:50%;
+  border:1px solid rgba(25,41,58,.3); background:transparent;
+  padding:0; transition:.2s;
+}
+.usd.active { background:var(--navy); border-color:var(--navy); }
+
+/* ── ANNOUNCEMENT BLOCK ── */
+.update-announce {
+  margin: 0 80px 1px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+.update-announce-text {
+  padding: 44px 48px;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+.update-announce-images {
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.update-announce-slider { flex: 1; position: relative; overflow: hidden; }
+.update-announce-slide {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .5s;
+}
+.update-announce-slide.active { opacity: 1; }
+.update-slider-dots {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 7px; z-index: 2;
+}
+
+/* ── PRODUCT ROWS ── */
+.update-rows {
+  margin: 0 80px;
+  border: 1px solid var(--border);
+  border-top: none;
+  display: flex; flex-direction: column;
+}
+.update-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .2s;
+}
+.update-row:hover { background: rgba(25,41,58,.025); }
+.update-row-text {
+  padding: 44px 48px;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--border);
+}
+.update-row.alt .update-row-text { border-right: none; border-left: 1px solid var(--border); }
+.update-row-images {
+  position: relative;
+  min-height: 300px;
+}
+.update-row-slider { position: absolute; inset: 0; overflow: hidden; }
+.update-row-slide {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .5s;
+}
+.update-row-slide.active { opacity: 1; }
+.update-row-dots {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 7px; z-index: 2;
+}
+
+/* flash when scrolled-to */
+@keyframes cardFlash {
+  0%   { background: rgba(25,41,58,.08); }
+  100% { background: transparent; }
+}
+.update-row.flash { animation: cardFlash 1.2s ease-out; }
+
+/* Discord CTA bar */
+.discord-cta-bar {
+  margin: 32px 80px 0;
+  border: 1px solid var(--border); padding: 24px 36px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+}
+.discord-cta-bar-left { display:flex; align-items:center; gap:14px; }
+.discord-cta-text p:first-child { font-size:12px; font-weight:700; margin-bottom:3px; }
+.discord-cta-text p:last-child  { font-size:10px; opacity:.45; letter-spacing:.05em; }
+.btn-discord {
+  background: var(--navy); color: var(--cream);
+  font-family: var(--mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  padding:12px 28px; border:none; text-decoration:none; display:inline-block; transition:background .2s; flex-shrink:0;
+}
+.btn-discord:hover { background: var(--mid); }
+
+@media(max-width:900px) {
+  .update-announce, .update-rows { margin: 0 24px; }
+  .update-announce { grid-template-columns: 1fr; }
+  .update-announce-images { min-height: 200px; border-top: 1px solid var(--border); }
+  .update-row { grid-template-columns: 1fr; }
+  .update-row-images { min-height: 220px; }
+  .update-row.alt { direction: ltr; }
+  .discord-cta-bar { margin: 24px 24px 0; flex-direction:column; align-items:flex-start; }
+}
+/* ─── PRODUCT MODAL — 3 col ─── */
+.product-modal-discord {
+  border-top: 1px solid rgba(25,41,58,.1);
+  padding: 28px 40px;
+  background: rgba(25,41,58,.03);
+  max-height: 240px;
+  overflow-y: auto;
+}
+.product-modal-discord::-webkit-scrollbar { width: 3px; }
+.product-modal-discord::-webkit-scrollbar-track { background: transparent; }
+.product-modal-discord::-webkit-scrollbar-thumb { background: rgba(25,41,58,.2); }
+.product-modal-discord-label {
+  font-size: 8px;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  opacity: .3;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.product-modal-discord-label::before {
+  content: '';
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--navy);
+  opacity: .3;
+}
+.product-modal-discord-title {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.product-modal-discord-body {
+  font-size: 11px;
+  line-height: 1.75;
+  opacity: .55;
+}
+.product-modal-discord-meta {
+  font-size: 9px;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  opacity: .3;
+  margin-top: 12px;
+}
+/* ─── SCROLL REVEAL ANIMATIONS ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
+}
+.reveal.revealed { opacity: 1; transform: translateY(0); }
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+}
+.reveal-left.revealed { opacity: 1; transform: translateX(0); }
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+}
+.reveal-right.revealed { opacity: 1; transform: translateX(0); }
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
+}
+.reveal-scale.revealed { opacity: 1; transform: scale(1); }
+.delay-r1 { transition-delay: 0.08s; }
+.delay-r2 { transition-delay: 0.16s; }
+.delay-r3 { transition-delay: 0.24s; }
+.delay-r4 { transition-delay: 0.32s; }
+.delay-r5 { transition-delay: 0.40s; }
+
+/* Nav reveal on scroll */
+nav.scrolled {
+  box-shadow: 0 2px 24px rgba(25,41,58,.08);
+}
+
+/* Parallax hero title */
+.hero-title { will-change: transform; }
+
+/* Section entrance line */
+.section-rule {
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.8s cubic-bezier(.16,1,.3,1) 0.3s;
+}
+.section-rule.revealed { transform: scaleX(1); }
+
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div class="cursor-dot" id="cursor-dot"></div>
+
+
+<!-- Global nautical background icons -->
+<svg class="nautical-bg-icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <g transform="translate(88vw, 18vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
+    <line x1="0" y1="-44" x2="0" y2="44"/><line x1="-44" y1="0" x2="44" y2="0"/>
+    <line x1="-31" y1="-31" x2="31" y2="31"/><line x1="31" y1="-31" x2="-31" y2="31"/>
+    <circle cx="0" cy="0" r="18"/><circle cx="0" cy="0" r="4" fill="currentColor"/>
+    <polygon points="0,-44 -5,-20 0,-28 5,-20" fill="currentColor"/>
+    <text x="5" y="-48" font-family="monospace" font-size="8" fill="currentColor" stroke="none">N</text>
+  </g>
+  <g transform="translate(6vw, 55vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
+    <line x1="0" y1="-32" x2="0" y2="32"/><line x1="-32" y1="0" x2="32" y2="0"/>
+    <circle cx="0" cy="0" r="14"/><circle cx="0" cy="0" r="3" fill="currentColor"/>
+    <polygon points="0,-32 -4,-14 0,-20 4,-14" fill="currentColor"/>
+  </g>
+  <g transform="translate(92vw, 82vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
+    <line x1="0" y1="-28" x2="0" y2="28"/><line x1="-28" y1="0" x2="28" y2="0"/>
+    <circle cx="0" cy="0" r="12"/><circle cx="0" cy="0" r="2.5" fill="currentColor"/>
+    <polygon points="0,-28 -3,-12 0,-17 3,-12" fill="currentColor"/>
+  </g>
+  <g transform="translate(93vw, 42vh)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
+    <circle cx="0" cy="-18" r="6"/><line x1="0" y1="-12" x2="0" y2="18"/>
+    <line x1="-14" y1="-8" x2="14" y2="-8"/>
+    <path d="M-14,18 Q-20,10 -14,6 M14,18 Q20,10 14,6"/>
+    <circle cx="0" cy="18" r="2.5" fill="currentColor"/>
+  </g>
+  <g transform="translate(8vw, 78vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".04">
+    <circle cx="0" cy="-14" r="5"/><line x1="0" y1="-9" x2="0" y2="14"/>
+    <line x1="-11" y1="-6" x2="11" y2="-6"/>
+    <path d="M-11,14 Q-16,8 -11,4 M11,14 Q16,8 11,4"/>
+  </g>
+  <g transform="translate(10vw, 28vh)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
+    <path d="M-30,0 Q-20,-12 -10,0 Q0,12 10,0 Q20,-12 30,0"/>
+    <path d="M-30,10 Q-20,-2 -10,10 Q0,22 10,10 Q20,-2 30,10" opacity=".5"/>
+  </g>
+  <g transform="translate(80vw, 70vh)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".04">
+    <path d="M-24,0 Q-16,-9 -8,0 Q0,9 8,0 Q16,-9 24,0"/>
+    <path d="M-24,7 Q-16,-2 -8,7 Q0,16 8,7 Q16,-2 24,7" opacity=".5"/>
+  </g>
+  <g transform="translate(52vw, 90vh)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".04">
+    <line x1="-20" y1="0" x2="20" y2="0"/><line x1="0" y1="-20" x2="0" y2="20"/>
+    <line x1="-14" y1="-14" x2="14" y2="14" opacity=".4"/><line x1="14" y1="-14" x2="-14" y2="14" opacity=".4"/>
+    <circle cx="0" cy="0" r="8" opacity=".5"/>
+  </g>
+  <g transform="translate(50vw, 8vh)" stroke="currentColor" stroke-width=".7" fill="none" opacity=".035">
+    <line x1="-24" y1="0" x2="24" y2="0"/><line x1="0" y1="-24" x2="0" y2="24"/>
+    <circle cx="0" cy="0" r="10"/>
+    <polygon points="0,-24 -3,-10 0,-15 3,-10" fill="currentColor"/>
+  </g>
+  <g transform="translate(2vw, 0)" stroke="currentColor" stroke-width=".5" opacity=".04">
+    <line x1="0" y1="15vh" x2="12" y2="15vh"/>
+    <line x1="0" y1="30vh" x2="8" y2="30vh"/>
+    <line x1="0" y1="45vh" x2="12" y2="45vh"/>
+    <line x1="0" y1="60vh" x2="8" y2="60vh"/>
+    <line x1="0" y1="75vh" x2="12" y2="75vh"/>
+    <line x1="0" y1="90vh" x2="8" y2="90vh"/>
+  </g>
+</svg>
+<!-- Corner coordinates -->
+<div class="coord coord-bl">59°54'N 10°44'E — UNDERWAY-MK2</div>
+<div class="coord coord-br">EST. 2021</div>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;">
+      <path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z"/>
+    </svg>
+    <span class="nav-logo-tag">Est. 2021</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#photos">Photos</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#partners" class="nav-cta">Partners</a></li>
+  </ul>
+</nav>
+
+<!-- ─── MARQUEE ─── -->
+<div class="marquee-wrap">
+  <div class="marquee-track" id="mq-track"></div>
+</div>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="home">
+  <svg class="hero-bg-lines" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="#19293a" stroke-width=".5" fill="none">
+      <line x1="0" y1="150" x2="1440" y2="150"/>
+      <line x1="0" y1="300" x2="1440" y2="300"/>
+      <line x1="0" y1="450" x2="1440" y2="450"/>
+      <line x1="0" y1="600" x2="1440" y2="600"/>
+      <line x1="0" y1="750" x2="1440" y2="750"/>
+      <line x1="240" y1="0" x2="240" y2="900"/>
+      <line x1="480" y1="0" x2="480" y2="900"/>
+      <line x1="720" y1="0" x2="720" y2="900"/>
+      <line x1="960" y1="0" x2="960" y2="900"/>
+      <line x1="1200" y1="0" x2="1200" y2="900"/>
+    </g>
+    <g transform="translate(1300,200)" stroke="#19293a" stroke-width="1" fill="none">
+      <line x1="0" y1="-50" x2="0" y2="50"/>
+      <line x1="-50" y1="0" x2="50" y2="0"/>
+      <line x1="-35" y1="-35" x2="35" y2="35"/>
+      <line x1="35" y1="-35" x2="-35" y2="35"/>
+      <circle cx="0" cy="0" r="22"/>
+      <circle cx="0" cy="0" r="5" fill="#19293a"/>
+      <polygon points="0,-50 -6,-24 0,-32 6,-24" fill="#19293a"/>
+      <text x="6" y="-54" font-family="monospace" font-size="9" fill="#19293a">N</text>
+    </g>
+    <text x="60" y="460" font-family="monospace" font-size="8" fill="#19293a">— 12m</text>
+    <text x="60" y="610" font-family="monospace" font-size="8" fill="#19293a">— 24m</text>
+  </svg>
+
+  <div class="hero-left">
+    <p class="hero-eyebrow anim">Marine · Industrial · Equipment</p>
+    <h1 class="hero-title anim delay-1">
+      UNDER<br>WAY
+      <em>built for the<br>long haul.</em>
+    </h1>
+    <p class="hero-tagline anim delay-2">Professional-grade marine solutions since 2021</p>
+    <div class="hero-btns anim delay-3">
+      <a href="#products" class="btn-primary">View Products</a>
+      <a href="#contact" class="btn-ghost">Get in Touch</a>
+    </div>
+  </div>
+
+  <div class="hero-right anim delay-2">
+    <div class="carousel-frame" id="carousel">
+      <!-- Slides — replace with real product photos by swapping background-image URLs -->
+      <div class="carousel-slide active" id="slide-0">
+        <div class="slide-placeholder">
+          <svg viewBox="0 0 620 279" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#19293a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/>
+          </svg>
+          <span class="slide-label">Marine Bollards — Series I</span>
+        </div>
+        <div class="slide-caption">Series I — Marine Bollards</div>
+      </div>
+      <div class="carousel-slide" id="slide-1">
+        <div class="slide-placeholder">
+          <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="30" width="80" height="8" rx="2" fill="#19293a" opacity=".2"/>
+            <rect x="25" y="18" width="50" height="12" rx="2" fill="#19293a" opacity=".15"/>
+            <rect x="40" y="8" width="20" height="10" rx="2" fill="#19293a" opacity=".12"/>
+            <circle cx="20" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/>
+            <circle cx="80" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/>
+          </svg>
+          <span class="slide-label">Dock Hardware — Range</span>
+        </div>
+        <div class="slide-caption">Dock Hardware — Full Range</div>
+      </div>
+      <div class="carousel-slide" id="slide-2">
+        <div class="slide-placeholder">
+          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="40,5 75,30 75,55 40,75 5,55 5,30" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/>
+            <circle cx="40" cy="40" r="18" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".2"/>
+            <circle cx="40" cy="40" r="5" fill="#19293a" opacity=".18"/>
+          </svg>
+          <span class="slide-label">Mooring Systems</span>
+        </div>
+        <div class="slide-caption">Mooring Systems — Custom</div>
+      </div>
+      <div class="carousel-slide" id="slide-3">
+        <div class="slide-placeholder">
+          <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="40" width="70" height="15" rx="1" fill="#19293a" opacity=".15"/>
+            <rect x="15" y="20" width="50" height="20" rx="1" fill="#19293a" opacity=".12"/>
+            <line x1="20" y1="5" x2="20" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/>
+            <line x1="40" y1="5" x2="40" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/>
+            <line x1="60" y1="5" x2="60" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/>
+          </svg>
+          <span class="slide-label">Fender Systems</span>
+        </div>
+        <div class="slide-caption">Fender Systems — Industrial</div>
+      </div>
+      <div class="carousel-slide" id="slide-4">
+        <div class="slide-placeholder">
+          <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10,70 Q40,10 70,70" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/>
+            <circle cx="10" cy="70" r="5" fill="#19293a" opacity=".2"/>
+            <circle cx="70" cy="70" r="5" fill="#19293a" opacity=".2"/>
+            <path d="M25,50 L40,20 L55,50" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".15"/>
+          </svg>
+          <span class="slide-label">Rigging & Lines</span>
+        </div>
+        <div class="slide-caption">Rigging & Lines — Marine Grade</div>
+      </div>
+
+      <button class="carousel-prev" onclick="carouselMove(-1)">←</button>
+      <button class="carousel-next" onclick="carouselMove(1)">→</button>
+      <div class="carousel-controls" id="carousel-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── INTRO / ABOUT ─── -->
+<section class="intro" id="about" style="overflow:hidden">
+  <div class="intro-text reveal-left">
+    <h2>Marine equipment that goes the distance.</h2>
+    <p>Underway designs, engineers, and supplies professional-grade marine hardware for harbours, dockyards, and commercial fleets. Every product we make is tested in real-world conditions — because the sea doesn't forgive shortcuts.</p>
+    <p>From bollards and fenders to full mooring systems, our catalogue is built around one principle: if it carries our name, it has to last.</p>
+    <a href="#products" class="btn-primary" style="margin-top:12px">Explore Catalogue →</a>
+  </div>
+  <div class="intro-stats reveal-right">
+    <div class="stat-block reveal delay-r1">
+      <div class="stat-num">320+</div>
+      <div class="stat-label">Products in Range</div>
+    </div>
+    <div class="stat-block reveal delay-r2">
+      <div class="stat-num">48</div>
+      <div class="stat-label">Active Partners</div>
+    </div>
+    <div class="stat-block reveal delay-r3">
+      <div class="stat-num">12+</div>
+      <div class="stat-label">Countries Served</div>
+    </div>
+    <div class="stat-block reveal delay-r4">
+      <div class="stat-num">4yr</div>
+      <div class="stat-label">In Operation</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCTS ─── -->
+<section class="products-section" id="products">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">What we make</p>
+    <h2 class="section-title">The <em>Catalogue</em></h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="sheets-config-notice" id="sheets-notice">
+    ⚙️ <strong>Google Sheets not connected yet.</strong> Showing placeholder data.<br>
+    To connect: <a href="#" onclick="document.getElementById('sheets-instructions').style.display='block';return false;">see setup instructions</a> · then paste your Sheet ID into the <code>SHEET_ID</code> variable in this file's script.
+    <div id="sheets-instructions" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid #e0c040;">
+      1. Create a Google Sheet with tabs named <strong>Products</strong> and <strong>Status</strong><br>
+      2. <strong>Products</strong> columns: <code>Name · Type · Status · Description · Details · CTA</code><br>
+      3. <strong>Status</strong> columns: <code>Name · StockPct · LeadTime · Badge · BarColor</code><br>
+      4. File → Share → Publish to web → CSV (do for both tabs)<br>
+      5. Copy your Sheet ID from the URL and paste it below in the script
+    </div>
+  </div>
+  <div class="products-grid" id="products-grid">
+    <!-- Populated from Google Sheet -->
+    <div class="sheets-loading">Loading products…</div>
+  </div>
+</section>
+
+<!-- ─── PHOTOS ─── -->
+<section class="photos-section" id="photos">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">Photo Competition</p>
+    <h2 class="section-title">Current <em>Entries</em></h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <!-- Current comp info bar -->
+  <div class="comp-info-bar reveal">
+    <div class="comp-info-left">
+      <span class="comp-label">Active Prompt</span>
+      <div class="comp-prompt-text">"Golden Hour — catch Underway equipment at its most atmospheric"</div>
+    </div>
+    <div class="comp-info-right">
+      <div class="comp-deadline">{CAL_SVG} Closes 31 Mar 2026</div>
+      <button class="btn-primary" onclick="openGallery()">View Full Gallery</button>
+    </div>
+  </div>
+
+  <!-- 3 most recent current-comp entries -->
+  <div class="photos-grid photos-grid-teaser" id="photos-teaser-grid">
+    {photo_card(0,'golden-hour','@saltwater_marina','Golden Hour — Solent','Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.',142,38)}
+    {photo_card(1,'golden-hour','@northsea_ports','Holding Fast — North Sea','Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.',204,157)}
+    {photo_card(2,'golden-hour','@coastal_eng','Pilot Unit at Dawn','First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.',93,88)}
+  </div>
+
+  <div class="photos-teaser-cta reveal">
+    <button class="photos-see-all" onclick="openGallery()">
+      See all entries &amp; past winners
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- ─── ANNOUNCEMENTS ─── -->
+<section class="announce-section" id="discord">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">From the team</p>
+    <h2 class="section-title">Announce<em>ments</em></h2>
+    <div class="section-rule"></div>
+  </div>
+  <div class="update-announce reveal">
+    <div class="update-announce-text">
+      <div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div>
+      <div class="update-card-top">
+        <span class="update-tag tag-announce">New</span>
+        <span class="update-date">Today</span>
+      </div>
+      <div class="update-title">Bollard Series II — First Look</div>
+      <div class="update-body">
+        Redesigned base casting, <strong>40% improvement in corrosion resistance</strong>, and a new anti-rotation collar installers have been asking for since day one. Rolling out to distributors Q3 2026. Full spec sheet dropping this week.
+      </div>
+      <div class="update-footer">
+        <span class="update-author">Underway_Official &nbsp;·&nbsp; Today</span>
+        <div class="update-reactions"></div>
+      </div>
+    </div>
+    <div class="update-announce-images">
+      <div class="update-announce-slider" id="ann-slider">
+        <div class="update-announce-slide active"><div class="update-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Series II — Front View</div></div>
+        <div class="update-announce-slide"><div class="update-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Series II — Base Detail</div></div>
+        <div class="update-announce-slide"><div class="update-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Series II — Installed</div></div>
+      </div>
+      <div class="update-slider-dots" id="ann-dots">
+        <button class="usd active" onclick="annSlide(0)"></button>
+        <button class="usd" onclick="annSlide(1)"></button>
+        <button class="usd" onclick="annSlide(2)"></button>
+      </div>
+    </div>
+  </div>
+  <div class="discord-cta-bar reveal">
+    <div class="discord-cta-bar-left">
+      <svg width="28" height="22" viewBox="0 0 36 28" fill="none"><path d="M30.5 2.4A36 36 0 0 0 24 .7a25 25 0 0 0-1.1 2.3 33 33 0 0 0-9.8 0A24 24 0 0 0 12 .7 36 36 0 0 0 5.5 2.4C.7 9.5-.5 16.4.6 23.2a36 36 0 0 0 11 5.6c.9-1.2 1.7-2.5 2.4-3.9a22.5 22.5 0 0 1-3.7-1.8l.9-.7a25.4 25.4 0 0 0 21.8 0l.9.7a22.5 22.5 0 0 1-3.7 1.8c.7 1.4 1.5 2.7 2.4 3.9a36 36 0 0 0 11-5.6c1-8-1.7-14.8-7-21.8ZM12 19c-2.1 0-3.8-2-3.8-4.4S9.9 10.2 12 10.2s3.9 2 3.8 4.4S14.1 19 12 19Zm12 0c-2.1 0-3.8-2-3.8-4.4s1.7-4.4 3.8-4.4 3.9 2 3.8 4.4S26.1 19 24 19Z" fill="var(--navy)" opacity=".4"/></svg>
+      <div class="discord-cta-text"><p>Join us on Discord</p><p>Product channels, team updates, and early access drops.</p></div>
+    </div>
+    <a href="#" class="btn-discord" target="_blank" rel="noopener">Join Server</a>
+  </div>
+</section>
+
+<!-- ─── COMMUNITY ─── -->
+<section class="community-section" id="community">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">Join us</p>
+    <h2 class="section-title">The <em>Community</em></h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="community-channels">
+    <a href="#" class="channel-card reveal-scale" target="_blank" rel="noopener">
+      <div class="channel-icon">
+        <svg width="32" height="23" viewBox="0 0 32 23" fill="none"><rect width="32" height="23" rx="5" fill="#FF0000"/><polygon points="13,6 26,11.5 13,17" fill="white"/></svg>
+      </div>
+      <div class="channel-name">YouTube</div>
+      <div class="channel-desc">Product walkthroughs, installation guides and behind the scenes footage.</div>
+      <div class="channel-cta">Watch Now</div>
+    </a>
+    <a href="#" class="channel-card reveal-scale delay-r1" target="_blank" rel="noopener">
+      <div class="channel-icon">
+        <svg width="30" height="23" viewBox="0 0 30 23" fill="none"><path d="M25.5 2A24.8 24.8 0 0 0 20 .6a17 17 0 0 0-.76 1.58 23 23 0 0 0-6.84 0A16.5 16.5 0 0 0 11.6.6 24.7 24.7 0 0 0 5.5 2C1.5 7.7.44 13.3 1.04 18.8a24.9 24.9 0 0 0 7.6 3.85c.61-.84 1.16-1.73 1.63-2.67a16.2 16.2 0 0 1-2.56-1.23l.62-.49a17.7 17.7 0 0 0 15.27 0l.62.49a16.2 16.2 0 0 1-2.57 1.23c.47.94 1.01 1.83 1.63 2.67A24.8 24.8 0 0 0 29 18.8c.72-6.4-1.13-12-4.5-16.8ZM10.6 15.5c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Zm8.8 0c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Z" fill="#5865F2"/></svg>
+      </div>
+      <div class="channel-name">Discord</div>
+      <div class="channel-desc">Chat with the team, ask questions and connect with other operators.</div>
+      <div class="channel-cta">Join Server</div>
+    </a>
+    <a href="#" class="channel-card reveal-scale delay-r2" target="_blank" rel="noopener">
+      <div class="channel-icon">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="13" fill="#1b2b3a"/><path d="M13 4.5C8.31 4.5 4.5 8.31 4.5 13a8.48 8.48 0 0 0 4.8 7.6l1.82-4.38a2.83 2.83 0 1 1 3.77-2.65l4.43-1.82A8.5 8.5 0 0 0 13 4.5Z" fill="#c7d5e0"/><circle cx="11" cy="15.5" r="2.3" fill="#1b2b3a"/></svg>
+      </div>
+      <div class="channel-name">Steam</div>
+      <div class="channel-desc">Follow our page for updates, announcements and community posts.</div>
+      <div class="channel-cta">View Page</div>
+    </a>
+  </div>
+
+  <div class="videos-section">
+    <div class="videos-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+      <p class="section-eyebrow" style="text-align:left;padding:0;margin-bottom:0">Latest from YouTube</p>
+      <a id="yt-channel-link" href="#" target="_blank" rel="noopener"
+         style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--navy);opacity:.45;text-decoration:none;display:flex;align-items:center;gap:7px;transition:opacity .2s;"
+         onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='.45'">
+        View all videos
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="videos-grid" id="yt-videos-grid">
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:80%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:40%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:70%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:35%"></div></div></div>
+      <div class="video-card yt-skeleton"><div class="video-thumb" style="background:rgba(25,41,58,.06);"></div><div class="video-info"><div style="height:14px;background:rgba(25,41,58,.08);border-radius:2px;margin-bottom:8px;width:75%"></div><div style="height:10px;background:rgba(25,41,58,.05);border-radius:2px;width:45%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PARTNERS ─── -->
+<section class="partners-section" id="partners">
+  <div class="section-header reveal">
+    <p class="section-eyebrow">Our network</p>
+    <h2 class="section-title">Trusted <em>Partners</em></h2>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="partners-grid-wrap">
+    <div class="partners-grid" id="partners-grid">
+      <!-- loaded from Google Sheets -->
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Partner Modal -->
+<div class="partner-modal" id="partner-modal" onclick="closePartnerModal()">
+  <div class="partner-modal-inner" onclick="event.stopPropagation()">
+    <button class="partner-modal-close" onclick="closePartnerModal()">&#10005;</button>
+    <div id="pm-partner-img-wrap"></div>
+    <div class="partner-modal-body">
+      <div class="partner-modal-initial" id="pm-partner-initial"></div>
+      <div class="partner-modal-name" id="pm-partner-name"></div>
+      <div class="partner-modal-type" id="pm-partner-type"></div>
+      <button class="partner-modal-desc-toggle" id="pm-desc-toggle" onclick="togglePartnerDesc()" style="display:none">
+        About <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="partner-modal-desc" id="pm-partner-desc"></div>
+      <div class="partner-modal-links" id="pm-partner-links"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="product-modal" id="product-modal" onclick="closeProductModal()">
+  <div class="product-modal-inner" onclick="event.stopPropagation()">
+    <button class="product-modal-close" onclick="closeProductModal()">&#10005;</button>
+    <div class="product-modal-layout">
+      <div class="product-modal-images">
+        <div class="product-modal-img-main" id="pm-img-main"></div>
+        <div class="pm-thumb-strip" id="pm-thumb-strip" style="display:none"></div>
+      </div>
+      <div class="product-modal-content">
+        <div class="product-modal-num" id="pm-num"></div>
+        <span class="product-modal-status" id="pm-status"></span>
+        <div class="product-modal-name" id="pm-name"></div>
+        <div class="product-modal-type" id="pm-type"></div>
+        <div class="product-modal-desc" id="pm-desc"></div>
+        <div class="product-modal-details" id="pm-details"></div>
+        <button class="product-modal-cta" id="pm-cta">Request a Quote</button>
+      </div>
+    </div>
+    <div class="product-modal-discord" id="pm-discord">
+      <div class="product-modal-discord-label">Latest from Discord</div>
+      <div class="product-modal-discord-title" id="pm-dc-title"></div>
+      <div class="product-modal-discord-body" id="pm-dc-body"></div>
+      <div class="product-modal-discord-meta" id="pm-dc-meta"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Video Modal -->
+<div class="video-modal" id="video-modal" onclick="closeVideoModal()">
+  <div class="video-modal-inner" onclick="event.stopPropagation()">
+    <button class="video-modal-close" onclick="closeVideoModal()">&#10005;</button>
+    <div class="video-modal-frame">
+      <iframe id="video-iframe" src="" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="pm-lightbox" id="pm-lightbox" onclick="pmLightboxClose()">
+  <button class="pm-lightbox-close" onclick="pmLightboxClose()">&#10005;</button>
+  <button class="pm-lightbox-nav prev" id="pm-lb-prev" onclick="event.stopPropagation();pmLightboxNav(-1)">&#8592;</button>
+  <img class="pm-lightbox-img" id="pm-lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <button class="pm-lightbox-nav next" id="pm-lb-next" onclick="event.stopPropagation();pmLightboxNav(1)">&#8594;</button>
+  <div class="pm-lightbox-counter" id="pm-lb-counter"></div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <a href="#home">
+    <svg viewBox="0 0 620 279" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#f7efe6" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/>
+    </svg>
+  </a>
+  <span class="footer-meta">© 2025 Underway. Built for the Long Haul.</span>
+  <ul class="footer-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#community">YouTube</a></li>
+    <li><a href="#discord">Discord</a></li>
+    <li><a href="#partners">Partners</a></li>
+  </ul>
+</footer>
+
+<!-- ─── SCRIPTS ─── -->
+<script>
+// Marquee - JS driven so it never stops
+(function(){
+  var BOLL_PATH = "M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0M114.79,239.94c162.92-.93,326.01,2.43,488.86-2.17-194.88-7.01-392.8-4.16-588.51-1.43.01.67.03,1.35.04,2.02,32.84,1.54,65.73,1.65,99.62,1.58M175.62,156.52c1.81,18.83,1.65,37.58-2.55,56.13-.8,3.55.57,4.5,3.76,4.48,6.84-1.68,30.19,4.79,28.08-6.1-2.95-51.83-25.81-99.63-42.44-148.07,4.1,31.65,11.17,61.11,13.15,93.58M170.8,14.51c-32.58,1.2-65.16,2.03-97.75,3.07-1.92.06-3.94,0-5.72,1.93,50.26,4.25,101.44,3.93,152.05,4.57,3.05-.2,7.58.45,8.58-3.33.89-5.45-6.2-6.72-10.23-6.44-15.31.06-30.62.11-46.93.19M491.04,16.16c-30.46-1.09-60.91-2.38-91.39-1.7-3.85.06-7.99.91-7.98,5.63.01,4.99,4.52,3.94,7.64,3.94,49.67-.39,99.42-1.95,149.04-4.52-.01-.28-.03-.56-.04-.84-18.77-.83-37.55-1.66-57.27-2.51M378.41,123.86c23.3-12.4,31.87-40.05,32.11-67.57-7.89,35.25-25.89,61.35-59.67,76.21,10.14-1.45,18.87-3.76,27.56-8.64M509.94,208.14c-.61.66-1.89.97-.97,2.76,12.89-.05,25.98.62,39.68-.27-2.29-6.3-32.13-4.19-38.71-2.49M78.23,210.91h33.81c-4.66-5.26-35.39-4.67-38.44-.7,1.12,1.02,2.51.53,4.64.7Z";
+  var ITEMS = ["Est. 2021", "Built for the Long Haul", "Est. 2021", "Built for the Long Haul"];
+  var track = document.getElementById('mq-track');
+  // Build 4x for smooth infinite loop
+  for (var r = 0; r < 4; r++) {
+    ITEMS.forEach(function(txt) {
+      var unit = document.createElement('div');
+      unit.className = 'mq-unit';
+      unit.innerHTML = '<div class="mq-boll"><svg width="36" height="16" viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg"><path fill="#f7efe6" d="' + BOLL_PATH + '"/></svg></div><span class="mq-word">UNDERWAY</span><div class="mq-dot"></div><span style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,239,230,.45);white-space:nowrap;padding:0 16px">' + txt + '</span><div class="mq-dot"></div>';
+      track.appendChild(unit);
+    });
+  }
+  // JS-driven scroll so it never stops
+  var pos = 0;
+  var speed = 0.5;
+  var halfW = 0;
+  function getHalf() { return track.scrollWidth / 2; }
+  function tick() {
+    pos += speed;
+    if (!halfW || pos >= halfW) { halfW = getHalf(); if (pos >= halfW) pos -= halfW; }
+    track.style.transform = 'translateX(-' + pos + 'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+
+// Custom cursor — dot only
+(function() {
+  var dot = document.getElementById('cursor-dot');
+  document.addEventListener('mousemove', function(e) {
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+  });
+  ['a','button','.product-card','.channel-card','.video-card','.discord-post'].forEach(function(sel) {
+    document.querySelectorAll(sel).forEach(function(el) {
+      el.addEventListener('mouseenter', function() { dot.classList.add('hovering'); });
+      el.addEventListener('mouseleave', function() { dot.classList.remove('hovering'); });
+    });
+  });
+  document.addEventListener('mousedown', function() { dot.classList.add('clicking'); });
+  document.addEventListener('mouseup', function() { dot.classList.remove('clicking'); });
+})();
+
+// Scroll reveal + parallax
+(function() {
+  var revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .section-rule');
+  var ro = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('revealed'); ro.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  revealEls.forEach(function(el) { ro.observe(el); });
+
+  var nav = document.querySelector('nav');
+  var heroTitle = document.querySelector('.hero-title');
+  window.addEventListener('scroll', function() {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+    if (heroTitle && window.scrollY < window.innerHeight) {
+      heroTitle.style.transform = 'translateY(' + (window.scrollY * 0.12) + 'px)';
+    }
+  }, { passive: true });
+})();
+
+
+
+
+// Gallery open/close
+function openGallery() {
+  document.getElementById('gallery-page').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  window.scrollTo(0,0);
+}
+function closeGallery() {
+  document.getElementById('gallery-page').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Gallery prompt filter
+var galleryCurrentPrompt = 'golden-hour';
+function galleryFilter(prompt, btn) {
+  document.querySelectorAll('.gp-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  galleryCurrentPrompt = prompt;
+  var cards = document.querySelectorAll('#gallery-grid .photo-card');
+  cards.forEach(function(c) {
+    var p = c.getAttribute('data-prompt');
+    if (prompt === 'all' || p === prompt) {
+      c.style.display = 'flex';
+    } else {
+      c.style.display = 'none';
+    }
+  });
+  // Update heading
+  var names = {'golden-hour':'Golden Hour','heavy-weather':'Heavy Weather','installation':'The Install','detail':'Close Quarters','all':'All Entries'};
+  var quotes = {
+    'golden-hour':'"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."',
+    'heavy-weather':'"Document Underway equipment performing in severe conditions."',
+    'installation':'"Capture the install — before, during, or the moment it goes live."',
+    'detail':'"Get close. The craftsmanship is the shot."',
+    'all':'All competition entries across every prompt.'
+  };
+  var isActive = prompt === 'golden-hour';
+  var h = document.getElementById('gallery-prompt-heading');
+  h.querySelector('.gallery-prompt-eyebrow').textContent = isActive ? 'Current Prompt' : 'Past Prompt';
+  h.querySelector('.gallery-prompt-title').textContent = names[prompt] || prompt;
+  h.querySelector('.gallery-prompt-quote').textContent = quotes[prompt] || '';
+}
+
+// Gallery sort
+function gallerySort(type, btn) {
+  document.querySelectorAll('.gsort-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var grid = document.getElementById('gallery-grid');
+  var cards = Array.from(grid.querySelectorAll('.photo-card'));
+  if (type === 'popular') {
+    cards.sort(function(a,b) {
+      var ah = parseInt(a.querySelector('[data-type="heart"] .like-count').textContent);
+      var bh = parseInt(b.querySelector('[data-type="heart"] .like-count').textContent);
+      return bh - ah;
+    });
+  }
+  cards.forEach(function(c) { grid.appendChild(c); });
+}
+
+// Like / fire toggle
+function toggleLike(btn) {
+  var type = btn.getAttribute('data-type');
+  var cls  = 'liked-' + type;
+  var countEl = btn.querySelector('.like-count');
+  var n = parseInt(countEl.textContent);
+  if (btn.classList.contains(cls)) {
+    btn.classList.remove(cls);
+    countEl.textContent = n - 1;
+  } else {
+    btn.classList.add(cls);
+    countEl.textContent = n + 1;
+  }
+}
+
+// Announcement slider
+var annCurrent = 0;
+function annSlide(n) {
+  var slides = document.querySelectorAll('#ann-slider .update-announce-slide');
+  var dots = document.querySelectorAll('#ann-dots .usd');
+  slides[annCurrent].classList.remove('active');
+  dots[annCurrent].classList.remove('active');
+  annCurrent = n;
+  slides[annCurrent].classList.add('active');
+  dots[annCurrent].classList.add('active');
+}
+
+// Product row sliders — each row has its own slider
+function rowSlide(dotBtn, n) {
+  var dotsWrap = dotBtn.parentElement;
+  var slider = dotsWrap.previousElementSibling;
+  var slides = slider.querySelectorAll('.update-row-slide');
+  var dots = dotsWrap.querySelectorAll('.usd');
+  var cur = 0;
+  dots.forEach(function(d,i){ if(d.classList.contains('active')) cur = i; });
+  slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
+  slides[n].classList.add('active'); dots[n].classList.add('active');
+  // stop event bubbling so row click-to-scroll doesn't fire
+  event.stopPropagation();
+}
+
+// Scroll to product in catalogue and flash the matching update card
+function scrollToProduct(name) {
+  var grid = document.getElementById('products-grid');
+  var cards = grid ? grid.querySelectorAll('.product-card') : [];
+  var target = null;
+  cards.forEach(function(c) {
+    if (c.querySelector('.product-name') && c.querySelector('.product-name').textContent.trim() === name) {
+      target = c;
+    }
+  });
+  if (target) {
+    var section = document.getElementById('products');
+    section.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(function() {
+      target.style.transition = 'background .15s';
+      target.style.background = 'rgba(247,239,230,.18)';
+      setTimeout(function() { target.style.background = ''; }, 900);
+    }, 600);
+  }
+}
+
+// Carousel
+var currentSlide = 0;
+var slides = document.querySelectorAll('.carousel-slide');
+var dotsContainer = document.getElementById('carousel-dots');
+slides.forEach(function(_, i) {
+  var btn = document.createElement('button');
+  btn.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+  btn.onclick = function() { goToSlide(i); };
+  dotsContainer.appendChild(btn);
+});
+function goToSlide(n) {
+  slides[currentSlide].classList.remove('active');
+  dotsContainer.children[currentSlide].classList.remove('active');
+  currentSlide = (n + slides.length) % slides.length;
+  slides[currentSlide].classList.add('active');
+  dotsContainer.children[currentSlide].classList.add('active');
+}
+function carouselMove(dir) { goToSlide(currentSlide + dir); }
+setInterval(function() { carouselMove(1); }, 3800);
+
+// Scroll animations
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.style.animationPlayState = 'running'; observer.unobserve(e.target); }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.anim').forEach(function(el) {
+  el.style.animationPlayState = 'paused'; observer.observe(el);
+});
+
+// Status bar observer (still used for any injected status rows)
+var statusObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.status-bar').forEach(function(bar) {
+        var target = bar.getAttribute('data-target') || bar.style.width;
+        bar.style.width = '0';
+        setTimeout(function() { bar.style.width = target; }, 80);
+      });
+      statusObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+// Product Modal — multi-image gallery + lightbox
+var pmImages = [];
+var pmCurrentImg = 0;
+
+function pmShowImage(idx) {
+  if (!pmImages.length) return;
+  idx = ((idx % pmImages.length) + pmImages.length) % pmImages.length;
+  pmCurrentImg = idx;
+  var main = document.getElementById('pm-img-main');
+  var img = main.querySelector('img.pm-main-img');
+  if (img) {
+    img.src = pmImages[idx];
+    img.onload = function() {
+      if (!img.naturalWidth) return;
+      var ratio = img.naturalWidth / img.naturalHeight;
+      var contentW = 420;
+      var layout = document.querySelector('.product-modal-layout');
+      var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
+      var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
+      layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
+      var maxH = Math.round(window.innerHeight * 0.7);
+      main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+    };
+  }
+  var counter = main.querySelector('.pm-img-counter');
+  if (counter) counter.textContent = (idx + 1) + ' / ' + pmImages.length;
+  var thumbs = document.querySelectorAll('.pm-thumb');
+  thumbs.forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+  var showNav = pmImages.length > 1;
+  main.querySelectorAll('.pm-img-nav').forEach(function(n) { n.style.display = showNav ? 'flex' : 'none'; });
+}
+
+function pmOpenLightbox(idx) {
+  pmCurrentImg = idx;
+  document.getElementById('pm-lb-img').src = pmImages[idx];
+  document.getElementById('pm-lb-counter').textContent = (idx + 1) + ' / ' + pmImages.length;
+  document.getElementById('pm-lb-prev').style.display = pmImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('pm-lb-next').style.display = pmImages.length > 1 ? 'flex' : 'none';
+  document.getElementById('pm-lightbox').classList.add('open');
+}
+
+function pmLightboxNav(dir) {
+  var idx = ((pmCurrentImg + dir) % pmImages.length + pmImages.length) % pmImages.length;
+  pmCurrentImg = idx;
+  document.getElementById('pm-lb-img').src = pmImages[idx];
+  document.getElementById('pm-lb-counter').textContent = (idx + 1) + ' / ' + pmImages.length;
+  pmShowImage(idx);
+}
+
+function pmLightboxClose() {
+  document.getElementById('pm-lightbox').classList.remove('open');
+}
+
+// Product Modal
+function openProductModal(num, status, name, type, desc, details, cta, dc_channel, dc_title, dc_body, dc_meta, imageStr, cta_url) {
+  var sc = { 'Active':'status-active', 'In Development':'status-dev', 'Coming Soon':'status-soon', 'In Dev':'status-dev' };
+  document.getElementById('pm-num').textContent = num;
+  var st = document.getElementById('pm-status');
+  st.textContent = status;
+  st.className = 'product-modal-status ' + (sc[status] || 'status-active');
+  document.getElementById('pm-name').textContent = name;
+  document.getElementById('pm-type').textContent = type;
+  document.getElementById('pm-desc').textContent = desc;
+  document.getElementById('pm-details').textContent = details;
+
+  // CTA button — use sheet text and url
+  var ctaBtn = document.getElementById('pm-cta');
+  ctaBtn.textContent = (cta || 'Request a Quote') + ' ->';
+  ctaBtn.onclick = function() {
+    if (cta_url) { window.open(cta_url, '_blank'); } else { closeProductModal(); }
+  };
+
+  // Parse images — comma-separated URLs, strip blanks and obviously invalid entries
+  pmImages = imageStr ? imageStr.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 4 && s.indexOf('.') !== -1; }) : [];
+  pmCurrentImg = 0;
+
+  var main = document.getElementById('pm-img-main');
+  var thumbStrip = document.getElementById('pm-thumb-strip');
+
+  var layout = document.querySelector('.product-modal-layout');
+  var contentW = 420; // right side always stays this wide
+  if (pmImages.length > 0) {
+    main.style.cursor = 'zoom-in';
+    var showNav = pmImages.length > 1;
+    main.innerHTML =
+      '<img class="pm-main-img" src="' + pmImages[0] + '" alt="' + name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:rgba(25,41,58,.04);" onerror="this.style.display=\'none\';this.parentElement.querySelector(\'.pm-placeholder\').style.display=\'flex\'">' +
+      '<div class="pm-placeholder" style="display:none;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase">Photos coming soon</span></div>' +
+      (showNav ? '<button class="pm-img-nav prev" onclick="event.stopPropagation();pmShowImage(pmCurrentImg-1)">&#8592;</button>' : '') +
+      (showNav ? '<button class="pm-img-nav next" onclick="event.stopPropagation();pmShowImage(pmCurrentImg+1)">&#8594;</button>' : '') +
+      (showNav ? '<div class="pm-img-counter">1 / ' + pmImages.length + '</div>' : '');
+    main.onclick = function() { pmOpenLightbox(pmCurrentImg); };
+    // Set a sensible default width immediately, then refine once image loads
+    layout.style.gridTemplateColumns = '480px ' + contentW + 'px';
+    main.style.minHeight = '480px';
+    setTimeout(function(){
+      var img = main.querySelector('.pm-main-img');
+      if (!img) return;
+      function applyRatio() {
+        if (!img.naturalWidth) return;
+        var ratio = img.naturalWidth / img.naturalHeight;
+        var maxImgW = Math.min(window.innerWidth * 0.97 - 48 - contentW, 1100);
+        var imgColW = Math.max(320, Math.min(Math.round(480 * ratio), maxImgW));
+        layout.style.gridTemplateColumns = imgColW + 'px ' + contentW + 'px';
+        var maxH = Math.round(window.innerHeight * 0.7);
+        main.style.minHeight = Math.min(Math.round(imgColW / ratio), maxH) + 'px';
+      }
+      if (img.complete && img.naturalWidth) { applyRatio(); }
+      else { img.addEventListener('load', applyRatio); }
+    }, 0);
+
+    // Thumbnail strip
+    if (pmImages.length > 1) {
+      thumbStrip.style.display = 'flex';
+      thumbStrip.innerHTML = pmImages.map(function(url, i) {
+        return '<img class="pm-thumb' + (i===0?' active':'') + '" src="' + url + '" onclick="pmShowImage(' + i + ')" alt="">';
+      }).join('');
+    } else {
+      thumbStrip.style.display = 'none';
+    }
+  } else {
+    // No images — square placeholder, equal columns
+    layout.style.gridTemplateColumns = contentW + 'px ' + contentW + 'px';
+    main.style.minHeight = contentW + 'px';
+    main.style.cursor = 'default';
+    main.onclick = null;
+    main.innerHTML = '<div class="pm-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="width:72px;opacity:.1"><path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0Z"/></svg><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px;display:block">Photos coming soon</span></div>';
+    thumbStrip.style.display = 'none';
+  }
+
+  var dcPanel = document.getElementById('pm-discord');
+  if (dc_title) {
+    document.getElementById('pm-dc-title').textContent = dc_title;
+    document.getElementById('pm-dc-body').textContent = dc_body || '';
+    document.getElementById('pm-dc-meta').textContent = (dc_channel || '') + (dc_meta ? '  ·  ' + dc_meta : '');
+    dcPanel.style.display = 'block';
+  } else {
+    dcPanel.style.display = 'none';
+  }
+  document.getElementById('product-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function togglePartnerDesc() {
+  var btn = document.getElementById('pm-desc-toggle');
+  var desc = document.getElementById('pm-partner-desc');
+  btn.classList.toggle('open');
+  desc.classList.toggle('open');
+}
+
+function openPartnerModal(p) {
+  var wrap = document.getElementById('pm-partner-img-wrap');
+  wrap.innerHTML = '';
+
+  // image_type column: 'logo' = square, anything else = banner
+  var imgType = (p.image_type || '').toLowerCase().trim();
+  var isLogo = imgType === 'logo';
+
+  if (p.image) {
+    var container = document.createElement('div');
+    container.className = isLogo ? 'partner-modal-img-logo' : 'partner-modal-img-banner';
+    var img = document.createElement('img');
+    img.src = p.image;
+    container.appendChild(img);
+    wrap.appendChild(container);
+  } else {
+    // No image — show placeholder in banner style always
+    var container = document.createElement('div');
+    container.className = 'partner-modal-img-banner';
+    var ph = document.createElement('div');
+    ph.className = 'partner-modal-img-placeholder';
+    ph.textContent = p.name ? p.name.charAt(0).toUpperCase() : '?';
+    container.appendChild(ph);
+    wrap.appendChild(container);
+  }
+
+  document.getElementById('pm-partner-initial').textContent = p.name ? p.name.charAt(0).toUpperCase() : '';
+  document.getElementById('pm-partner-name').textContent = p.name || '';
+  document.getElementById('pm-partner-type').textContent = p.type || '';
+
+  // Desc — hide by default, show toggle only if there's content
+  var descEl = document.getElementById('pm-partner-desc');
+  var toggleBtn = document.getElementById('pm-desc-toggle');
+  var descText = p.desc || p.description || '';
+  descEl.textContent = descText;
+  descEl.classList.remove('open');
+  toggleBtn.classList.remove('open');
+  toggleBtn.style.display = descText ? 'flex' : 'none';
+
+  // Links
+  var linksEl = document.getElementById('pm-partner-links');
+  linksEl.innerHTML = '';
+  var hasLinks = false;
+  for (var n = 1; n <= 3; n++) {
+    var lbl = p['link' + n + '_label'];
+    var url = p['link' + n + '_url'];
+    if (lbl && url) {
+      hasLinks = true;
+      var a = document.createElement('a');
+      a.className = 'partner-modal-link';
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = lbl + ' →';
+      linksEl.appendChild(a);
+    }
+  }
+  linksEl.style.display = hasLinks ? 'flex' : 'none';
+
   document.getElementById('partner-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
