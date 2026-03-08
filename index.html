@@ -2261,7 +2261,8 @@ loadFromSheets();
     items.slice(0, 3).forEach(function(item) {
       var videoId = item.id.videoId;
       var title = item.snippet.title;
-      var thumb = (item.snippet.thumbnails.maxres || item.snippet.thumbnails.high || item.snippet.thumbnails.medium || item.snippet.thumbnails.default || {}).url || '';
+      // Construct high-res thumbnail directly from video ID (search API doesn't return maxres)
+      var thumb = 'https://i.ytimg.com/vi/' + videoId + '/hqdefault.jpg';
       var published = timeAgo(item.snippet.publishedAt);
       var card = document.createElement('div');
       card.className = 'video-card';
