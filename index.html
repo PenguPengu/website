@@ -1608,12 +1608,13 @@ nav.scrolled { box-shadow: 0 2px 24px rgba(25,41,58,.08); }
     <h2 class="section-title">Current <em>Entries</em></h2>
     <div class="section-rule"></div>
   </div>
-  <div class="comp-info-bar reveal" id="comp-info-bar" style="display:none;">
+  <div class="comp-info-bar reveal">
     <div class="comp-info-left">
       <span class="comp-label">Active Prompt</span>
-      <div class="comp-prompt-text" id="comp-prompt-text"></div>
+      <div class="comp-prompt-text">"Golden Hour — catch Underway equipment at its most atmospheric"</div>
     </div>
     <div class="comp-info-right">
+      <div class="comp-deadline">Closes 31 Mar 2026</div>
       <button class="btn-primary" onclick="openGallery()">View Full Gallery</button>
     </div>
   </div>
@@ -1881,9 +1882,22 @@ function closeMobileNav() {
 function openGallery() { document.getElementById('gallery-page').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
 function closeGallery() { document.getElementById('gallery-page').style.display = 'none'; document.body.style.overflow = ''; }
 
-// galleryFilter removed — all entries shown from live sheet data
+var galleryCurrentPrompt = 'golden-hour';
+function galleryFilter(prompt, btn) {
+  document.querySelectorAll('.gp-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  galleryCurrentPrompt = prompt;
+  var cards = document.querySelectorAll('#gallery-grid .photo-card');
+  cards.forEach(function(c) { c.style.display = (prompt === 'all' || c.getAttribute('data-prompt') === prompt) ? 'flex' : 'none'; });
+  var names = {'golden-hour':'Golden Hour','heavy-weather':'Heavy Weather','installation':'The Install','detail':'Close Quarters','all':'All Entries'};
+  var quotes = {'golden-hour':'"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."','heavy-weather':'"Document Underway equipment performing in severe conditions."','installation':'"Capture the install — before, during, or the moment it goes live."','detail':'"Get close. The craftsmanship is the shot."','all':'All competition entries across every prompt.'};
+  var h = document.getElementById('gallery-prompt-heading');
+  h.querySelector('.gallery-prompt-eyebrow').textContent = prompt === 'golden-hour' ? 'Current Prompt' : 'Past Prompt';
+  h.querySelector('.gallery-prompt-title').textContent = names[prompt] || prompt;
+  h.querySelector('.gallery-prompt-quote').textContent = quotes[prompt] || '';
+}
+
 function gallerySort(type, btn) {
-type, btn) {
   document.querySelectorAll('.gsort-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
   var grid = document.getElementById('gallery-grid');
@@ -2233,44 +2247,15 @@ function renderGalleryFromSheet(rows) {
   var theme       = first['theme'] || '';
   var contestOpen = first['contest_open'] === 'TRUE';
 
-  // Drive comp info bar on main page
-  var compBar = document.getElementById('comp-info-bar');
-  var compPromptText = document.getElementById('comp-prompt-text');
-  if (compBar) {
-    if (contestOpen && theme) {
-      compBar.style.display = '';
-      if (compPromptText) compPromptText.textContent = '"' + theme + '"';
-    } else {
-      compBar.style.display = 'none';
-    }
-  }
-
-  // Drive gallery sidebar competition section
-  var sidebarComp = document.getElementById('sidebar-competition');
-  var sidebarThemeName = document.getElementById('sidebar-theme-name');
-  var sidebarThemeQuote = document.getElementById('sidebar-theme-quote');
-  if (sidebarComp) {
-    if (theme) {
-      sidebarComp.style.display = '';
-      if (sidebarThemeName) sidebarThemeName.textContent = theme;
-      if (sidebarThemeQuote) sidebarThemeQuote.textContent = '';
-    } else {
-      sidebarComp.style.display = 'none';
-    }
-  }
-
-  // Drive gallery prompt heading
-  var promptHeading = document.getElementById('gallery-prompt-heading');
-  var galleryPromptTitle = document.getElementById('gallery-prompt-title');
-  var galleryPromptQuote = document.getElementById('gallery-prompt-quote');
-  if (promptHeading) {
-    if (theme) {
-      promptHeading.style.display = '';
-      if (galleryPromptTitle) galleryPromptTitle.textContent = theme;
-      if (galleryPromptQuote) galleryPromptQuote.textContent = '';
-    } else {
-      promptHeading.style.display = 'none';
-    }
+  // Update gallery prompt heading if theme is set
+  if (theme) {
+    var promptTitle = document.querySelector('.gallery-prompt-title');
+    var promptQuote = document.querySelector('.gallery-prompt-quote');
+    if (promptTitle) promptTitle.textContent = theme;
+    if (promptQuote) promptQuote.textContent = '"' + theme + '"';
+    // Also update main page comp bar
+    var compPromptText = document.querySelector('.comp-prompt-text');
+    if (compPromptText) compPromptText.textContent = '"' + theme + '"';
   }
 
   // Sort by Score descending
@@ -2662,35 +2647,63 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
   <div class="gallery-body">
-    <div class="gallery-sidebar" id="gallery-sidebar">
-      <!-- Current competition — shown only when contest is open and theme exists -->
-      <div class="gallery-sidebar-section" id="sidebar-competition" style="display:none;">
+    <div class="gallery-sidebar">
+      <div class="gallery-sidebar-section">
         <div class="gallery-sidebar-label">Current Competition</div>
         <div class="gallery-comp-active">
-          <div class="gallery-comp-name" id="sidebar-theme-name"></div>
-          <div class="gallery-comp-prompt" id="sidebar-theme-quote"></div>
+          <div class="gallery-comp-name">Golden Hour</div>
+          <div class="gallery-comp-prompt">"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."</div>
+          <div class="gallery-comp-meta"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg> Closes 31 Mar 2026</div>
+          <div class="gallery-comp-prize"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg> Prize: Series II Bollard + Feature</div>
         </div>
       </div>
-      <!-- Sort controls -->
       <div class="gallery-sidebar-section">
-        <div class="gallery-sidebar-label">Sort By</div>
-        <div class="gallery-sort-btns">
-          <button class="gsort-btn active" onclick="gallerySort('score', this)">Top Rated</button>
-          <button class="gsort-btn" onclick="gallerySort('recent', this)">Recent</button>
+        <div class="gallery-sidebar-label">Browse Prompts</div>
+        <div class="gallery-prompt-list">
+          <button class="gp-btn active" onclick="galleryFilter('golden-hour', this)"><span class="gp-dot active-dot"></span><span class="gp-name">Golden Hour</span><span class="gp-count">12 entries</span></button>
+          <button class="gp-btn past" onclick="galleryFilter('heavy-weather', this)"><span class="gp-dot"></span><span class="gp-name">Heavy Weather</span><span class="gp-count">past · 9 entries</span></button>
+          <button class="gp-btn past" onclick="galleryFilter('installation', this)"><span class="gp-dot"></span><span class="gp-name">The Install</span><span class="gp-count">past · 14 entries</span></button>
+          <button class="gp-btn past" onclick="galleryFilter('detail', this)"><span class="gp-dot"></span><span class="gp-name">Close Quarters</span><span class="gp-count">past · 7 entries</span></button>
+          <button class="gp-btn" onclick="galleryFilter('all', this)"><span class="gp-dot"></span><span class="gp-name">All Entries</span><span class="gp-count">42 total</span></button>
+        </div>
+      </div>
+      <div class="gallery-sidebar-section">
+        <div class="gallery-sidebar-label">Hall of Winners</div>
+        <div class="gallery-winners-list">
+          <div class="gallery-winner-row"><div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="gallery-winner-info"><div class="gallery-winner-name">Heavy Weather</div><div class="gallery-winner-author">@northsea_ports</div><div class="gallery-winner-title">"Holding Fast — North Sea"</div></div></div>
+          <div class="gallery-winner-row"><div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="gallery-winner-info"><div class="gallery-winner-name">The Install</div><div class="gallery-winner-author">@halcyon_yachts</div><div class="gallery-winner-title">"D-Type Run — Hamble"</div></div></div>
+          <div class="gallery-winner-row"><div class="gallery-winner-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div><div class="gallery-winner-info"><div class="gallery-winner-name">Close Quarters</div><div class="gallery-winner-author">@underway_jamie</div><div class="gallery-winner-title">"Series I — Base Detail"</div></div></div>
         </div>
       </div>
     </div>
-      <div class="gallery-main">
-        <div id="gallery-prompt-heading" style="display:none;">
+    <div class="gallery-main">
+      <div class="gallery-main-header">
+        <div id="gallery-prompt-heading">
           <div class="gallery-prompt-eyebrow">Current Prompt</div>
-          <div class="gallery-prompt-title" id="gallery-prompt-title"></div>
-          <div class="gallery-prompt-quote" id="gallery-prompt-quote"></div>
+          <div class="gallery-prompt-title">Golden Hour</div>
+          <div class="gallery-prompt-quote">"Catch Underway equipment at its most atmospheric — sunrise, sunset, golden light only."</div>
         </div>
+        <div class="gallery-sort">
+          <span class="gallery-sort-label">Sort</span>
+          <button class="gsort-btn active" onclick="gallerySort('popular', this)">Most Liked</button>
+          <button class="gsort-btn" onclick="gallerySort('recent', this)">Recent</button>
+        </div>
+      </div>
       <div class="gallery-grid" id="gallery-grid">
-        <div style="grid-column:1/-1;padding:64px 0;text-align:center;opacity:.3;font-size:12px;letter-spacing:.1em;text-transform:uppercase;">Loading submissions…</div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Golden Hour — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Golden Hour — Solent</div><div class="photo-desc">Series I bollards catching the first light. Six-unit install completed overnight, ready for the morning tide.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">142</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">38</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Holding Fast — North Sea</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Holding Fast — North Sea</div><div class="photo-desc">Force 8, 3am. The mooring held. Shot from the bridge as conditions peaked.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">204</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">157</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Pilot Unit at Dawn</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@coastal_eng</span></div><div class="photo-title">Pilot Unit at Dawn</div><div class="photo-desc">First smart monitoring unit live in the field — caught it just as the sun cleared the dock wall.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">93</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Med Berth — Dusk</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@maritime_supply_int</span></div><div class="photo-title">Med Berth — Dusk</div><div class="photo-desc">Superyacht mooring setup, polished stainless in the last light. Worth every penny.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">118</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">43</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Bollard — Low Sun</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@kirkland_marine</span></div><div class="photo-title">Bollard — Low Sun</div><div class="photo-desc">Long shadow across the dock. Series II prototype at the yard, late afternoon light.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">76</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">31</span></button></div></div></div>
+        <div class="photo-card" data-prompt="golden-hour"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Dawn Patrol — Solent</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@tidal_basin</span></div><div class="photo-title">Dawn Patrol — Solent</div><div class="photo-desc">Fenders still wet from the night tide. Caught this ten minutes before the crew arrived.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">59</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">19</span></button></div></div></div>
+        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Storm Hold — Tyne</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@northsea_ports</span></div><div class="photo-title">Storm Hold — Tyne</div><div class="photo-desc">Full gale. Every bollard held. Taken from the dock office window.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">187</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">142</span></button></div></div></div>
+        <div class="photo-card" data-prompt="heavy-weather"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Swell Running — Blyth</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@saltwater_marina</span></div><div class="photo-title">Swell Running — Blyth</div><div class="photo-desc">D-type fenders doing exactly what they should. Force 6, building.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">94</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">67</span></button></div></div></div>
+        <div class="photo-card" data-prompt="installation"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>D-Type Run — Hamble</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@halcyon_yachts</span></div><div class="photo-title">D-Type Run — Hamble</div><div class="photo-desc">Full fender run along the pontoon finger. Single afternoon.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">134</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">88</span></button></div></div></div>
+        <div class="photo-card" data-prompt="detail"><div class="photo-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span>Series I — Base Casting</span><span class="photo-winner-badge"><svg width="13" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 21h8M12 17v4M17 3H7v8a5 5 0 0 0 10 0V3Z"/><path d="M7 5H4a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M17 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1"/></svg>Winner</span></div><div class="photo-info"><div class="photo-meta-row"><span class="photo-author">@underway_jamie</span></div><div class="photo-title">Series I — Base Casting</div><div class="photo-desc">The new anti-rotation collar. You have to see it in person.</div><div class="photo-actions"><button class="photo-like" data-type="heart" onclick="toggleLike(this)"><svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg><span class="like-count">112</span></button><button class="photo-like" data-type="fire" onclick="toggleLike(this)"><svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg><span class="like-count">95</span></button></div></div></div>
       </div>
     </div>
   </div>
 </div>
 
 </body>
+</html>
