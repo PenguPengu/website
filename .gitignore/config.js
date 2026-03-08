@@ -1,5 +1,5 @@
 const UNDERWAY_CONFIG = {
-  ytKey: 'YOUR_API_KEY',
+  ytKey: 'AIzaSyCMMT17fpemZDy9gPnldktWKmCgPpDIzvc',
   ytChannelId: 'UCvb7I8pciCJq94WzjyoGFeQ'
 };
 ```
