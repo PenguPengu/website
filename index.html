@@ -213,8 +213,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .gallery-challenge-meta{font-size:9px;opacity:.6;letter-spacing:.1em;}
 .gallery-challenge-toggle-right{font-size:9px;opacity:.6;display:flex;align-items:center;gap:10px;}
 .gallery-challenge-toggle-right svg{transition:transform .25s;flex-shrink:0;}
-.gallery-challenge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
-.gallery-challenge-grid.closed{display:none;}
+.gallery-challenge-grid{display:none;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.gallery-challenge-grid.open{display:grid;}
 
 /* STATUS */
 .status-section{padding:0 0 80px;}
@@ -1126,7 +1126,7 @@ function renderGallery(rows){
             '<div class="gallery-challenge-theme">'+g.name+'</div>'+
             (dateStr?'<div class="gallery-challenge-meta">'+dateStr+'</div>':'')+
           '</div>'+
-          '<div class="gallery-challenge-toggle-right">'+g.entries.length+' entr'+(g.entries.length===1?'y':'ies')+' <svg style="transform:rotate(180deg);transition:transform .2s" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>'+
+          '<div class="gallery-challenge-toggle-right">'+g.entries.length+' entr'+(g.entries.length===1?'y':'ies')+' <svg style="transition:transform .2s" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>'+
         '</button>'+
         '<div class="gallery-challenge-grid">'+sorted.map(buildCard).join('')+'</div>';
       if(pc)pc.appendChild(div);
@@ -1140,9 +1140,9 @@ function escA(s){return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
 
 function toggleGroup(btn){
   var grid=btn.nextElementSibling;
-  var closed=grid.classList.toggle('closed');
+  var open=grid.classList.toggle('open');
   var svg=btn.querySelector('svg');
-  if(svg)svg.style.transform=closed?'':'rotate(180deg)';
+  if(svg)svg.style.transform=open?'rotate(180deg)':'';
 }
 
 function sidebarJump(btn,name){
@@ -1169,14 +1169,17 @@ function sidebarJump(btn,name){
     if(ms)ms.scrollTo({top:0,behavior:'smooth'});
     return;
   }
-  // Find past group and scroll to it (already open)
+  // Find past group — open it if closed, then scroll to it. Don't touch other groups.
   document.querySelectorAll('[data-gname]').forEach(function(el){
     if(el.getAttribute('data-gname')===name){
       var grid=el.querySelector('.gallery-challenge-grid');
       var toggle=el.querySelector('.gallery-challenge-toggle');
-      // Re-open if user had closed it
-      if(grid&&grid.classList.contains('closed')){toggleGroup(toggle);}
-      el.scrollIntoView({behavior:'smooth',block:'start'});
+      if(grid&&!grid.classList.contains('open')){
+        grid.classList.add('open');
+        var svg=toggle&&toggle.querySelector('svg');
+        if(svg)svg.style.transform='rotate(180deg)';
+      }
+      setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},50);
     }
   });
 }
