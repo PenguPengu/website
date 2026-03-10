@@ -205,6 +205,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
 /* Past challenges */
 .gallery-past-header{padding:22px 40px 18px;border-top:2px solid var(--border);font-size:8px;letter-spacing:.3em;text-transform:uppercase;opacity:.35;background:rgba(25,41,58,.02);margin-top:2px;}
+.gallery-mobile-theme-bar{display:none;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(25,41,58,.03);}
+.gallery-mobile-theme-label{font-size:8px;letter-spacing:.25em;text-transform:uppercase;opacity:.6;white-space:nowrap;flex-shrink:0;}
+.gallery-mobile-theme-select{flex:1;font-family:var(--mono);font-size:11px;color:var(--navy);background:var(--cream);border:1px solid rgba(25,41,58,.3);padding:8px 12px;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2319293a' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px;}
 .gallery-challenge-group{border-bottom:1px solid var(--border);}
 .gallery-challenge-toggle{width:100%;background:none;border:none;color:var(--navy);font-family:var(--mono);font-size:11px;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-align:left;transition:background .15s;}
 .gallery-challenge-toggle:hover{background:rgba(25,41,58,.03);}
@@ -476,6 +479,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
   .gallery-nav-label{display:none;}
   .gallery-body{flex-direction:column;}
   .gallery-sidebar{display:none;}
+  .gallery-mobile-theme-bar{display:flex!important;}
   .gallery-main{overflow-y:auto;}
   .gallery-current-header{padding:16px;flex-direction:column!important;align-items:flex-start!important;gap:12px;}
   .gallery-current-title{font-size:18px;}
@@ -865,7 +869,6 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     </a>
     <div class="gallery-nav-right">
       <span class="gallery-nav-label">Photo Competition</span>
-      <a href="#" class="btn-gallery-submit">Submit a Photo</a>
     </div>
   </div>
 
@@ -899,6 +902,13 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
           <button class="gsort-btn active" onclick="gallerySort('popular',this)">Top Rated</button>
           <button class="gsort-btn" onclick="gallerySort('recent',this)">Recent</button>
         </div>
+      </div>
+      <!-- Mobile theme picker (hidden on desktop) -->
+      <div class="gallery-mobile-theme-bar" id="gallery-mobile-theme-bar" style="display:none">
+        <label class="gallery-mobile-theme-label">Theme</label>
+        <select class="gallery-mobile-theme-select" id="gallery-mobile-theme-select" onchange="mobileThemeJump(this.value)">
+          <option value="__all__">Show All</option>
+        </select>
       </div>
       <div class="gallery-current-grid" id="gallery-current-grid">
         <div class="gallery-loading">Loading…</div>
@@ -1106,6 +1116,16 @@ function renderGallery(rows){
         '</button>';
       }).join('');
   }
+  // Populate mobile dropdown
+  var mSel=document.getElementById('gallery-mobile-theme-select');
+  if(mSel){
+    mSel.innerHTML='<option value="__all__">Show All ('+entries.length+')</option>'+
+      groups.map(function(g,i){
+        return '<option value="'+escA(g.name)+'"'+(i===0?' selected':'')+'>'+g.name+' ('+g.entries.length+')</option>';
+      }).join('');
+  }
+  var mBar=document.getElementById('gallery-mobile-theme-bar');
+  if(mBar)mBar.style.display='';
 
   // ── Past challenges accordion ────────────────────────────────────────────
   var ph=document.getElementById('gallery-past-header');
@@ -1145,6 +1165,8 @@ function toggleGroup(btn){
   if(svg)svg.style.transform=open?'rotate(180deg)':'';
 }
 
+var _lastSidebarOpened=null;
+
 function sidebarJump(btn,name){
   _showingAll=false;
   var allBtn=document.getElementById('sidebar-show-all');
@@ -1167,11 +1189,57 @@ function sidebarJump(btn,name){
     if(g)g.innerHTML=sorted.length?sorted.map(buildCard).join(''):'<div class="gallery-empty">No submissions yet</div>';
     var ms=document.getElementById('gallery-main-scroll');
     if(ms)ms.scrollTo({top:0,behavior:'smooth'});
+    // Close previously sidebar-opened past group
+    if(_lastSidebarOpened){closeSidebarGroup(_lastSidebarOpened);_lastSidebarOpened=null;}
     return;
   }
-  // Find past group — open it if closed, then scroll to it. Don't touch other groups.
+  // Close the previously sidebar-opened group (if different from this one)
+  if(_lastSidebarOpened&&_lastSidebarOpened!==name){
+    closeSidebarGroup(_lastSidebarOpened);
+  }
+  _lastSidebarOpened=name;
+  // Open the target group and scroll to it
   document.querySelectorAll('[data-gname]').forEach(function(el){
     if(el.getAttribute('data-gname')===name){
+      var grid=el.querySelector('.gallery-challenge-grid');
+      var toggle=el.querySelector('.gallery-challenge-toggle');
+      if(grid&&!grid.classList.contains('open')){
+        grid.classList.add('open');
+        var svg=toggle&&toggle.querySelector('svg');
+        if(svg)svg.style.transform='rotate(180deg)';
+      }
+      setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},50);
+    }
+  });
+}
+
+function closeSidebarGroup(name){
+  document.querySelectorAll('[data-gname]').forEach(function(el){
+    if(el.getAttribute('data-gname')===name){
+      var grid=el.querySelector('.gallery-challenge-grid');
+      var toggle=el.querySelector('.gallery-challenge-toggle');
+      if(grid&&grid.classList.contains('open')){
+        grid.classList.remove('open');
+        var svg=toggle&&toggle.querySelector('svg');
+        if(svg)svg.style.transform='';
+      }
+    }
+  });
+}
+
+function mobileThemeJump(val){
+  if(val==='__all__'){showAllThemes();return;}
+  // Find if it's the current group or a past group
+  var firstGroup=document.querySelector('.gallery-theme-btn[data-group]');
+  if(firstGroup&&firstGroup.getAttribute('data-group')===val){
+    // Current contest — scroll to top
+    var ms=document.getElementById('gallery-main-scroll');
+    if(ms)ms.scrollTo({top:0,behavior:'smooth'});
+    return;
+  }
+  // Past group — open and scroll
+  document.querySelectorAll('[data-gname]').forEach(function(el){
+    if(el.getAttribute('data-gname')===val){
       var grid=el.querySelector('.gallery-challenge-grid');
       var toggle=el.querySelector('.gallery-challenge-toggle');
       if(grid&&!grid.classList.contains('open')){
