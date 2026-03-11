@@ -455,29 +455,24 @@ footer>*{position:relative;z-index:1;}
 }
 .pm-cta-btn:hover{background:var(--mid);}
 
-/* ── LATEST UPDATE PANEL (full width, bottom) ── */
-.pm-update-panel{
-  background:var(--navy);
-  color:var(--cream);
-  padding:32px 40px;
-  position:relative;
-  overflow:hidden;
-  flex-shrink:0;
+/* ── BUILD UPDATES FEED (full width, bottom) ── */
+.pm-updates-section{
+  background:var(--navy);color:var(--cream);
+  flex-shrink:0;position:relative;overflow:hidden;
 }
-.pm-update-panel::before{
+.pm-updates-section::before{
   content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(rgba(247,239,230,.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(247,239,230,.03) 1px,transparent 1px);
+  background-image:linear-gradient(rgba(247,239,230,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(247,239,230,.025) 1px,transparent 1px);
   background-size:80px 80px;
 }
-.pm-update-panel>*{position:relative;z-index:1;}
-.pm-update-header{
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:16px;margin-bottom:20px;
+.pm-updates-section>*{position:relative;z-index:1;}
+.pm-updates-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 40px 16px;
   border-bottom:1px solid rgba(247,239,230,.1);
-  padding-bottom:14px;
 }
-.pm-update-label{
+.pm-updates-label{
   display:flex;align-items:center;gap:8px;
   font-size:8px;letter-spacing:.3em;text-transform:uppercase;
   color:var(--cream);opacity:.5;
@@ -492,33 +487,61 @@ footer>*{position:relative;z-index:1;}
   0%,100%{opacity:1;transform:scale(1);}
   50%{opacity:.5;transform:scale(.8);}
 }
-.pm-update-date{
-  font-size:9px;letter-spacing:.15em;color:var(--cream);opacity:.35;
-  white-space:nowrap;
+.pm-updates-count{
+  font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream);opacity:.25;
 }
-.pm-update-title{
-  font-family:var(--serif);font-size:20px;font-weight:700;
-  color:var(--cream);line-height:1.2;margin-bottom:12px;
+/* Scrollable feed */
+.pm-updates-feed{
+  max-height:320px;overflow-y:auto;
 }
-.pm-update-body{
-  font-size:11px;line-height:1.85;color:var(--cream);opacity:.65;
-  margin-bottom:0;white-space:pre-line;
+.pm-updates-feed::-webkit-scrollbar{width:3px;}
+.pm-updates-feed::-webkit-scrollbar-track{background:rgba(247,239,230,.04);}
+.pm-updates-feed::-webkit-scrollbar-thumb{background:rgba(247,239,230,.25);border-radius:2px;}
+/* Individual update entry */
+.pm-update-entry{
+  padding:22px 40px 20px;
+  border-bottom:1px solid rgba(247,239,230,.07);
+  transition:background .15s;
 }
-/* Update image strip */
-.pm-update-images{
-  display:flex;gap:10px;margin-top:20px;
-  overflow-x:auto;padding-bottom:4px;
+.pm-update-entry:last-child{border-bottom:none;}
+.pm-update-entry:hover{background:rgba(247,239,230,.03);}
+.pm-update-entry-header{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:8px;
 }
-.pm-update-images::-webkit-scrollbar{height:2px;}
-.pm-update-images::-webkit-scrollbar-thumb{background:rgba(247,239,230,.2);}
-.pm-update-img{
-  height:110px;width:auto;
+.pm-update-entry-date{
+  font-size:8px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cream);opacity:.3;white-space:nowrap;
+}
+.pm-update-entry-badge{
+  font-size:7px;letter-spacing:.18em;text-transform:uppercase;
+  padding:2px 7px;border:1px solid rgba(111,207,151,.35);
+  color:#6fcf97;white-space:nowrap;background:rgba(111,207,151,.08);
+}
+.pm-update-entry-title{
+  font-family:var(--serif);font-size:16px;font-weight:700;
+  color:var(--cream);line-height:1.2;margin-bottom:7px;
+}
+.pm-update-entry-body{
+  font-size:11px;line-height:1.8;color:var(--cream);opacity:.6;
+  white-space:pre-line;margin-bottom:0;
+}
+/* Image strip per entry */
+.pm-update-entry-images{
+  display:flex;gap:8px;margin-top:12px;
+  overflow-x:auto;padding-bottom:3px;
+}
+.pm-update-entry-images::-webkit-scrollbar{height:2px;}
+.pm-update-entry-images::-webkit-scrollbar-thumb{background:rgba(247,239,230,.2);}
+.pm-update-entry-img{
+  height:90px;width:auto;min-width:70px;
   flex-shrink:0;object-fit:cover;
   cursor:zoom-in;
   border:1px solid rgba(247,239,230,.12);
   transition:.15s;
 }
-.pm-update-img:hover{border-color:rgba(247,239,230,.5);opacity:.9;}
+.pm-update-entry-img:hover{border-color:rgba(247,239,230,.45);opacity:.9;}
 
 /* ── LIGHTBOX ── */
 .pm-lightbox{display:none;position:fixed;inset:0;z-index:9000;background:rgba(10,16,22,.96);align-items:center;justify-content:center;}
@@ -803,7 +826,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
       </div>
       <div class="carousel-slide" id="slide-1"><div class="slide-placeholder"><svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="30" width="80" height="8" rx="2" fill="#19293a" opacity=".2"/><rect x="25" y="18" width="50" height="12" rx="2" fill="#19293a" opacity=".15"/><circle cx="20" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/><circle cx="80" cy="60" r="10" fill="none" stroke="#19293a" stroke-width="2" opacity=".2"/></svg><span class="slide-label">Dock Hardware — Range</span></div></div>
       <div class="carousel-slide" id="slide-2"><div class="slide-placeholder"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><polygon points="40,5 75,30 75,55 40,75 5,55 5,30" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/><circle cx="40" cy="40" r="18" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".2"/><circle cx="40" cy="40" r="5" fill="#19293a" opacity=".18"/></svg><span class="slide-label">Mooring Systems</span></div></div>
-      <div class="carousel-slide" id="slide-3"><div class="slide-placeholder"><svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="40" width="70" height="15" rx="1" fill="#19293a" opacity=".15"/><rect x="15" y="20" width="50" height="20" rx="1" fill="#19293a" opacity=".12"/><line x1="20" y1="5" x2="20" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/><line x1="40" y1="5" x2="40" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/><line x1="60" y1="5" x2="60" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/></svg><span class="slide-label">Fender Systems</span></div></div>
+      <div class="carousel-slide" id="slide-3"><div class="slide-placeholder"><svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="40" width="70" height="15" rx="1" fill="#19293a" opacity=".15"/><rect x="15" y="20" width="50" height="20" rx="1" fill="#19293a" opacity=".15"/><line x1="20" y1="5" x2="20" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/><line x1="40" y1="5" x2="40" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/><line x1="60" y1="5" x2="60" y2="20" stroke="#19293a" stroke-width="2" opacity=".18"/></svg><span class="slide-label">Fender Systems</span></div></div>
       <div class="carousel-slide" id="slide-4"><div class="slide-placeholder"><svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><path d="M10,70 Q40,10 70,70" fill="none" stroke="#19293a" stroke-width="1.5" opacity=".18"/><circle cx="10" cy="70" r="5" fill="#19293a" opacity=".2"/><circle cx="70" cy="70" r="5" fill="#19293a" opacity=".2"/></svg><span class="slide-label">Rigging &amp; Lines</span></div></div>
       <button class="carousel-prev" onclick="carouselMove(-1)">←</button>
       <button class="carousel-next" onclick="carouselMove(1)">→</button>
@@ -1000,18 +1023,16 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
         </div>
       </div>
 
-      <!-- 3. Latest update panel (full width, dark) — only shown if update exists -->
-      <div class="pm-update-panel" id="pm-update-panel" style="display:none">
-        <div class="pm-update-header">
-          <div class="pm-update-label">
+      <!-- 3. Build updates feed (full width, dark) — only shown if updates exist -->
+      <div class="pm-updates-section" id="pm-update-panel" style="display:none">
+        <div class="pm-updates-header">
+          <div class="pm-updates-label">
             <span class="pm-update-label-dot"></span>
-            Latest Update
+            Build Updates
           </div>
-          <div class="pm-update-date" id="pm-update-date"></div>
+          <span class="pm-updates-count" id="pm-updates-count"></span>
         </div>
-        <div class="pm-update-title" id="pm-update-title"></div>
-        <div class="pm-update-body" id="pm-update-body"></div>
-        <div class="pm-update-images" id="pm-update-images" style="display:none"></div>
+        <div class="pm-updates-feed" id="pm-updates-feed"></div>
       </div>
 
     </div><!-- /product-modal-scroll -->
@@ -1403,58 +1424,65 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
     thumbStrip.style.display='none';
   }
 
-  // ── 5. Find latest build update for this product ─────────────────────────
+  // ── 5. Find all build updates for this product, newest-first ───────────────────
   var updatePanel=document.getElementById('pm-update-panel');
-  var latestUpdate=null;
+  var buildUpdates=[];
   if(name&&_announcements.length){
-    var buildUpdates=_announcements.filter(function(a){
+    buildUpdates=_announcements.filter(function(a){
       var t=(a.type||'').toLowerCase().trim();
       var isBuild=t==='build update'||t==='build_update';
       var buildName=(a.build||'').toLowerCase().trim();
       return isBuild&&buildName===name.toLowerCase().trim();
-    });
-    if(buildUpdates.length)latestUpdate=buildUpdates[buildUpdates.length-1];
+    }).slice().reverse(); // newest first
   }
 
-  if(latestUpdate){
-    var updContent=(latestUpdate.content||'').trim();
-    var updImgStr=(latestUpdate.images||'').trim();
-    // If content is just a URL, treat it as an image
-    if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
-    // Format date
-    var updDate='';
-    try{var _ud=new Date(latestUpdate.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
-    // Extract image URLs
-    var updUrls=updImgStr?updImgStr.split(',').map(function(s){
-      s=s.trim();if(s.indexOf('cdn.discordapp.com')!==-1)s=s.replace('cdn.discordapp.com','media.discordapp.net');return s;
-    }).filter(function(s){return s.indexOf('http')===0;}).reverse():[];
+  if(buildUpdates.length){
+    // Build lightbox pool: product images first, then all update images
+    var allUpdateImgs=[];
+    var feedHtml=buildUpdates.map(function(upd,entryIdx){
+      var updContent=(upd.content||'').trim();
+      var updImgStr=(upd.images||'').trim();
+      if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
+      // Date
+      var updDate='';
+      try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
+      // Image URLs
+      var updUrls=updImgStr?updImgStr.split(',').map(function(s){
+        s=s.trim();if(s.indexOf('cdn.discordapp.com')!==-1)s=s.replace('cdn.discordapp.com','media.discordapp.net');return s;
+      }).filter(function(s){return s.indexOf('http')===0;}).reverse():[];
+      // Track for lightbox
+      var imgOffset=_pmGalImages.length+allUpdateImgs.length;
+      allUpdateImgs=allUpdateImgs.concat(updUrls);
+      // Parse title / body
+      var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      var updTitle=lines.length>1?lines[0]:'';
+      var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
+      if(!updTitle)updTitle=name+' — Update';
+      // Images HTML
+      var imgsHtml='';
+      if(updUrls.length){
+        imgsHtml='<div class="pm-update-entry-images">'+updUrls.map(function(u,i){
+          var lbIdx=imgOffset+i;
+          return '<img class="pm-update-entry-img" src="'+u+'" onclick="pmOpenUpdateImg('+lbIdx+')" alt="" onerror="this.style.display=\'none\'">';
+        }).join('')+'</div>';
+      }
+      return '<div class="pm-update-entry">'+
+        '<div class="pm-update-entry-header">'+
+          (updDate?'<span class="pm-update-entry-date">'+updDate+'</span>':'')+
+          (entryIdx===0?'<span class="pm-update-entry-badge">Latest</span>':'')+
+        '</div>'+
+        '<div class="pm-update-entry-title">'+updTitle+'</div>'+
+        (updBody?'<div class="pm-update-entry-body">'+updBody.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>':'')+
+        imgsHtml+
+      '</div>';
+    }).join('');
 
-    // Parse first line as a "title" if content has multiple lines
-    var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-    var updTitle=lines.length>1?lines[0]:'';
-    var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
-
-    document.getElementById('pm-update-date').textContent=updDate;
-    document.getElementById('pm-update-title').textContent=updTitle||(name+' — Latest Update');
-    document.getElementById('pm-update-body').textContent=updBody;
-    document.getElementById('pm-update-body').style.display=updBody?'block':'none';
-
-    // Update image strip — these get added to lightbox pool
-    var updImgEl=document.getElementById('pm-update-images');
-    var imgOffset=_pmGalImages.length;
-    if(updUrls.length){
-      updImgEl.style.display='flex';
-      updImgEl.innerHTML=updUrls.map(function(u,i){
-        var lbIdx=imgOffset+i;
-        return '<img class="pm-update-img" src="'+u+'" onclick="pmOpenUpdateImg('+lbIdx+')" alt="" onerror="this.style.display=\'none\'">';
-      }).join('');
-      // Combine product + update images for lightbox
-      _lbImages=_pmGalImages.concat(updUrls);
-    }else{
-      updImgEl.style.display='none';
-      _lbImages=_pmGalImages.slice();
-    }
-
+    document.getElementById('pm-updates-feed').innerHTML=feedHtml;
+    document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
+    // Reset scroll to top
+    var feed=document.getElementById('pm-updates-feed');if(feed)feed.scrollTop=0;
+    // Lightbox pool
+    _lbImages=_pmGalImages.concat(allUpdateImgs);
     updatePanel.style.display='block';
   }else{
     updatePanel.style.display='none';
