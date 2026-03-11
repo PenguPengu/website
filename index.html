@@ -822,7 +822,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
       </div>
     </div>
     <div class="product-modal-discord" id="pm-discord">
-      <div class="product-modal-discord-label">Latest from Discord</div>
+      <div class="product-modal-discord-label" id="pm-dc-label">Latest Update</div>
       <div class="product-modal-discord-title" id="pm-dc-title"></div>
       <div class="product-modal-discord-body" id="pm-dc-body"></div>
       <div class="product-modal-discord-meta" id="pm-dc-meta"></div>
@@ -994,6 +994,7 @@ function buildCard(entry){
 
 // ── Sort state ────────────────────────────────────────────────────────────────
 var _currentEntries=[];
+var _announcements=[];
 var _allEntries=[];
 var _showingAll=false;
 function gallerySort(type,btn){
@@ -1262,18 +1263,27 @@ var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK7
 function loadAnnouncements(){
   fetch(ANNOUNCEMENTS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
     var rows=parseCSV(text);if(!rows||!rows.length)return;
-    var items=rows.slice().reverse().slice(0,1);if(!items.length)return;
-    var r={};Object.keys(items[0]).forEach(function(k){r[k.toLowerCase()]=items[0][k];});
-    var content=r.content||r.body||'',author=r.author||'',ts=r.timestamp||'',imgs=r.images||r.image||'';
-    var lines=content.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    // Normalise keys and store all rows globally for product modal lookups
+    _announcements=rows.map(function(row){var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});return r;});
+    // Main feed: show latest "Announcement" type (or no type for backwards compat)
+    var annRows=_announcements.filter(function(r){var t=r.type||'';return t===''||t.toLowerCase()==='announcement';});
+    if(!annRows.length)return;
+    var row=annRows[annRows.length-1]; // newest at bottom
+    var body_raw=row.content||row.body||'',author=row.author||'',ts=row.timestamp||'',imgs=row.images||row.image||'';
+    var lines=body_raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
     var title=lines[0]||'Update',body=lines.slice(1).join(' ').trim();
     var dateStr='';if(ts){try{dateStr=new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){dateStr=ts;}}
     var tb=document.getElementById('ann-text-block');
     if(tb)tb.innerHTML='<div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div><div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">'+(dateStr||'Latest')+'</span></div><div class="update-title">'+title+'</div>'+(body?'<div class="update-body">'+body+'</div>':'')+'<div class="update-footer"><span class="update-author">'+author+(dateStr?' · '+dateStr:'')+'</span><div class="update-reactions"></div></div>';
     var slider=document.getElementById('ann-slider'),dotsEl=document.getElementById('ann-dots');
-    if(slider&&imgs){var urls=imgs.split(',').map(function(s){return s.trim();}).filter(function(s){return s.length>4;});
+    if(slider){var urls=imgs?imgs.split(',').map(function(s){return s.trim();}).filter(function(s){return s.length>4;}):[]; 
       if(urls.length){slider.innerHTML=urls.map(function(u,i){return '<div class="update-announce-slide'+(i===0?' active':'')+'"><img src="'+u+'" style="width:100%;height:100%;object-fit:cover;" alt=""></div>';}).join('');
-        if(dotsEl)dotsEl.innerHTML=urls.map(function(_,i){return '<button class="usd'+(i===0?' active':'')+'" onclick="annSlide('+i+')"></button>';}).join('');annCurrent=0;}}
+        if(dotsEl)dotsEl.innerHTML=urls.map(function(_,i){return '<button class="usd'+(i===0?' active':'')+'" onclick="annSlide('+i+')"></button>';}).join('');annCurrent=0;
+      } else {
+        slider.innerHTML='<div class="update-announce-slide active"><div class="update-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> No images</div></div>';
+        if(dotsEl)dotsEl.innerHTML='<button class="usd active" onclick="annSlide(0)"></button>';annCurrent=0;
+      }
+    }
   }).catch(function(){});
 }
 
@@ -1305,7 +1315,7 @@ function renderProducts(products){
   grid.querySelectorAll('.product-card').forEach(function(card){
     card.addEventListener('click',function(){
       var idx=parseInt(this.getAttribute('data-idx')),p=PRODUCT_REGISTRY[idx],r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
-      openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.dc_channel||'',r.dc_title||'',r.dc_body||'',r.dc_meta||'',r.image||'',r.cta_url||'');
+      openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.dc_channel||'',r.dc_title||'',r.dc_body||'',r.dc_meta||'',r.image||'',r.cta_url||'',r.name||'');
     });
   });
   grid.querySelectorAll('.anim').forEach(function(el){el.style.animationPlayState='paused';observer.observe(el);});
@@ -1360,7 +1370,31 @@ function openProductModal(num,status,name,type,desc,details,cta,dc_channel,dc_ti
   if(img){if(img.complete&&img.naturalWidth)ar();else img.addEventListener('load',ar);}
   if(pmImages.length>1){ts.style.display='flex';ts.innerHTML=pmImages.map(function(u,i){return '<img class="pm-thumb'+(i===0?' active':'')+'" src="'+u+'" onclick="pmShowImage('+i+')" alt="">';}).join('');}else ts.style.display='none';}
   else{layout.style.gridTemplateColumns=RW+'px '+RW+'px';main.style.minHeight=RW+'px';main.style.cursor='default';main.onclick=null;main.innerHTML='<div class="pm-placeholder" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px"><span style="font-size:9px;letter-spacing:.2em;opacity:.3;text-transform:uppercase;margin-top:8px">Photos coming soon</span></div>';ts.style.display='none';}
-  var dcPanel=document.getElementById('pm-discord');if(dc_title){document.getElementById('pm-dc-title').textContent=dc_title;document.getElementById('pm-dc-body').textContent=dc_body||'';document.getElementById('pm-dc-meta').textContent=(dc_channel||'')+(dc_meta?' · '+dc_meta:'');dcPanel.style.display='block';}else dcPanel.style.display='none';
+  var dcPanel=document.getElementById('pm-discord');
+  // Look up latest Build Update for this product from announcements sheet
+  var productName=arguments[13]||'';
+  var latestUpdate=null;
+  if(productName&&_announcements.length){
+    var updates=_announcements.filter(function(a){return (a.type||'').toLowerCase()==='build update'&&(a.product||'').toLowerCase()===productName.toLowerCase();});
+    if(updates.length)latestUpdate=updates[updates.length-1];
+  }
+  if(latestUpdate){
+    var updLines=(latestUpdate.content||'').split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var updTitle=updLines[0]||'Update';
+    var updBody=updLines.slice(1).join(' ').trim();
+    var updMeta=latestUpdate.timestamp?'Posted '+new Date(latestUpdate.timestamp).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+    document.getElementById('pm-dc-title').textContent=updTitle;
+    document.getElementById('pm-dc-body').textContent=updBody;
+    document.getElementById('pm-dc-meta').textContent=updMeta;
+    dcPanel.style.display='block';
+  } else if(dc_title){
+    document.getElementById('pm-dc-title').textContent=dc_title;
+    document.getElementById('pm-dc-body').textContent=dc_body||'';
+    document.getElementById('pm-dc-meta').textContent=(dc_channel||'')+(dc_meta?' · '+dc_meta:'');
+    dcPanel.style.display='block';
+  } else {
+    dcPanel.style.display='none';
+  }
   document.getElementById('product-modal').classList.add('open');document.body.style.overflow='hidden';
 }
 function closeProductModal(){document.getElementById('product-modal').classList.remove('open');document.body.style.overflow='';}
