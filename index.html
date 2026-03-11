@@ -1028,8 +1028,9 @@ function buildCard(entry){
   if(url.indexOf('cdn.discordapp.com')!==-1)url=url.replace('cdn.discordapp.com','media.discordapp.net');
   var ph='<div class="photo-placeholder">'+IMG_SVG+'</div>';
   var imgHtml=url?'<img src="'+url+'" alt="'+(entry.title||'').replace(/"/g,'&quot;')+'" loading="lazy" onerror="this.style.display=\'none\'">'+ph:ph;
+  var imgClick=url?' style="cursor:zoom-in;" onclick="openLightboxSingle(\''+url.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"':'';
   return '<div class="photo-card">'+
-    '<div class="photo-img">'+imgHtml+'</div>'+
+    '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
@@ -1125,18 +1126,60 @@ function loadAnnouncements(){
     _announcements=rows.map(function(row){
       var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});return r;
     });
+
+    // ── Render homepage announcement box ──────────────────────────────────
     var annRows=_announcements.filter(function(r){var t=(r.type||'').toLowerCase();return t===''||t==='announcement';});
     if(!annRows.length)return;
     var row=annRows[annRows.length-1];
-    var msgText=(row.content||'').trim(),author=row.author||'',ts=row.timestamp||'',imgStr=(row.images||'').trim();
-    if(!imgStr&&msgText.indexOf('http')===0){imgStr=msgText;msgText='';}
+    var rawContent=(row.content||'').trim();
+    var author=row.author||'',ts=row.timestamp||'',imgStr=(row.images||'').trim();
+    if(!imgStr&&rawContent.indexOf('http')===0){imgStr=rawContent;rawContent='';}
+
+    // Split first line → title, remainder → body (same logic as build updates)
+    var contentLines=rawContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var annTitle=contentLines.length>1?contentLines[0]:'';
+    var annBody=contentLines.length>1?contentLines.slice(1).join('\n'):rawContent;
+    if(!annTitle)annTitle='Latest Announcement';
+
     var dateStr='';if(ts){try{var d=new Date(ts);if(!isNaN(d.getTime()))dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}}
+
     var tb=document.getElementById('ann-text-block');
-    if(tb)tb.innerHTML='<div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div><div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">'+(dateStr||'Latest')+'</span></div>'+(msgText?'<div class="update-body" style="margin-top:12px;font-size:13px;line-height:1.8;">'+msgText.replace(/\n/g,'<br>')+'</div>':'')+'<div class="update-footer" style="margin-top:auto;padding-top:20px;"><span class="update-author">'+author+(dateStr?' · '+dateStr:'')+'</span></div>';
-    var slider=document.getElementById('ann-slider'),dotsEl=document.getElementById('ann-dots');if(!slider)return;
-    var urls=imgStr?imgStr.split(',').map(function(s){s=s.trim();if(s.indexOf('cdn.discordapp.com')!==-1)s=s.replace('cdn.discordapp.com','media.discordapp.net');return s;}).filter(function(s){return s.indexOf('http')===0;}):[]; 
-    if(urls.length){slider.innerHTML=urls.map(function(u,i){return'<div class="update-announce-slide'+(i===0?' active':'')+'"><img src="'+u+'" style="width:100%;height:100%;object-fit:cover;display:block;" alt="" onerror="this.parentNode.innerHTML=\'<div class=\\"update-img-ph\\">Image unavailable</div>\'"></div>';}).join('');if(dotsEl)dotsEl.innerHTML=urls.map(function(_,i){return'<button class="usd'+(i===0?' active':'')+'" onclick="annSlide('+i+')"></button>';}).join('');annCurrent=0;}
-    else{slider.innerHTML='<div class="update-announce-slide active" style="display:flex;align-items:center;justify-content:center;min-height:300px;"><div class="update-img-ph">No images</div></div>';if(dotsEl)dotsEl.innerHTML='<button class="usd active" onclick="annSlide(0)"></button>';annCurrent=0;}
+    if(tb)tb.innerHTML=
+      '<div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div>'+
+      '<div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">'+(dateStr||'Latest')+'</span></div>'+
+      '<div class="update-title" style="font-size:22px;margin-top:10px;">'+annTitle+'</div>'+
+      (annBody?'<div class="update-body" style="margin-top:10px;font-size:12px;line-height:1.85;">'+annBody.replace(/\n/g,'<br>')+'</div>':'')+
+      '<div class="update-footer" style="margin-top:auto;padding-top:20px;"><span class="update-author">'+author+(dateStr?' · '+dateStr:'')+'</span></div>';
+
+    // ── Image slider ──────────────────────────────────────────────────────
+    var slider=document.getElementById('ann-slider'),dotsEl=document.getElementById('ann-dots');
+    if(!slider)return;
+    var urls=imgStr?imgStr.split(',').map(function(s){
+      s=s.trim();
+      if(s.indexOf('cdn.discordapp.com')!==-1)s=s.replace('cdn.discordapp.com','media.discordapp.net');
+      return s;
+    }).filter(function(s){return s.indexOf('http')===0;}):[]; 
+
+    if(urls.length){
+      // Each slide image is clickable → opens lightbox with all ann images
+      slider.innerHTML=urls.map(function(u,i){
+        var esc=u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        return '<div class="update-announce-slide'+(i===0?' active':'')+'">'+
+          '<img src="'+u+'" '+
+            'style="width:100%;height:100%;object-fit:contain;display:block;cursor:zoom-in;background:#0d1820;" '+
+            'alt="" '+
+            'onclick="openLightboxMulti([\''+urls.map(function(x){return x.replace(/\\/g,'\\\\').replace(/'/g,"\\'");}).join("','")+'\'],'+i+')" '+
+            'onerror="this.parentNode.innerHTML=\'<div class=\\"update-img-ph\\">Image unavailable</div>\'"'+
+          '>'+
+        '</div>';
+      }).join('');
+      if(dotsEl)dotsEl.innerHTML=urls.map(function(_,i){return'<button class="usd'+(i===0?' active':'')+'" onclick="annSlide('+i+')"></button>';}).join('');
+      annCurrent=0;
+    }else{
+      slider.innerHTML='<div class="update-announce-slide active" style="display:flex;align-items:center;justify-content:center;min-height:300px;"><div class="update-img-ph">No images</div></div>';
+      if(dotsEl)dotsEl.innerHTML='<button class="usd active" onclick="annSlide(0)"></button>';
+      annCurrent=0;
+    }
   }).catch(function(e){console.log('[Ann] error',e);});
 }
 
@@ -1206,6 +1249,10 @@ function pmOpenLightbox(idx){
 }
 function pmLightboxNav(dir){_lbCurrent=((_lbCurrent+dir)%_lbImages.length+_lbImages.length)%_lbImages.length;var img=document.getElementById('pm-lb-img'),counter=document.getElementById('pm-lb-counter');img.src=_lbImages[_lbCurrent];counter.textContent=(_lbCurrent+1)+' / '+_lbImages.length;}
 function pmLightboxClose(){document.getElementById('pm-lightbox').classList.remove('open');}
+
+// ── Shared lightbox helpers (used by gallery cards + announcements) ───────────
+function openLightboxSingle(url){_lbImages=[url];_lbCurrent=0;pmOpenLightbox(0);}
+function openLightboxMulti(urls,idx){_lbImages=urls.slice();_lbCurrent=idx;pmOpenLightbox(idx);}
 
 // ── Gallery state for current modal ──────────────────────────────────────────
 var _pmGalImages=[],_pmGalCurrent=0;
