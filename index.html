@@ -967,12 +967,58 @@ var HEART_SVG='<svg width="14" height="13" viewBox="0 0 24 22" fill="none" strok
 var FIRE_SVG='<svg width="12" height="14" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C12 2 4 8 4 15a8 8 0 0 0 16 0c0-4-3-7-3-7s-1 3-3 3c0 0 2-5-2-9Z"/></svg>';
 var IMG_SVG='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
 
-// ── CSV parser ────────────────────────────────────────────────────────────────
+// ── CSV parser (streaming — handles quoted multiline fields) ──────────────────
 function parseCSV(text){
-  function pLine(line){var f=[],i=0,len=line.length;while(i<=len){if(i===len){f.push('');break;}if(line[i]==='"'){var j=i+1,v='';while(j<len){if(line[j]==='"'){if(line[j+1]==='"'){v+='"';j+=2;}else{v+=line[j++];break;}}else{v+=line[j++];}}f.push(v);while(j<len&&line[j]!==',')j++;i=j+1;}else{var e=line.indexOf(',',i);if(e===-1){f.push(line.slice(i));break;}f.push(line.slice(i,e));i=e+1;}}return f;}
-  var lines=text.trim().replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
-  var headers=pLine(lines[0]).map(function(h){return h.trim();});
-  var rows=[];for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var vals=pLine(lines[i]);var obj={};headers.forEach(function(h,idx){obj[h]=(vals[idx]||'').trim();});rows.push(obj);}
+  // Normalise line endings
+  text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  var i=0,len=text.length;
+
+  function parseRow(){
+    if(i>=len)return null;
+    var fields=[];
+    while(i<=len){
+      if(i===len){fields.push('');break;}
+      var ch=text[i];
+      if(ch==='"'){
+        // Quoted field — may contain literal newlines
+        i++;var v='';
+        while(i<len){
+          if(text[i]==='"'){
+            if(text[i+1]==='"'){v+='"';i+=2;}
+            else{i++;break;}
+          }else{v+=text[i++];}
+        }
+        fields.push(v);
+        // skip to next comma or end-of-row
+        while(i<len&&text[i]!==','&&text[i]!=='\n')i++;
+        if(i<len&&text[i]===','){i++;continue;}
+        break;
+      }else if(ch==='\n'){
+        // End of row — push empty field only if mid-row (trailing comma)
+        if(fields.length||text[i-1]===',')fields.push('');
+        i++;break;
+      }else{
+        var s=i;
+        while(i<len&&text[i]!==','&&text[i]!=='\n')i++;
+        fields.push(text.slice(s,i).trim());
+        if(i<len&&text[i]===','){i++;continue;}
+        if(i<len&&text[i]==='\n')i++;
+        break;
+      }
+    }
+    return fields;
+  }
+
+  var headers=parseRow();if(!headers)return[];
+  headers=headers.map(function(h){return h.trim();});
+  var rows=[];
+  while(i<len){
+    var vals=parseRow();
+    if(!vals||!vals.length||(vals.length===1&&!vals[0]))continue;
+    var obj={};
+    headers.forEach(function(h,idx){obj[h]=(vals[idx]||'').trim();});
+    rows.push(obj);
+  }
   return rows;
 }
 
