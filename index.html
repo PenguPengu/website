@@ -353,9 +353,9 @@ footer>*{position:relative;z-index:1;}
 .product-modal-details{font-size:11px;line-height:1.85;opacity:.45;border-top:1px solid rgba(25,41,58,.1);padding-top:18px;margin-bottom:28px;}
 .product-modal-cta{display:inline-block;background:var(--navy);color:var(--cream);font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;padding:14px 28px;transition:.2s;cursor:pointer;border:none;align-self:flex-start;margin-top:auto;}
 .product-modal-cta:hover{background:var(--mid);}
-.product-modal-discord{border-top:2px solid var(--navy);padding:32px 40px;background:rgba(25,41,58,.04);}
+.product-modal-discord{padding:28px 40px;background:rgba(25,41,58,.04);border-top:2px solid var(--navy);}
 .product-modal-discord::-webkit-scrollbar{width:3px;}
-.product-modal-discord-label{font-size:8px;letter-spacing:.3em;text-transform:uppercase;opacity:.3;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.product-modal-discord-label{font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.5;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .product-modal-discord-label::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--navy);opacity:.3;}
 .product-modal-discord-title{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:10px;line-height:1.2;}
 .product-modal-discord-body{font-size:12px;line-height:1.8;opacity:.65;margin-bottom:4px;}
@@ -964,7 +964,7 @@ function parseCSV(text){
   function pLine(line){var f=[],i=0,len=line.length;while(i<=len){if(i===len){f.push('');break;}if(line[i]==='"'){var j=i+1,v='';while(j<len){if(line[j]==='"'){if(line[j+1]==='"'){v+='"';j+=2;}else{j++;break;}}else{v+=line[j++];}}f.push(v);while(j<len&&line[j]!==',')j++;i=j+1;}else{var e=line.indexOf(',',i);if(e===-1){f.push(line.slice(i));break;}f.push(line.slice(i,e));i=e+1;}}return f;}
   var lines=text.trim().replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
   var headers=pLine(lines[0]).map(function(h){return h.trim();});
-  var rows=[];for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var vals=pLine(lines[i]);var obj={};headers.forEach(function(h,idx){obj[h]=(vals[idx]||'').trim();});rows.push(obj);}
+  var rows=[];for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var vals=pLine(lines[i]);var obj={};headers.forEach(function(h,idx){obj[h]=(vals[idx]||'').trim();});obj._v=vals.map(function(v){return(v||'').trim();});rows.push(obj);}
   return rows;
 }
 
@@ -1256,18 +1256,51 @@ var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK7
 
 // ── Announcements ─────────────────────────────────────────────────────────────
 function fixDiscordUrl(u){if(u.indexOf('cdn.discordapp.com')!==-1)return u.replace('cdn.discordapp.com','media.discordapp.net');return u;}
+// Known column positions for Announcements sheet (0-based):
+// 0=Timestamp, 1=Author, 2=Content, 3=Images, 4=Type, 5=Build
+function annRowGet(row, namedKey, pos){
+  var byName=(row[namedKey]||'').trim();
+  // If the named value looks like real text (not a URL), use it
+  if(byName&&byName.indexOf('http')!==0)return byName;
+  // Fall back to column position
+  var byPos=(row._v&&row._v[pos]!==undefined?row._v[pos]:'').trim();
+  // For non-text fields (type, build, timestamp) prefer byPos if byName is empty
+  if(!byName&&byPos)return byPos;
+  // For content fields: if byName was a URL and byPos is text, prefer byPos
+  if(byName&&byName.indexOf('http')===0&&byPos&&byPos.indexOf('http')!==0)return byPos;
+  return byName||byPos;
+}
+function annImgGet(row){
+  var byName=(row.images||row.image||'').trim();
+  var byPos=(row._v&&row._v[3]!==undefined?row._v[3]:'').trim();
+  // Collect all comma-separated values from both and keep those that are URLs
+  var candidates=[byName,byPos].join(',').split(',').map(function(s){return s.trim();}).filter(function(s){return s.indexOf('http')===0;});
+  return candidates.join(',');
+}
 function loadAnnouncements(){
   fetch(ANNOUNCEMENTS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
     var rows=parseCSV(text);if(!rows||!rows.length)return;
-    _announcements=rows.map(function(row){var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});return r;});
+    _announcements=rows.map(function(row){
+      var r={};
+      Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});
+      r._v=row._v||[];
+      return r;
+    });
     _announcements.sort(function(a,b){return (a.timestamp||'').localeCompare(b.timestamp||'');});
-    var annRows=_announcements.filter(function(r){var t=r.type||'';return t===''||t.toLowerCase()==='announcement';});
+    var annRows=_announcements.filter(function(r){
+      var t=annRowGet(r,'type',4);
+      return t===''||t.toLowerCase()==='announcement';
+    });
     if(!annRows.length)return;
     var row=annRows[annRows.length-1];
-    var body_raw=row.content||row.body||'',author=row.author||'',ts=row.timestamp||'',imgs=row.images||row.image||'';
+    var ts=annRowGet(row,'timestamp',0);
+    var author=annRowGet(row,'author',1);
+    var body_raw=annRowGet(row,'content',2);
+    var imgs=annImgGet(row);
     var lines=body_raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
     var title=lines[0]||'Update',body=lines.slice(1).join('\n').trim();
-    var dateStr='';if(ts){try{dateStr=new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){dateStr=ts;}}
+    var dateStr='';
+    if(ts){try{var d=new Date(ts);if(!isNaN(d.getTime()))dateStr=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}}
     var tb=document.getElementById('ann-text-block');
     if(tb)tb.innerHTML='<div class="update-product-pill"><span class="update-product-pill-dot"></span>Announcement</div><div class="update-card-top"><span class="update-tag tag-announce">New</span><span class="update-date">'+(dateStr||'Latest')+'</span></div><div class="update-title">'+title+'</div>'+(body?'<div class="update-body">'+body.replace(/\n/g,'<br>')+'</div>':'')+'<div class="update-footer"><span class="update-author">'+author+(dateStr?' \u00b7 '+dateStr:'')+'</span><div class="update-reactions"></div></div>';
     var slider=document.getElementById('ann-slider'),dotsEl=document.getElementById('ann-dots');
@@ -1277,7 +1310,7 @@ function loadAnnouncements(){
         slider.innerHTML=urls.map(function(u,i){return '<div class="update-announce-slide'+(i===0?' active':'')+'" style="position:absolute;inset:0;"><img src="'+u+'" style="width:100%;height:100%;object-fit:cover;display:block;" alt="" onerror="this.style.display=\'none\'"></div>';}).join('');
         if(dotsEl)dotsEl.innerHTML=urls.map(function(_,i){return '<button class="usd'+(i===0?' active':'')+'" onclick="annSlide('+i+')"></button>';}).join('');annCurrent=0;
       } else {
-        slider.innerHTML='<div class="update-announce-slide active"><div class="update-img-ph" style="min-height:200px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> No images</div></div>';
+        slider.innerHTML='<div class="update-announce-slide active" style="min-height:300px"><div class="update-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> No images</div></div>';
         if(dotsEl)dotsEl.innerHTML='<button class="usd active" onclick="annSlide(0)"></button>';annCurrent=0;
       }
     }
@@ -1371,15 +1404,17 @@ function openProductModal(num,status,name,type,desc,details,cta,dc_channel,dc_ti
   var productName=arguments[13]||'';
   var latestUpdate=null;
   if(productName&&_announcements.length){
-    var updates=_announcements.filter(function(a){return (a.type||'').toLowerCase()==='build update'&&(a.build||a.product||'').toLowerCase()===productName.toLowerCase();});
+    var updates=_announcements.filter(function(a){return annRowGet(a,'type',4).toLowerCase()==='build update'&&annRowGet(a,'build',5).toLowerCase()===productName.toLowerCase();});
     if(updates.length)latestUpdate=updates[updates.length-1];
   }
   if(latestUpdate){
-    var updLines=(latestUpdate.content||'').split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var updBody_raw=annRowGet(latestUpdate,'content',2);
+    var updLines=updBody_raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
     var updTitle=updLines[0]||'Update';
     var updBody=updLines.slice(1).join('\n').trim();
-    var updDate=latestUpdate.timestamp?new Date(latestUpdate.timestamp).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
-    var updImgs=latestUpdate.images||latestUpdate.image||'';var _updImgStart=pmImages.length;
+    var updTs=annRowGet(latestUpdate,'timestamp',0);
+    var updDate='';try{var _ud=new Date(updTs);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
+    var updImgs=annImgGet(latestUpdate);var _updImgStart=pmImages.length;
     var updUrls=updImgs?updImgs.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}).reverse():[];
     var imgHtml=updUrls.length?'<div style="display:flex;gap:8px;margin-top:18px;overflow-x:auto;padding-bottom:4px;">'+updUrls.map(function(u,_i){return '<img src="'+u+'" style="height:96px;width:auto;flex-shrink:0;object-fit:cover;border-radius:2px;cursor:zoom-in;border:1px solid rgba(25,41,58,.1);" onclick="pmOpenLightbox('+(_updImgStart+_i)+')" onerror="this.style.display=\'none\'">';}).join('')+'</div>':'';
     dcPanel.innerHTML='<div class="product-modal-discord-label">Latest Update</div>'+
