@@ -76,8 +76,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .carousel-frame{width:100%;position:relative;overflow:hidden;background:rgba(25,41,58,.06);}
 .carousel-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .7s ease;}
 .carousel-slide.active{opacity:1;position:relative;}
-.carousel-slide img{width:100%;height:auto;display:block;max-height:80vh;object-fit:contain;}
-.slide-placeholder{width:100%;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.carousel-slide img{width:100%;height:auto;display:block;aspect-ratio:16/10;object-fit:cover;}
+.slide-placeholder{width:100%;aspect-ratio:16/10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 .slide-placeholder svg{width:120px;height:auto;opacity:.2;}
 .carousel-caption{padding:10px 0 0;font-size:9px;letter-spacing:.3em;text-transform:uppercase;opacity:.45;text-align:center;}
 .carousel-controls{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10;}
@@ -986,8 +986,9 @@ function goSlide(n){
   slides[curSlide].classList.add('active');dotsCont.children[curSlide].classList.add('active');
   var cap=document.getElementById('carousel-caption');if(cap)cap.textContent=_slideLabels[curSlide]||'';
 }
-function carouselMove(d){goSlide(curSlide+d);}
-setInterval(function(){carouselMove(1);},3800);
+function carouselMove(d){goSlide(curSlide+d);resetCarouselTimer();}
+var _carouselTimer=setInterval(function(){goSlide(curSlide+1);},6000);
+function resetCarouselTimer(){clearInterval(_carouselTimer);_carouselTimer=setInterval(function(){goSlide(curSlide+1);},6000);}
 
 // ── Anim observer ─────────────────────────────────────────────────────────────
 var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.style.animationPlayState='running';observer.unobserve(e.target);}});},{threshold:0.15});
