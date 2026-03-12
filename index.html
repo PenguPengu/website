@@ -66,7 +66,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .carousel-frame{width:100%;position:relative;overflow:hidden;background:rgba(25,41,58,.06);}
 .carousel-slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .7s ease;}
 .carousel-slide.active{opacity:1;position:relative;}
-.carousel-slide img{width:100%;height:auto;display:block;max-height:60vh;object-fit:contain;}
+.carousel-slide img{width:100%;height:auto;display:block;max-height:80vh;object-fit:contain;}
 .slide-placeholder{width:100%;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
 .slide-placeholder svg{width:120px;height:auto;opacity:.2;}
 .carousel-caption{padding:10px 0 0;font-size:9px;letter-spacing:.3em;text-transform:uppercase;opacity:.45;text-align:center;}
@@ -747,14 +747,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
       <div class="update-body">Updates from the team will appear here.</div>
       <div class="update-footer"><span class="update-author">Underway</span><div class="update-reactions"></div></div>
     </div>
-    <div class="update-announce-images" id="ann-images-wrap">
-  </div>
-  <div class="discord-cta-bar reveal">
-    <div class="discord-cta-bar-left">
-      <svg width="28" height="22" viewBox="0 0 36 28" fill="none"><path d="M30.5 2.4A36 36 0 0 0 24 .7a25 25 0 0 0-1.1 2.3 33 33 0 0 0-9.8 0A24 24 0 0 0 12 .7 36 36 0 0 0 5.5 2.4C.7 9.5-.5 16.4.6 23.2a36 36 0 0 0 11 5.6c.9-1.2 1.7-2.5 2.4-3.9a22.5 22.5 0 0 1-3.7-1.8l.9-.7a25.4 25.4 0 0 0 21.8 0l.9.7a22.5 22.5 0 0 1-3.7 1.8c.7 1.4 1.5 2.7 2.4 3.9a36 36 0 0 0 11-5.6c1-8-1.7-14.8-7-21.8ZM12 19c-2.1 0-3.8-2-3.8-4.4S9.9 10.2 12 10.2s3.9 2 3.8 4.4S14.1 19 12 19Zm12 0c-2.1 0-3.8-2-3.8-4.4s1.7-4.4 3.8-4.4 3.9 2 3.8 4.4S26.1 19 24 19Z" fill="var(--navy)" opacity=".4"/></svg>
-      <div class="discord-cta-text"><p>Join us on Discord</p><p>Product channels, team updates, and early access drops.</p></div>
-    </div>
-    <a href="#" class="btn-discord" target="_blank" rel="noopener">Join Server</a>
+    <div class="update-announce-images" id="ann-images-wrap"></div>
   </div>
 </section>
 
@@ -765,22 +758,22 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <div class="section-rule"></div>
   </div>
   <div class="community-channels">
-    <a href="#" class="channel-card reveal-scale" target="_blank" rel="noopener">
+    <a href="https://www.youtube.com/@Pengu672" class="channel-card reveal-scale" target="_blank" rel="noopener">
       <div class="channel-icon"><svg width="32" height="23" viewBox="0 0 32 23" fill="none"><rect width="32" height="23" rx="5" fill="#FF0000"/><polygon points="13,6 26,11.5 13,17" fill="white"/></svg></div>
       <div class="channel-name">YouTube</div>
-      <div class="channel-desc">Product walkthroughs, installation guides and behind the scenes footage.</div>
+      <div class="channel-desc">Walkthroughs, Tutorials, Behind the Scenes &amp; More!</div>
       <div class="channel-cta">Watch Now</div>
     </a>
-    <a href="#" class="channel-card reveal-scale delay-r1" target="_blank" rel="noopener">
+    <a href="https://discord.gg/jnMVGUbpFu" class="channel-card reveal-scale delay-r1" target="_blank" rel="noopener">
       <div class="channel-icon"><svg width="30" height="23" viewBox="0 0 30 23" fill="none"><path d="M25.5 2A24.8 24.8 0 0 0 20 .6a17 17 0 0 0-.76 1.58 23 23 0 0 0-6.84 0A16.5 16.5 0 0 0 11.6.6 24.7 24.7 0 0 0 5.5 2C1.5 7.7.44 13.3 1.04 18.8a24.9 24.9 0 0 0 7.6 3.85c.61-.84 1.16-1.73 1.63-2.67a16.2 16.2 0 0 1-2.56-1.23l.62-.49a17.7 17.7 0 0 0 15.27 0l.62.49a16.2 16.2 0 0 1-2.57 1.23c.47.94 1.01 1.83 1.63 2.67A24.8 24.8 0 0 0 29 18.8c.72-6.4-1.13-12-4.5-16.8ZM10.6 15.5c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Zm8.8 0c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Z" fill="#5865F2"/></svg></div>
       <div class="channel-name">Discord</div>
-      <div class="channel-desc">Chat with the team, ask questions and connect with other operators.</div>
+      <div class="channel-desc">Chat directly with the team, ask questions, get help, and partake in photography challenges!</div>
       <div class="channel-cta">Join Server</div>
     </a>
-    <a href="#" class="channel-card reveal-scale delay-r2" target="_blank" rel="noopener">
-      <div class="channel-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="13" fill="#1b2b3a"/><path d="M13 4.5C8.31 4.5 4.5 8.31 4.5 13a8.48 8.48 0 0 0 4.8 7.6l1.82-4.38a2.83 2.83 0 1 1 3.77-2.65l4.43-1.82A8.5 8.5 0 0 0 13 4.5Z" fill="#c7d5e0"/><circle cx="11" cy="15.5" r="2.3" fill="#1b2b3a"/></svg></div>
+    <a href="https://steamcommunity.com/profiles/76561198811951629/" class="channel-card reveal-scale delay-r2" target="_blank" rel="noopener">
+      <div class="channel-icon"><svg width="30" height="30" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M45 0C20.1 0 0 20.1 0 45c0 24.8 20 44.9 44.8 45l7.7-18.5a11.3 11.3 0 0 1-7.2-14.8l.1-.2-17-6.9C26.9 49 25 46.2 25 43a10 10 0 0 1 10-10c.4 0 .8 0 1.2.1l15.1 6.2v-.1a15 15 0 0 1 15-14.5c8.3 0 15 6.7 15 15 0 8.2-6.6 14.9-14.8 15h-.3l-6.6 17.8C73.7 67.8 90 57.9 90 45 90 20.1 69.9 0 45 0Z" fill="#1b2838"/><path d="M41.2 56.9 35 54.4a8.5 8.5 0 0 0 7.8 5.2 8.5 8.5 0 0 0 8.5-8.5c0-.4 0-.9-.1-1.3l-6.4-2.6a5.7 5.7 0 0 1-5.6 5 5.7 5.7 0 0 1-5.7-5.7c0-.5.1-1 .2-1.5l7.5 5.9z" fill="#fff"/><path d="M66.2 36.7a10 10 0 0 0-10-10 10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10zm-3.5 0a6.5 6.5 0 0 1-6.5 6.5 6.5 6.5 0 0 1-6.5-6.5 6.5 6.5 0 0 1 6.5-6.5 6.5 6.5 0 0 1 6.5 6.5z" fill="#fff"/></svg></div>
       <div class="channel-name">Steam</div>
-      <div class="channel-desc">Follow our page for updates, announcements and community posts.</div>
+      <div class="channel-desc">See and use the latest products from our lineup and partners!</div>
       <div class="channel-cta">View Page</div>
     </a>
   </div>
