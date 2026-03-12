@@ -654,7 +654,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <p class="hero-tagline anim delay-2">Professional-grade marine solutions since 2021</p>
     <div class="hero-btns anim delay-3">
       <a href="#products" class="btn-primary">View Products</a>
-      <a href="#contact" class="btn-ghost">Get in Touch</a>
+      <a href="#partners" class="btn-ghost">View Partners</a>
     </div>
   </div>
   <div class="hero-right anim delay-2">
@@ -678,15 +678,15 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 
 <section class="intro" id="about" style="overflow:hidden">
   <div class="intro-text reveal-left">
-    <h2>Marine equipment that goes the distance.</h2>
-    <p>Underway designs, engineers, and supplies professional-grade marine hardware for harbours, dockyards, and commercial fleets. Every product we make is tested in real-world conditions — because the sea doesn't forgive shortcuts.</p>
-    <p>From bollards and fenders to full mooring systems, our catalogue is built around one principle: if it carries our name, it has to last.</p>
+    <h2 id="intro-heading">Marine equipment that goes the distance.</h2>
+    <p id="intro-body1">Underway designs, engineers, and supplies professional-grade marine hardware for harbours, dockyards, and commercial fleets. Every product we make is tested in real-world conditions — because the sea doesn't forgive shortcuts.</p>
+    <p id="intro-body2">From bollards and fenders to full mooring systems, our catalogue is built around one principle: if it carries our name, it has to last.</p>
     <a href="#products" class="btn-primary" style="margin-top:12px">Explore Catalogue →</a>
   </div>
   <div class="intro-stats reveal-right">
-    <div class="stat-block reveal delay-r1"><div class="stat-num">320+</div><div class="stat-label">Products in Range</div></div>
-    <div class="stat-block reveal delay-r2"><div class="stat-num">48</div><div class="stat-label">Active Partners</div></div>
-    <div class="stat-block reveal delay-r3"><div class="stat-num">12+</div><div class="stat-label">Countries Served</div></div>
+    <div class="stat-block reveal delay-r1"><div class="stat-num" id="stat-customers">160,000+</div><div class="stat-label">Happy Customers</div></div>
+    <div class="stat-block reveal delay-r2"><div class="stat-num" id="stat-partners">—</div><div class="stat-label">Active Partners</div></div>
+    <div class="stat-block reveal delay-r3"><div class="stat-num" id="stat-products">42+</div><div class="stat-label">Active Products</div></div>
     <div class="stat-block reveal delay-r4"><div class="stat-num">4yr</div><div class="stat-label">In Operation</div></div>
   </div>
 </section>
@@ -1136,6 +1136,42 @@ var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK7
 var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=664706385&single=true&output=csv';
 var SUBMISSIONS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=802177609&single=true&output=csv';
 var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
+// ── Config sheet URL — replace GID with your "Config" tab's gid ──────────────
+// Sheet columns: Key | Value
+// Keys: intro_heading, intro_body1, intro_body2,
+//       hero_image_1, hero_label_1, hero_image_2, hero_label_2,
+//       hero_image_3, hero_label_3, hero_image_4, hero_label_4, hero_image_5, hero_label_5
+var CONFIG_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=REPLACE_WITH_CONFIG_GID&single=true&output=csv';
+
+// ── Config ─────────────────────────────────────────────────────────────────────
+function loadConfig(){
+  if(CONFIG_URL.indexOf('REPLACE_WITH_CONFIG_GID')!==-1)return; // not set up yet
+  fetch(CONFIG_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+    var rows=parseCSV(text);if(!rows||!rows.length)return;
+    var cfg={};
+    rows.forEach(function(row){
+      var k=(row['Key']||row['key']||'').trim().toLowerCase();
+      var v=(row['Value']||row['value']||'').trim();
+      if(k)cfg[k]=v;
+    });
+    // Intro text
+    var h=document.getElementById('intro-heading');if(h&&cfg['intro_heading'])h.textContent=cfg['intro_heading'];
+    var b1=document.getElementById('intro-body1');if(b1&&cfg['intro_body1'])b1.textContent=cfg['intro_body1'];
+    var b2=document.getElementById('intro-body2');if(b2&&cfg['intro_body2'])b2.textContent=cfg['intro_body2'];
+    // Stats overrides (optional)
+    var sc=document.getElementById('stat-customers');if(sc&&cfg['stat_customers'])sc.textContent=cfg['stat_customers'];
+    var spr=document.getElementById('stat-products');if(spr&&cfg['stat_products'])spr.textContent=cfg['stat_products'];
+    // Hero carousel images — replace placeholder slides with real photos
+    for(var n=1;n<=5;n++){
+      var imgKey='hero_image_'+n,lblKey='hero_label_'+n;
+      var imgUrl=cfg[imgKey],label=cfg[lblKey]||'';
+      if(!imgUrl)continue;
+      var slide=document.getElementById('slide-'+(n-1));
+      if(!slide)continue;
+      slide.innerHTML='<img src="'+imgUrl+'" alt="'+label+'" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\'">'+(label?'<span class="slide-label">'+label+'</span>':'');
+    }
+  }).catch(function(e){console.log('[Config] error',e);});
+}
 
 // ── Announcements ─────────────────────────────────────────────────────────────
 var _announcements=[];
@@ -1240,6 +1276,7 @@ function renderPartners(partners){
   var grid=document.getElementById('partners-grid');if(!grid)return;
   if(!partners||!partners.length){grid.innerHTML='<div style="padding:40px;opacity:.4;font-size:11px;letter-spacing:.15em;text-transform:uppercase;grid-column:1/-1">Partners coming soon</div>';return;}
   PARTNER_REGISTRY=partners.map(function(p){var r={};Object.keys(p).forEach(function(k){r[k.toLowerCase().trim()]=(p[k]||'').trim();});return r;});
+  var sp=document.getElementById('stat-partners');if(sp)sp.textContent=PARTNER_REGISTRY.length;
   grid.innerHTML=PARTNER_REGISTRY.map(function(r,i){var nm=r.name||'',init=nm?nm.charAt(0).toUpperCase():'?';return'<div class="partner-card" data-idx="'+i+'" style="cursor:pointer;"><div class="partner-initial">'+init+'</div><div class="partner-name">'+nm+'</div>'+(r.type?'<div class="partner-type">'+r.type+'</div>':'')+'<div style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div></div>';}).join('');
   grid.querySelectorAll('.partner-card').forEach(function(card){card.addEventListener('click',function(){openPartnerModal(PARTNER_REGISTRY[parseInt(this.getAttribute('data-idx'))]);});});
 }
@@ -1498,6 +1535,7 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
+loadConfig();
 loadFromSheets();
 loadPartners();
 loadAnnouncements();
