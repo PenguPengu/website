@@ -1371,8 +1371,15 @@ function openProductBySlug(slug){
 }
 
 function checkDeepLink(){
-  var path=window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
+  // GitHub Pages 404 redirect passes the path as ?p=
+  var params=new URLSearchParams(window.location.search);
+  var fromRedirect=params.get('p');
+  var path=fromRedirect
+    ? decodeURIComponent(fromRedirect)
+    : window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
   if(!path||RESERVED_PATHS.indexOf(path.toLowerCase())!==-1)return;
+  // Clean up the ?p= from the URL before opening the modal
+  if(fromRedirect){history.replaceState(null,'','/'+encodeURIComponent(path));}
   openProductBySlug(path);
 }
 
