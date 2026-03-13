@@ -362,6 +362,10 @@ footer>*{position:relative;z-index:1;}
 .pm-status-badge{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:5px 12px;border:1px solid;white-space:nowrap;}
 .pm-cta-btn{background:var(--navy);color:var(--cream);font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:12px 22px;border:none;cursor:pointer;transition:.2s;white-space:nowrap;align-self:flex-start;}
 .pm-cta-btn:hover{background:var(--mid);}
+.pm-share-btn{background:transparent;color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:10px 22px;border:1.5px solid rgba(25,41,58,.3);cursor:pointer;transition:all .2s;white-space:nowrap;align-self:flex-start;display:flex;align-items:center;gap:8px;}
+.pm-share-btn:hover{border-color:var(--navy);}
+.pm-share-btn.copied{border-color:var(--navy);color:var(--navy);}
+.pm-share-btn svg{flex-shrink:0;}
 .pm-updates-section{background:var(--navy);color:var(--cream);flex-shrink:0;position:relative;overflow:hidden;}
 .pm-updates-section::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(247,239,230,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(247,239,230,.025) 1px,transparent 1px);background-size:80px 80px;}
 .pm-updates-section>*{position:relative;z-index:1;}
@@ -840,19 +844,16 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
   </div>
   <div class="community-channels">
     <a href="https://www.youtube.com/@Pengu672" class="channel-card reveal-scale" target="_blank" rel="noopener">
-      <div class="channel-icon"><svg width="32" height="23" viewBox="0 0 32 23" fill="none"><rect width="32" height="23" rx="5" fill="#FF0000"/><polygon points="13,6 26,11.5 13,17" fill="white"/></svg></div>
       <div class="channel-name">YouTube</div>
       <div class="channel-desc">Walkthroughs, Tutorials, Behind the Scenes &amp; More!</div>
       <div class="channel-cta">Watch Now</div>
     </a>
     <a href="https://discord.gg/jnMVGUbpFu" class="channel-card reveal-scale delay-r1" target="_blank" rel="noopener">
-      <div class="channel-icon"><svg width="30" height="23" viewBox="0 0 30 23" fill="none"><path d="M25.5 2A24.8 24.8 0 0 0 20 .6a17 17 0 0 0-.76 1.58 23 23 0 0 0-6.84 0A16.5 16.5 0 0 0 11.6.6 24.7 24.7 0 0 0 5.5 2C1.5 7.7.44 13.3 1.04 18.8a24.9 24.9 0 0 0 7.6 3.85c.61-.84 1.16-1.73 1.63-2.67a16.2 16.2 0 0 1-2.56-1.23l.62-.49a17.7 17.7 0 0 0 15.27 0l.62.49a16.2 16.2 0 0 1-2.57 1.23c.47.94 1.01 1.83 1.63 2.67A24.8 24.8 0 0 0 29 18.8c.72-6.4-1.13-12-4.5-16.8ZM10.6 15.5c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Zm8.8 0c-1.47 0-2.68-1.36-2.68-3.03 0-1.67 1.18-3.04 2.68-3.04s2.72 1.37 2.68 3.04c0 1.67-1.18 3.03-2.68 3.03Z" fill="#5865F2"/></svg></div>
       <div class="channel-name">Discord</div>
       <div class="channel-desc">Chat directly with the team, ask questions, get help, and partake in photography challenges!</div>
       <div class="channel-cta">Join Server</div>
     </a>
     <a href="https://steamcommunity.com/profiles/76561198811951629/" class="channel-card reveal-scale delay-r2" target="_blank" rel="noopener">
-      <div class="channel-icon"><svg width="30" height="30" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M45 0C20.1 0 0 20.1 0 45c0 24.8 20 44.9 44.8 45l7.7-18.5a11.3 11.3 0 0 1-7.2-14.8l.1-.2-17-6.9C26.9 49 25 46.2 25 43a10 10 0 0 1 10-10c.4 0 .8 0 1.2.1l15.1 6.2v-.1a15 15 0 0 1 15-14.5c8.3 0 15 6.7 15 15 0 8.2-6.6 14.9-14.8 15h-.3l-6.6 17.8C73.7 67.8 90 57.9 90 45 90 20.1 69.9 0 45 0Z" fill="#1b2838"/><path d="M41.2 56.9 35 54.4a8.5 8.5 0 0 0 7.8 5.2 8.5 8.5 0 0 0 8.5-8.5c0-.4 0-.9-.1-1.3l-6.4-2.6a5.7 5.7 0 0 1-5.6 5 5.7 5.7 0 0 1-5.7-5.7c0-.5.1-1 .2-1.5l7.5 5.9z" fill="#fff"/><path d="M66.2 36.7a10 10 0 0 0-10-10 10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10zm-3.5 0a6.5 6.5 0 0 1-6.5 6.5 6.5 6.5 0 0 1-6.5-6.5 6.5 6.5 0 0 1 6.5-6.5 6.5 6.5 0 0 1 6.5 6.5z" fill="#fff"/></svg></div>
       <div class="channel-name">Steam</div>
       <div class="channel-desc">See and use the latest products from our lineup and partners!</div>
       <div class="channel-cta">View Page</div>
@@ -927,6 +928,10 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
         <div class="pm-content-meta">
           <span class="pm-status-badge" id="pm-status"></span>
           <button class="pm-cta-btn" id="pm-cta">Request a Quote →</button>
+          <button class="pm-share-btn" id="pm-share" onclick="shareProduct()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            Share
+          </button>
         </div>
       </div>
       <div class="pm-updates-section" id="pm-update-panel" style="display:none">
@@ -1595,6 +1600,20 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
 }
 
 function pmOpenUpdateImg(lbIdx){pmOpenLightbox(lbIdx);}
+function shareProduct(){
+  var name=document.getElementById('pm-name').textContent||'';
+  var slug=productSlug(name);
+  var url=slug?(window.location.origin+'/?p='+encodeURIComponent(slug)):window.location.href;
+  var btn=document.getElementById('pm-share');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){
+      btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      btn.classList.add('copied');
+      setTimeout(function(){btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share';btn.classList.remove('copied');},2000);
+    }).catch(function(){window.prompt('Copy this link:',url);});
+  }else{window.prompt('Copy this link:',url);}
+}
+
 function closeProductModal(){
   document.getElementById('product-modal').classList.remove('open');
   document.body.style.overflow='';
