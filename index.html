@@ -1051,35 +1051,30 @@ function toggleLike(btn){
   var type=btn.getAttribute('data-type');
   var id=btn.getAttribute('data-id');
   var ip=window._userIp||'unknown';
-  // Get what this user currently voted on this photo (one vote per photo)
   var current=null;
   try{current=localStorage.getItem('vote_'+id);}catch(e){}
-  // Find both buttons on this card
   var card=btn.closest('.photo-card');
   var heartBtn=card.querySelector('[data-type="heart"]');
   var fireBtn=card.querySelector('[data-type="fire"]');
-  var heartCount=heartBtn.querySelector('.like-count');
-  var fireCount=fireBtn.querySelector('.like-count');
+
   if(current===type){
-    // Un-vote: remove this vote
+    // Un-vote: clicking same button removes it
     btn.classList.remove('liked-'+type);
     btn.querySelector('.like-count').textContent=Math.max(0,parseInt(btn.querySelector('.like-count').textContent)-1);
     try{localStorage.removeItem('vote_'+id);}catch(e){}
     sendVote(id,type,ip,'remove');
   } else {
-    // If switching from the other type, undo it visually
+    // Switch or new vote — undo old UI first
     if(current){
       var oldBtn=card.querySelector('[data-type="'+current+'"]');
       oldBtn.classList.remove('liked-'+current);
-      var oldCount=oldBtn.querySelector('.like-count');
-      oldCount.textContent=Math.max(0,parseInt(oldCount.textContent)-1);
-      sendVote(id,current,ip,'remove');
+      oldBtn.querySelector('.like-count').textContent=Math.max(0,parseInt(oldBtn.querySelector('.like-count').textContent)-1);
     }
-    // Apply new vote
     btn.classList.add('liked-'+type);
     btn.querySelector('.like-count').textContent=parseInt(btn.querySelector('.like-count').textContent)+1;
     try{localStorage.setItem('vote_'+id,type);}catch(e){}
-    sendVote(id,type,ip,'add');
+    // Single 'set' request handles both new vote and switching server-side
+    sendVote(id,type,ip,'set');
   }
 }
 function sendVote(id,type,ip,action){
