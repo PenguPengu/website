@@ -463,7 +463,7 @@ footer>*{position:relative;z-index:1;}
 
 /* CURSOR */
 *,*::before,*::after{cursor:none!important;}
-.cursor-dot{position:fixed;pointer-events:none;z-index:9999;width:7px;height:7px;border-radius:50%;transform:translate(-50%,-50%);background:#fff;mix-blend-mode:difference;transition:width .12s,height .12s;}
+.cursor-dot{position:fixed;pointer-events:none;z-index:10002;width:7px;height:7px;border-radius:50%;transform:translate(-50%,-50%);background:#fff;mix-blend-mode:difference;transition:width .12s,height .12s;}
 .cursor-dot.hovering{width:11px;height:11px;}
 .cursor-dot.clicking{width:4px;height:4px;}
 
@@ -500,6 +500,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 .tour-close-x:hover{opacity:.85;}
 .tour-panel-body{padding:14px 24px 0;}
 .tour-panel-icon{font-size:24px;margin-bottom:6px;line-height:1;}
+.tour-panel-icon:empty{display:none;}
 .tour-panel-title{font-family:var(--serif);font-size:21px;font-weight:900;letter-spacing:-.02em;line-height:1.05;margin-bottom:10px;}
 .tour-panel-desc{font-size:11px;line-height:1.85;opacity:.62;}
 .tour-progress{display:flex;gap:4px;align-items:center;padding:14px 24px 0;}
@@ -1516,44 +1517,44 @@ var TOUR_STEPS=[
   },
   {
     target:'#home',
-    icon:'🧭',
-    title:'The Hero',
-    desc:'This is the main landing section. The carousel on the right showcases featured builds — use the arrows or dots to browse, and they auto-advance every 6 seconds.',
+    icon:'',
+    title:'Featured Builds',
+    desc:'The carousel showcases our latest and most notable builds. Use the arrows to browse through them, or just let it scroll on its own.',
     cta:'Next'
   },
   {
     target:'#products',
-    icon:'📐',
+    icon:'',
     title:'The Catalogue',
-    desc:'Every active product and build is listed here with a status badge — Active, In Development, Coming Soon, or Cancelled. Click any card to open a detailed modal with photos, specs, and a live build-update log.',
+    desc:'Browse everything we build — each card shows the current status so you know what\'s available now, what\'s in the works, and what\'s coming. Click any card to see full details and photos.',
     cta:'Next'
   },
   {
     target:'#photos',
-    icon:'📸',
+    icon:'',
     title:'Photo Competition',
-    desc:'Community members submit screenshots around a rotating theme. The top entries appear here. Click "View Full Gallery" to browse all entries, filter by challenge, or sort by top rated vs. most recent.',
+    desc:'Our community runs regular screenshot competitions around a set theme. The best entries are shown here — click "View Full Gallery" to see all submissions and past challenges.',
     cta:'Next'
   },
   {
     target:'#discord',
-    icon:'📢',
+    icon:'',
     title:'Announcements',
-    desc:'The latest update from the team is pinned here — with attached images, timestamps, and a full body that supports bold, italic, and inline code formatting. Refreshes automatically every 60 seconds.',
+    desc:'The latest news from the team lives here — new releases, updates, and anything worth knowing. Check back often or join the Discord to get notified in real time.',
     cta:'Next'
   },
   {
     target:'#community',
-    icon:'🌐',
-    title:'The Community',
-    desc:'Three ways to connect: YouTube for walkthroughs and builds, Discord for direct chat and photo competitions, and Steam to grab the latest workshop releases. Latest YouTube videos load live from the channel.',
+    icon:'',
+    title:'Join the Community',
+    desc:'Follow us on YouTube for build videos and tutorials, join the Discord to chat with the team and enter competitions, or head to Steam to download our latest workshop releases.',
     cta:'Next'
   },
   {
     target:'#partners',
-    icon:'🤝',
-    title:'Trusted Partners',
-    desc:'Builders and creators the team has collaborated with. Click any partner card for their full profile — description, links, and branding. That\'s the full site! You can retake this tour anytime using the "Site Tour" button in the top nav.',
+    icon:'',
+    title:'Our Partners',
+    desc:'The talented builders and creators we work alongside. Click any card to learn more about them and find links to their work.',
     cta:'Done ✓'
   }
 ];
@@ -1566,6 +1567,10 @@ function tourOpen(startStep){
   closeProductModal();closePartnerModal();closeVideoModal();pmLightboxClose();
   if(document.getElementById('gallery-page').style.display!=='none')closeGallery();
   _tourActive=true;_tourStep=startStep;
+  // Reset any inline styles from a previous close
+  document.getElementById('tour-overlay-blocker').style.display='';
+  document.getElementById('tour-spotlight').style.display='';
+  document.getElementById('tour-panel').style.display='';
   document.getElementById('tour-overlay-blocker').classList.add('active');
   document.getElementById('tour-spotlight').classList.add('active');
   document.getElementById('tour-panel').classList.add('active');
@@ -1575,9 +1580,12 @@ function tourOpen(startStep){
 
 function tourClose(){
   _tourActive=false;
-  document.getElementById('tour-overlay-blocker').classList.remove('active');
-  document.getElementById('tour-spotlight').classList.remove('active');
-  document.getElementById('tour-panel').classList.remove('active');
+  var blocker=document.getElementById('tour-overlay-blocker');
+  var spl=document.getElementById('tour-spotlight');
+  var panel=document.getElementById('tour-panel');
+  blocker.classList.remove('active');blocker.style.display='none';
+  spl.classList.remove('active');spl.style.cssText='display:none;';
+  panel.classList.remove('active');panel.style.display='none';
   document.body.style.overflow='';
   try{localStorage.setItem('underway_toured_v1','1');}catch(e){}
 }
