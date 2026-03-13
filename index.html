@@ -623,7 +623,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 <div id="tour-spotlight"></div>
 <div id="tour-panel">
   <div class="tour-panel-head">
-    <span class="tour-step-label" id="tour-step-label">Step 1 of 7</span>
+    <span class="tour-step-label" id="tour-step-label">Step 1 of 9</span>
     <button class="tour-close-x" onclick="tourClose()" title="Close tour">&#10005;</button>
   </div>
   <div class="tour-progress" id="tour-progress"></div>
@@ -1550,35 +1550,74 @@ var TOUR_STEPS=[
     target:null,
     icon:'⚓',
     title:'Welcome to Underway',
-    desc:'A professional-grade marine and industrial builds team for Stormworks. This quick tour will walk you through everything on the site — products, photos, announcements, and the community. Takes about 60 seconds.',
-    cta:'Start Tour'
+    desc:'A professional-grade marine and industrial builds team for Stormworks. This quick tour walks you through everything — products, photos, announcements, and community. Takes about 90 seconds.',
+    cta:'Start Tour',
+    onEnter:function(){window.scrollTo({top:0,behavior:'smooth'});}
   },
   {
     target:'#products',
     icon:'',
     title:'The Catalogue',
-    desc:'Browse everything we build — each card shows the current status so you know what\'s available now, what\'s in the works, and what\'s coming. Click any card to see full details and photos.',
+    desc:'Browse everything we build. Each card shows the current build status — Active, In Development, Coming Soon. Click any card to open the full product page.',
     cta:'Next'
+  },
+  {
+    target:'#pm-gallery-main',
+    icon:'',
+    title:'Photos & Gallery',
+    desc:'Every product has a full photo gallery. Click the main image to open it full-screen, or use the thumbnails below to jump between shots.',
+    cta:'Next',
+    onEnter:function(){
+      if(!document.getElementById('product-modal').classList.contains('open')){
+        openProductModal('Example','In Development','Example','','','','','','');
+        // Ensure the modal scroll is at the top so the gallery is visible
+        setTimeout(function(){var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;},120);
+      }
+    }
+  },
+  {
+    target:'#pm-content',
+    icon:'',
+    title:'Status, Specs & Details',
+    desc:'The info panel shows the build status badge, full description, and technical spec line. The status updates live from our team as a build progresses.',
+    cta:'Next',
+    onEnter:function(){
+      var s=document.querySelector('.product-modal-scroll');
+      if(s)s.scrollTo({top:0,behavior:'smooth'});
+    }
+  },
+  {
+    target:'#pm-update-panel',
+    icon:'',
+    title:'Live Build Updates',
+    desc:'This is the build log — every milestone, test result, and progress note from the team posted directly from Discord. Scroll down to see the full history.',
+    cta:'Next',
+    onEnter:function(){
+      var panel=document.getElementById('pm-update-panel');
+      var s=document.querySelector('.product-modal-scroll');
+      if(panel&&s){var pTop=panel.offsetTop-20;s.scrollTo({top:Math.max(0,pTop),behavior:'smooth'});}
+    },
+    onLeave:function(){closeProductModal();}
   },
   {
     target:'#photos',
     icon:'',
     title:'Photo Competition',
-    desc:'Our community runs regular screenshot competitions around a set theme. The best entries are shown here — click "View Full Gallery" to see all submissions and past challenges.',
+    desc:'Our community runs regular screenshot competitions around a set theme. Vote on your favourites with hearts and fire, or click "View Full Gallery" to browse all entries.',
     cta:'Next'
   },
   {
     target:'#discord',
     icon:'',
     title:'Announcements',
-    desc:'The latest news from the team lives here — new releases, updates, and anything worth knowing. Check back often or join the Discord to get notified in real time.',
+    desc:'The latest news from the team lives here — new releases, updates, and anything worth knowing. Join the Discord to get pinged the moment something drops.',
     cta:'Next'
   },
   {
     target:'#community',
     icon:'',
     title:'Join the Community',
-    desc:'Follow us on YouTube for build videos and tutorials, join the Discord to chat with the team and enter competitions, or head to Steam to download our latest workshop releases.',
+    desc:'Subscribe on YouTube for build videos, join the Discord to chat and enter competitions, or head to Steam to grab our latest workshop releases.',
     cta:'Next'
   },
   {
@@ -1594,11 +1633,9 @@ var _tourStep=0,_tourActive=false;
 
 function tourOpen(startStep){
   startStep=startStep||0;
-  // Close any open modals first
   closeProductModal();closePartnerModal();closeVideoModal();pmLightboxClose();
   if(document.getElementById('gallery-page').style.display!=='none')closeGallery();
   _tourActive=true;_tourStep=startStep;
-  // Reset any inline styles from a previous close
   document.getElementById('tour-overlay-blocker').style.display='';
   document.getElementById('tour-spotlight').style.display='';
   document.getElementById('tour-panel').style.display='';
@@ -1611,6 +1648,8 @@ function tourOpen(startStep){
 
 function tourClose(){
   _tourActive=false;
+  // Clean up demo modal if tour opened it
+  closeProductModal();
   var blocker=document.getElementById('tour-overlay-blocker');
   var spl=document.getElementById('tour-spotlight');
   var panel=document.getElementById('tour-panel');
@@ -1633,29 +1672,33 @@ function tourRender(){
     else if(i<_tourStep)cls+=' done';
     return'<div class="'+cls+'"></div>';
   }).join('');
-  // Labels
   document.getElementById('tour-step-label').textContent='Step '+(_tourStep+1)+' of '+TOUR_STEPS.length;
-  document.getElementById('tour-icon').textContent=step.icon;
+  document.getElementById('tour-icon').textContent=step.icon||'';
   document.getElementById('tour-title').textContent=step.title;
   document.getElementById('tour-desc').textContent=step.desc;
-  // Buttons
   document.getElementById('tour-next-btn').textContent=isLast?step.cta:(isFirst?'Start Tour →':'Next →');
-  var prevBtn=document.getElementById('tour-prev-btn');
-  prevBtn.style.display=isFirst?'none':'inline-block';
-
-  // Position
+  document.getElementById('tour-prev-btn').style.display=isFirst?'none':'inline-block';
+  // Fire onEnter callback
+  if(step.onEnter)step.onEnter();
+  // Position spotlight
   if(!step.target){
     tourCenterPanel();
-    var spl=document.getElementById('tour-spotlight');
-    spl.style.cssText='display:block;position:fixed;left:50%;top:50%;width:0;height:0;transform:translate(-50%,-50%);box-shadow:0 0 0 9999px rgba(25,41,58,.88);border:none;';
+    document.getElementById('tour-spotlight').style.cssText='display:block;position:fixed;left:50%;top:50%;width:0;height:0;transform:translate(-50%,-50%);box-shadow:0 0 0 9999px rgba(25,41,58,.88);border:none;';
   }else{
     var target=document.querySelector(step.target);
     if(!target){tourCenterPanel();return;}
-    var navH=document.getElementById('main-nav').offsetHeight||72;
-    var rect=target.getBoundingClientRect();
-    var scrollTarget=window.scrollY+rect.top-navH-24;
-    window.scrollTo({top:Math.max(0,scrollTarget),behavior:'smooth'});
-    setTimeout(function(){tourPositionSpotlight(target);},460);
+    // Check if target is inside the modal scroll container
+    var modalScroll=document.querySelector('.product-modal-scroll');
+    var isInModal=modalScroll&&modalScroll.contains(target);
+    if(isInModal){
+      // Already scrolled by onEnter — just wait for scroll then position
+      setTimeout(function(){tourPositionSpotlight(target);},420);
+    }else{
+      var navH=document.getElementById('main-nav').offsetHeight||72;
+      var rect=target.getBoundingClientRect();
+      window.scrollTo({top:Math.max(0,window.scrollY+rect.top-navH-24),behavior:'smooth'});
+      setTimeout(function(){tourPositionSpotlight(target);},460);
+    }
   }
 }
 
@@ -1666,15 +1709,13 @@ function tourPositionSpotlight(el){
   var spl=document.getElementById('tour-spotlight');
   var top=Math.max(navH+4,rect.top-PAD);
   var left=Math.max(0,rect.left-PAD);
-  var w=Math.min(rect.width+PAD*2, window.innerWidth-left);
+  var w=Math.min(rect.width+PAD*2,window.innerWidth-left);
   var vpH=window.innerHeight;
-  var h=Math.min(rect.height+PAD*2, vpH-top-8);
+  var h=Math.min(rect.height+PAD*2,vpH-top-8);
   spl.style.cssText='display:block;position:fixed;top:'+top+'px;left:'+left+'px;width:'+w+'px;height:'+h+'px;'+
     'box-shadow:0 0 0 9999px rgba(25,41,58,.82);border:2px solid rgba(201,168,76,.7);'+
     'transition:top .45s cubic-bezier(.16,1,.3,1),left .45s cubic-bezier(.16,1,.3,1),width .45s cubic-bezier(.16,1,.3,1),height .45s cubic-bezier(.16,1,.3,1);';
-  // Panel positioning — prefer below spotlight, fall back to above
   var panel=document.getElementById('tour-panel');
-  // Force layout to measure panel
   panel.style.visibility='hidden';
   panel.style.top='0px';panel.style.left='0px';panel.style.transform='none';
   var panelH=panel.offsetHeight||240;
@@ -1683,32 +1724,33 @@ function tourPositionSpotlight(el){
   var spaceBelow=vpH-(top+h)-16;
   var spaceAbove=top-navH-16;
   var panelTop;
-  if(spaceBelow>=panelH){
-    panelTop=top+h+12;
-  }else if(spaceAbove>=panelH){
-    panelTop=top-panelH-12;
-  }else{
-    // Not enough room above or below — float to right or center
-    panelTop=Math.max(navH+8, Math.min(top, vpH-panelH-16));
-  }
-  var panelLeft=Math.max(12,Math.min(left, window.innerWidth-panelW-12));
+  if(spaceBelow>=panelH){panelTop=top+h+12;}
+  else if(spaceAbove>=panelH){panelTop=top-panelH-12;}
+  else{panelTop=Math.max(navH+8,Math.min(top,vpH-panelH-16));}
+  var panelLeft=Math.max(12,Math.min(left,window.innerWidth-panelW-12));
   panel.style.top=panelTop+'px';
   panel.style.left=panelLeft+'px';
   panel.style.transform='none';
 }
 
 function tourCenterPanel(){
-  var spl=document.getElementById('tour-spotlight');
-  spl.style.cssText='display:block;position:fixed;left:50%;top:50%;width:0;height:0;transform:translate(-50%,-50%);box-shadow:0 0 0 9999px rgba(25,41,58,.88);border:none;';
+  document.getElementById('tour-spotlight').style.cssText='display:block;position:fixed;left:50%;top:50%;width:0;height:0;transform:translate(-50%,-50%);box-shadow:0 0 0 9999px rgba(25,41,58,.88);border:none;';
   var panel=document.getElementById('tour-panel');
   panel.style.top='50%';panel.style.left='50%';panel.style.transform='translate(-50%,-50%)';
 }
 
 function tourNext(){
+  var step=TOUR_STEPS[_tourStep];
+  if(step.onLeave)step.onLeave();
   if(_tourStep>=TOUR_STEPS.length-1){tourClose();return;}
   _tourStep++;tourRender();
 }
-function tourPrev(){if(_tourStep>0){_tourStep--;tourRender();}}
+function tourPrev(){
+  if(_tourStep<=0)return;
+  var step=TOUR_STEPS[_tourStep];
+  if(step.onLeave)step.onLeave();
+  _tourStep--;tourRender();
+}
 
 // ── Keyboard ──────────────────────────────────────────────────────────────────
 document.addEventListener('keydown',function(e){
