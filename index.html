@@ -515,10 +515,6 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 .tour-prev-btn:hover{border-color:var(--navy);}
 .tour-next-btn{background:var(--navy);border:1.5px solid var(--navy);color:var(--cream);font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:8px 20px;cursor:pointer;transition:background .15s;}
 .tour-next-btn:hover{background:var(--mid);border-color:var(--mid);}
-/* Nav tour button */
-#tour-launch-btn{font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:none;border:1px solid rgba(25,41,58,.25);color:var(--navy);padding:7px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;white-space:nowrap;opacity:.7;}
-#tour-launch-btn:hover{border-color:rgba(25,41,58,.6);opacity:1;}
-#tour-launch-btn svg{flex-shrink:0;}
 /* Mobile tour link */
 .mobile-tour-link{display:block;padding:16px 24px;font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--navy);background:none;border:none;border-top:1px solid var(--border);opacity:.7;cursor:pointer;text-align:left;width:100%;}
 
@@ -608,7 +604,6 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
   footer{flex-direction:column!important;align-items:flex-start!important;padding:28px 20px;gap:16px;}
   .footer-links{flex-direction:column!important;gap:12px;}
   .coord{display:none;}
-  #tour-launch-btn{display:none;}
   #tour-panel{width:calc(100vw - 20px)!important;left:10px!important;transform:none!important;}
 }
 @media(max-width:480px){
@@ -687,10 +682,6 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <li><a href="#community">Community</a></li>
     <li><a href="#partners" class="nav-cta">Partners</a></li>
   </ul>
-  <button id="tour-launch-btn" onclick="tourOpen(0)" title="Take a tour of the site">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-    Site Tour
-  </button>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -956,6 +947,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <li><a href="#about">About</a></li><li><a href="#products">Products</a></li>
     <li><a href="#community">YouTube</a></li><li><a href="#discord">Discord</a></li>
     <li><a href="#partners">Partners</a></li>
+    <li><a href="#" onclick="tourOpen(0);return false;">Site Tour</a></li>
   </ul>
 </footer>
 
@@ -1514,13 +1506,6 @@ var TOUR_STEPS=[
     title:'Welcome to Underway',
     desc:'A professional-grade marine and industrial builds team for Stormworks. This quick tour will walk you through everything on the site — products, photos, announcements, and the community. Takes about 60 seconds.',
     cta:'Start Tour'
-  },
-  {
-    target:'#home',
-    icon:'',
-    title:'Featured Builds',
-    desc:'The carousel showcases our latest and most notable builds. Use the arrows to browse through them, or just let it scroll on its own.',
-    cta:'Next'
   },
   {
     target:'#products',
