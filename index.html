@@ -507,9 +507,14 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 .tour-prog-dot{height:2px;flex:1;background:rgba(25,41,58,.12);transition:background .3s;}
 .tour-prog-dot.done{background:rgba(25,41,58,.3);}
 .tour-prog-dot.active{background:var(--navy);}
+.tour-panel-note{font-size:9px;line-height:1.7;opacity:.45;padding:10px 24px 0;text-align:center;display:none;}
+.tour-panel-note.visible{display:block;}
 .tour-panel-foot{padding:16px 24px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(25,41,58,.08);margin-top:16px;}
-.tour-skip-btn{background:none;border:none;color:var(--navy);font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;opacity:.28;padding:0;transition:opacity .15s;}
-.tour-skip-btn:hover{opacity:.7;}
+.tour-tip{position:relative;}
+.tour-tip[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:var(--cream);font-family:var(--mono);font-size:8px;letter-spacing:.12em;white-space:nowrap;padding:5px 10px;pointer-events:none;opacity:0;transition:opacity .2s;z-index:10001;}
+.tour-tip[data-tip]:hover::after{opacity:1;}
+.tour-skip-btn{background:none;border:none;color:var(--navy);font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;opacity:.5;padding:0;transition:opacity .15s;}
+.tour-skip-btn:hover{opacity:.85;}
 .tour-nav-btns{display:flex;gap:8px;}
 .tour-prev-btn{background:transparent;border:1.5px solid rgba(25,41,58,.28);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .15s;}
 .tour-prev-btn:hover{border-color:var(--navy);}
@@ -624,7 +629,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 <div id="tour-panel">
   <div class="tour-panel-head">
     <span class="tour-step-label" id="tour-step-label">Step 1 of 9</span>
-    <button class="tour-close-x" onclick="tourClose()" title="Close tour">&#10005;</button>
+    <button class="tour-close-x tour-tip" data-tip="You can always replay from the footer" onclick="tourClose()" title="Close tour">&#10005;</button>
   </div>
   <div class="tour-progress" id="tour-progress"></div>
   <div class="tour-panel-body">
@@ -633,10 +638,10 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <div class="tour-panel-desc" id="tour-desc"></div>
   </div>
   <div class="tour-panel-foot">
-    <button class="tour-skip-btn" onclick="tourClose()">Skip Tour</button>
+    <button class="tour-skip-btn tour-tip" data-tip="You can always replay from the footer" onclick="tourClose()">Skip Tour</button>
     <div class="tour-nav-btns">
       <button class="tour-prev-btn" id="tour-prev-btn" onclick="tourPrev()" style="display:none">&#8592; Back</button>
-      <button class="tour-next-btn" id="tour-next-btn" onclick="tourNext()">Start Tour</button>
+      <button class="tour-next-btn tour-tip" id="tour-next-btn" onclick="tourNext()">Start Tour</button>
     </div>
   </div>
 </div>
@@ -1344,6 +1349,33 @@ function loadSubmissions(){
 function statusClass(s){return({'Active':'status-active','In Stock':'status-active','To Order':'status-active','In Development':'status-dev','In Dev':'status-dev','Low Stock':'status-dev','Coming Soon':'status-soon','Cancelled':'status-cancelled','Canceled':'status-cancelled','Discontinued':'status-cancelled'})[s]||'status-active';}
 function statusIcon(s){if(s==='Active'||s==='In Stock'||s==='To Order')return '&#9679;';if(s==='In Development'||s==='In Dev')return '&#9680;';return '&#9676;';}
 var PRODUCT_REGISTRY=[];
+function productSlug(name){return(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+
+// Reserved path names that should never be treated as product slugs
+var RESERVED_PATHS=['products','photos','discord','community','partners','home','tour','about','gallery'];
+
+function openProductBySlug(slug){
+  if(!slug||!PRODUCT_REGISTRY)return false;
+  var s=slug.toLowerCase();
+  for(var i=0;i<PRODUCT_REGISTRY.length;i++){
+    var p=PRODUCT_REGISTRY[i],r={};
+    Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
+    if(productSlug(r.name||'')===s){
+      openProductModal(String(i+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.image||'',r.cta_url||'');
+      // Update URL without triggering a reload
+      history.replaceState(null,'','/'+encodeURIComponent(s));
+      return true;
+    }
+  }
+  return false;
+}
+
+function checkDeepLink(){
+  var path=window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
+  if(!path||RESERVED_PATHS.indexOf(path.toLowerCase())!==-1)return;
+  openProductBySlug(path);
+}
+
 function renderProducts(products){
   PRODUCT_REGISTRY=products;
   var grid=document.getElementById('products-grid');
@@ -1354,10 +1386,13 @@ function renderProducts(products){
   grid.querySelectorAll('.product-card').forEach(function(card){
     card.addEventListener('click',function(){
       var idx=parseInt(this.getAttribute('data-idx')),p=PRODUCT_REGISTRY[idx],r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
+      var slug=productSlug(r.name||'');
+      if(slug)history.pushState({product:slug},'','/'+encodeURIComponent(slug));
       openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.image||'',r.cta_url||'');
     });
   });
   grid.querySelectorAll('.anim').forEach(function(el){el.style.animationPlayState='paused';observer.observe(el);});
+  checkDeepLink();
 }
 function renderComingSoon(){document.getElementById('products-grid').innerHTML='<div style="grid-column:1/-1;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;"><div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream)">Catalogue Coming Soon</div><div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range.</div></div>';}
 function loadFromSheets(){fetch(PRODUCTS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){var p=parseCSV(text);if(!p.length)throw 0;renderProducts(p);}).catch(function(){renderComingSoon();});}
@@ -1538,7 +1573,24 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
 }
 
 function pmOpenUpdateImg(lbIdx){pmOpenLightbox(lbIdx);}
-function closeProductModal(){document.getElementById('product-modal').classList.remove('open');document.body.style.overflow='';}
+function closeProductModal(){
+  document.getElementById('product-modal').classList.remove('open');
+  document.body.style.overflow='';
+  // Clear product slug from URL if it's there
+  if(window.history.state&&window.history.state.product){
+    history.pushState(null,'','/');
+  }
+}
+
+// Handle browser back/forward through product pages
+window.addEventListener('popstate',function(e){
+  if(e.state&&e.state.product){
+    openProductBySlug(e.state.product);
+  }else{
+    document.getElementById('product-modal').classList.remove('open');
+    document.body.style.overflow='';
+  }
+});
 
 // ── Video modal ───────────────────────────────────────────────────────────────
 function openVideoModal(url){document.getElementById('video-iframe').src=url+'?autoplay=1';document.getElementById('video-modal').classList.add('open');document.body.style.overflow='hidden';}
@@ -1648,7 +1700,6 @@ function tourOpen(startStep){
 
 function tourClose(){
   _tourActive=false;
-  // Clean up demo modal if tour opened it
   closeProductModal();
   var blocker=document.getElementById('tour-overlay-blocker');
   var spl=document.getElementById('tour-spotlight');
@@ -1657,6 +1708,7 @@ function tourClose(){
   spl.classList.remove('active');spl.style.cssText='display:none;';
   panel.classList.remove('active');panel.style.display='none';
   document.body.style.overflow='';
+  window.scrollTo({top:0,behavior:'smooth'});
   try{localStorage.setItem('underway_toured_v1','1');}catch(e){}
 }
 
@@ -1676,7 +1728,10 @@ function tourRender(){
   document.getElementById('tour-icon').textContent=step.icon||'';
   document.getElementById('tour-title').textContent=step.title;
   document.getElementById('tour-desc').textContent=step.desc;
-  document.getElementById('tour-next-btn').textContent=isLast?step.cta:(isFirst?'Start Tour →':'Next →');
+  var nextBtn=document.getElementById('tour-next-btn');
+  nextBtn.textContent=isLast?TOUR_STEPS[_tourStep].cta:(isFirst?'Start Tour →':'Next →');
+  if(isLast){nextBtn.setAttribute('data-tip','You can always replay from the footer');}
+  else{nextBtn.removeAttribute('data-tip');}
   document.getElementById('tour-prev-btn').style.display=isFirst?'none':'inline-block';
   // Fire onEnter callback
   if(step.onEnter)step.onEnter();
