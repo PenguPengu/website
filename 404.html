@@ -5,270 +5,320 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>404 — Underway</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script>
-(function(){
-  var path=window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
-  if(path)window.location.replace('/?p='+encodeURIComponent(path));
-})();
-</script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --navy:#19293a;--cream:#f7efe6;--rust:#b84c2e;--gold:#c9a84c;
+  --navy:#19293a;--cream:#f7efe6;--gold:#c9a84c;
   --mid:#4a6478;--border:rgba(25,41,58,0.18);
   --serif:'Playfair Display',serif;--mono:'Space Mono',monospace;
 }
-html{scroll-behavior:smooth;}
-body{background:var(--cream);color:var(--navy);font-family:var(--mono);min-height:100vh;overflow-x:hidden;}
-
-/* grid bg — exact match to site */
+html,body{height:100%;overflow:hidden;}
+body{background:var(--cream);color:var(--navy);font-family:var(--mono);}
 body::before{
   content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(rgba(25,41,58,.042) 1px,transparent 1px),linear-gradient(90deg,rgba(25,41,58,.042) 1px,transparent 1px);
   background-size:120px 120px;
 }
+.page{position:relative;z-index:1;height:100vh;display:grid;grid-template-columns:1fr 1fr;}
 
-/* NAV — exact copy */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 56px;height:72px;
-  background:rgba(247,239,230,0.92);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-}
-.nav-logo{display:flex;align-items:center;gap:16px;text-decoration:none;}
-.nav-logo svg{width:110px;height:auto;}
-.nav-logo-tag{font-family:var(--mono);font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--navy);opacity:.45;padding-left:16px;border-left:1px solid var(--border);}
-
-/* MARQUEE — exact copy */
-.marquee-wrap{
-  position:fixed;top:72px;left:0;right:0;z-index:99;
-  background:var(--navy);border-bottom:1px solid rgba(247,239,230,0.12);
-  overflow:hidden;height:42px;
-}
-.marquee-track{display:flex;align-items:center;width:max-content;height:42px;will-change:transform;}
-.mq-unit{display:flex;align-items:center;padding:0;gap:0;flex-shrink:0;}
-.mq-dot{width:4px;height:4px;border-radius:50%;background:rgba(247,239,230,0.3);margin:0 28px;flex-shrink:0;}
-.mq-boll svg{width:44px;height:auto;}
-.mq-word{font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--cream);padding-left:14px;}
-
-/* PAGE BODY */
-.page{
-  position:relative;z-index:1;
-  min-height:100vh;padding-top:114px;
-  display:grid;grid-template-columns:1fr 1fr;
-}
-
-/* LEFT PANEL */
+/* LEFT */
 .left{
-  padding:80px 64px 80px 80px;
-  display:flex;flex-direction:column;justify-content:center;gap:28px;
-  border-right:1px solid var(--border);
-}
-.eyebrow{font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--navy);opacity:.45;}
-.big-num{
-  font-family:var(--serif);font-size:clamp(100px,14vw,160px);
-  font-weight:900;line-height:.85;letter-spacing:-.04em;
-  color:var(--navy);opacity:.08;
-  pointer-events:none;user-select:none;
-  margin-bottom:-24px;
-}
-.headline{
-  font-family:var(--serif);font-size:clamp(40px,5vw,72px);
-  font-weight:900;line-height:.92;letter-spacing:-.02em;
-}
-.headline em{display:block;font-style:italic;font-weight:400;font-size:.62em;opacity:.4;line-height:1.3;}
-.tagline{
-  font-size:12px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--navy);opacity:.55;
-  border-top:1px solid rgba(25,41,58,.15);padding-top:20px;
-  width:fit-content;
-}
-.desc{font-size:11px;line-height:1.9;opacity:.55;max-width:380px;}
-.btns{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;}
-.btn-primary{
-  background:var(--navy);color:var(--cream);font-family:var(--mono);
-  font-size:10px;letter-spacing:.25em;text-transform:uppercase;
-  padding:14px 28px;border:none;cursor:pointer;text-decoration:none;
-  transition:background .2s;display:inline-block;
-}
-.btn-primary:hover{background:var(--mid);}
-.btn-ghost{
-  background:transparent;color:var(--navy);
-  border:1.5px solid rgba(25,41,58,.45);font-family:var(--mono);
-  font-size:10px;letter-spacing:.25em;text-transform:uppercase;
-  padding:14px 28px;cursor:pointer;text-decoration:none;
-  transition:all .2s;display:inline-block;
-}
-.btn-ghost:hover{border-color:var(--navy);}
-
-/* RIGHT PANEL */
-.right{
-  display:flex;align-items:center;justify-content:center;
-  padding:80px;background:rgba(25,41,58,.03);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:80px;border-right:1px solid var(--border);
   position:relative;overflow:hidden;
+  gap:0;
 }
-.bollard-display{
-  display:flex;flex-direction:column;align-items:center;gap:32px;
-  position:relative;z-index:1;
-}
-.bollard-display svg{
-  width:clamp(120px,16vw,220px);height:auto;
-  opacity:.12;
-  animation:bob 5s ease-in-out infinite;
-}
-@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
-
-.status-block{
-  text-align:center;
-  border:1px solid var(--border);
-  padding:24px 40px;
-  display:flex;flex-direction:column;gap:8px;
-}
-.status-label{font-size:8px;letter-spacing:.35em;text-transform:uppercase;opacity:.35;}
-.status-val{font-family:var(--serif);font-size:20px;font-weight:700;letter-spacing:.05em;}
-.status-sub{font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.3;margin-top:4px;}
-
-/* right bg number */
-.right::before{
-  content:'404';
+/* ghost 404 — absolutely positioned, behind text */
+.ghost-num{
   position:absolute;
-  font-family:var(--serif);font-size:clamp(160px,22vw,280px);
-  font-weight:900;letter-spacing:-.04em;
-  color:var(--navy);opacity:.03;
-  line-height:1;
+  bottom:-40px;left:60px;
+  font-family:var(--serif);font-size:clamp(120px,16vw,200px);
+  font-weight:900;line-height:1;letter-spacing:-.04em;
+  color:var(--navy);opacity:.04;
   pointer-events:none;user-select:none;
+  z-index:0;
+}
+.left>*:not(.ghost-num){position:relative;z-index:1;}
+.eyebrow{font-size:8px;letter-spacing:.4em;text-transform:uppercase;opacity:.35;margin-bottom:20px;}
+.headline{
+  font-family:var(--serif);font-size:clamp(40px,4.8vw,68px);
+  font-weight:900;line-height:.9;letter-spacing:-.02em;margin-bottom:24px;
+}
+.headline em{display:block;font-style:italic;font-weight:400;font-size:.58em;opacity:.4;line-height:1.4;}
+.rule{width:40px;height:1px;background:var(--navy);opacity:.2;margin-bottom:24px;}
+.desc{font-size:10px;line-height:1.95;opacity:.5;max-width:320px;margin-bottom:40px;}
+.btn{
+  background:var(--navy);color:var(--cream);font-family:var(--mono);
+  font-size:9px;letter-spacing:.25em;text-transform:uppercase;
+  padding:14px 28px;border:none;cursor:pointer;text-decoration:none;
+  display:inline-block;transition:background .2s;width:fit-content;
+}
+.btn:hover{background:var(--mid);}
+.coords{
+  margin-top:32px;font-size:7px;letter-spacing:.15em;
+  text-transform:uppercase;opacity:.18;line-height:2;
 }
 
-/* FOOTER */
-footer{
-  position:relative;z-index:1;
-  background:var(--navy);border-top:1px solid rgba(247,239,230,.08);
-  padding:40px 80px;
-  display:flex;align-items:center;justify-content:space-between;
+/* RIGHT */
+.right{
+  display:flex;align-items:stretch;justify-content:stretch;
+  position:relative;overflow:hidden;background:rgba(25,41,58,.02);
+  padding:24px;
 }
-footer::before{
-  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(247,239,230,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(247,239,230,.04) 1px,transparent 1px);
-  background-size:120px 120px;
-}
-footer>*{position:relative;z-index:1;}
-.footer-logo svg{width:90px;height:auto;}
-.footer-meta{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.3;}
-.footer-links{display:flex;gap:28px;list-style:none;}
-.footer-links a{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.3;text-decoration:none;transition:.2s;}
-.footer-links a:hover{opacity:.7;}
-
-/* COORDS */
-.coord{position:fixed;font-size:7px;letter-spacing:.15em;color:var(--navy);opacity:.2;z-index:50;font-family:var(--mono);pointer-events:none;}
-.coord-bl{bottom:12px;left:16px;}.coord-br{bottom:12px;right:16px;}
+.chart-wrap{width:100%;height:100%;position:relative;display:flex;align-items:center;}
+.chart-wrap svg{width:100%;height:100%;}
 
 /* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
-.left>*{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) both;}
-.eyebrow{animation-delay:.05s;}
-.big-num{animation-delay:.1s;}
-.headline{animation-delay:.18s;}
-.tagline{animation-delay:.26s;}
-.desc{animation-delay:.32s;}
-.btns{animation-delay:.4s;}
-.bollard-display{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) .25s both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes drift{0%,100%{transform:translateY(0) rotate(-.4deg);}50%{transform:translateY(-7px) rotate(.4deg);}}
+@keyframes dash{to{stroke-dashoffset:-22;}}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
-/* RESPONSIVE */
-@media(max-width:768px){
-  nav{padding:0 24px;}
-  .nav-logo-tag{display:none;}
-  .page{grid-template-columns:1fr;padding-top:114px;}
-  .left{padding:48px 24px 40px;}
+.left>*:not(.ghost-num){animation:fadeUp .65s cubic-bezier(.16,1,.3,1) both;}
+.eyebrow{animation-delay:.05s;}.headline{animation-delay:.12s;}.rule{animation-delay:.2s;}
+.desc{animation-delay:.26s;}.btn{animation-delay:.34s;}.coords{animation-delay:.4s;}
+.chart-wrap{animation:fadeIn .9s ease .15s both;}
+
+@media(max-width:700px){
+  .page{grid-template-columns:1fr;}
+  .left{padding:48px 32px;}
   .right{display:none;}
-  footer{padding:32px 24px;flex-direction:column;gap:20px;text-align:center;}
-  .footer-links{flex-wrap:wrap;justify-content:center;}
 }
 </style>
 </head>
 <body>
-
-<!-- NAV -->
-<nav>
-  <a href="/" class="nav-logo">
-    <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#19293a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0"/>
-    </svg>
-    <span class="nav-logo-tag">Est. 2021</span>
-  </a>
-  <a href="/" class="btn-primary" style="font-size:9px;padding:10px 20px;">Return Home</a>
-</nav>
-
-<!-- MARQUEE -->
-<div class="marquee-wrap">
-  <div class="marquee-track" id="mq-track"></div>
-</div>
-
-<!-- MAIN -->
 <div class="page">
+
   <div class="left">
-    <div class="eyebrow">Error 404 &mdash; Position Lost</div>
-    <div class="big-num" aria-hidden="true">404</div>
-    <div class="headline">
-      Off<br>
-      <em>the charts</em>
-    </div>
-    <div class="tagline">This page has slipped its mooring</div>
-    <p class="desc">The page you're looking for doesn't exist or has been moved. Head back to the main channel — everything else is still underway.</p>
-    <div class="btns">
-      <a class="btn-primary" href="/">Return to Port</a>
-      <a class="btn-ghost" href="/#products">View Catalogue</a>
+    <div class="ghost-num" aria-hidden="true">404</div>
+    <div class="eyebrow">Error 404 — Underway</div>
+    <div class="headline">Off<br><em>the charts</em></div>
+    <div class="rule"></div>
+    <p class="desc">You've sailed past the last charted coordinate. There's nothing plotted here — no depth readings, no landmarks, no heading home. Turn back while you still can.</p>
+    <a class="btn" href="/">&#8592;&nbsp;&nbsp;Back to Shore</a>
+    <div class="coords">
+      LAST FIX: 52°03.2'N / 0°58.7'W<br>
+      CURRENT POSITION: UNKNOWN<br>
+      SIGNAL LOST &middot; CHART ENDS HERE
     </div>
   </div>
+
   <div class="right">
-    <div class="bollard-display">
-      <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#19293a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0"/>
-      </svg>
-      <div class="status-block">
-        <span class="status-label">Navigation Status</span>
-        <span class="status-val">ERR — 404</span>
-        <span class="status-sub">Page not found &middot; Signal lost</span>
-      </div>
+    <div class="chart-wrap">
+<svg viewBox="0 0 440 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"
+     style="width:100%;height:100%;animation:drift 8s ease-in-out infinite;">
+<defs>
+  <clipPath id="cc">
+    <polygon points="22,22 418,22 418,22 418,365 405,372 390,363 372,370 354,361 335,369 315,360 293,367 270,358 246,366 220,356 192,364 162,354 130,362 96,353 62,359 30,350 22,350"/>
+  </clipPath>
+  <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#ede5d8"/>
+    <stop offset="100%" stop-color="#f2ebe0"/>
+  </linearGradient>
+  <!-- fade mask: chart detail fades out toward the right edge -->
+  <linearGradient id="fadeRight" x1="55%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="white" stop-opacity="0"/>
+    <stop offset="100%" stop-color="white" stop-opacity="1"/>
+  </linearGradient>
+  <mask id="chartFade">
+    <rect x="0" y="0" width="440" height="480" fill="white"/>
+    <rect x="0" y="0" width="440" height="480" fill="url(#fadeRight)"/>
+  </mask>
+</defs>
+
+<!-- PAPER -->
+<polygon points="22,22 418,22 418,365 405,372 390,363 372,370 354,361 335,369 315,360 293,367 270,358 246,366 220,356 192,364 162,354 130,362 96,353 62,359 30,350 22,350"
+  fill="url(#paperGrad)" stroke="rgba(25,41,58,.13)" stroke-width="1"/>
+
+<!-- everything on the chart clipped + fading right -->
+<g clip-path="url(#cc)" mask="url(#chartFade)">
+
+  <!-- GRID -->
+  <g stroke="#19293a" stroke-width=".45" opacity=".15">
+    <line x1="22" y1="80"  x2="418" y2="80"/>
+    <line x1="22" y1="140" x2="418" y2="140"/>
+    <line x1="22" y1="200" x2="418" y2="200"/>
+    <line x1="22" y1="260" x2="418" y2="260"/>
+    <line x1="22" y1="320" x2="418" y2="320"/>
+    <line x1="82"  y1="22" x2="82"  y2="360"/>
+    <line x1="142" y1="22" x2="142" y2="360"/>
+    <line x1="202" y1="22" x2="202" y2="360"/>
+    <line x1="262" y1="22" x2="262" y2="360"/>
+    <line x1="322" y1="22" x2="322" y2="360"/>
+    <line x1="382" y1="22" x2="382" y2="360"/>
+  </g>
+
+  <!-- COASTLINE — left side, detailed and solid -->
+  <path d="M22,150 C32,132 50,124 62,112 C74,100 78,82 94,70
+    C108,60 128,58 144,66 C160,74 168,92 172,110
+    C176,128 168,148 158,160 C148,172 132,176 122,188
+    C112,200 112,220 102,234 C92,248 74,256 64,270
+    C54,284 50,304 40,318 C30,332 22,342 22,350Z"
+    fill="#ddd5c8" stroke="#19293a" stroke-width="1.1" opacity=".6"/>
+
+  <!-- land hatching -->
+  <g stroke="#19293a" stroke-width=".4" opacity=".1">
+    <line x1="26" y1="180" x2="55" y2="180"/><line x1="24" y1="196" x2="56" y2="196"/>
+    <line x1="24" y1="212" x2="54" y2="212"/><line x1="24" y1="228" x2="52" y2="228"/>
+    <line x1="26" y1="244" x2="52" y2="244"/><line x1="28" y1="260" x2="54" y2="260"/>
+    <line x1="30" y1="276" x2="56" y2="276"/><line x1="32" y1="292" x2="56" y2="292"/>
+    <line x1="34" y1="308" x2="52" y2="308"/>
+    <line x1="90" y1="76" x2="122" y2="76"/><line x1="86" y1="92" x2="124" y2="92"/>
+    <line x1="84" y1="108" x2="122" y2="108"/>
+  </g>
+
+  <!-- DEPTH CONTOURS -->
+  <g fill="none" stroke="#19293a" opacity=".12" stroke-width=".9">
+    <path d="M172,110 C196,90 240,82 276,94 C312,106 330,136 324,164
+      C318,192 294,208 264,214 C234,220 200,210 182,190
+      C164,170 152,148 172,110Z"/>
+    <path d="M180,120 C202,103 240,96 272,107 C304,118 320,144 315,168
+      C310,192 288,206 260,212 C232,218 200,208 184,190
+      C168,172 162,153 180,120Z" opacity=".18"/>
+    <path d="M194,133 C212,120 244,115 268,124 C292,133 306,156 302,176
+      C298,196 278,208 256,213 C234,218 206,208 194,192
+      C182,176 178,156 194,133Z" opacity=".24"/>
+    <!-- second shoal -->
+    <path d="M160,258 C180,240 222,234 250,248 C278,262 286,292 272,312
+      C258,332 226,340 196,330 C166,320 148,298 152,276 C156,258 144,274 160,258Z" opacity=".1"/>
+    <path d="M170,266 C188,250 220,244 244,256 C268,268 276,294 264,312
+      C252,330 222,336 196,328 C170,320 154,300 158,280 C162,264 154,280 170,266Z" opacity=".18"/>
+  </g>
+
+  <!-- DEPTH SOUNDINGS -->
+  <g font-family="'Space Mono',monospace" font-size="7.5" fill="#19293a" opacity=".28">
+    <text x="196" y="108">—</text>
+    <text x="230" y="155">47</text><text x="254" y="136">53</text>
+    <text x="276" y="162">42</text><text x="300" y="148">38</text>
+    <text x="248" y="188">35</text><text x="282" y="192">30</text>
+    <text x="172" y="200">29</text><text x="200" y="230">26</text>
+    <text x="220" y="292">18</text><text x="248" y="308">14</text>
+    <text x="270" y="280">22</text><text x="300" y="260">27</text>
+    <text x="324" y="200">31</text><text x="348" y="170">36</text>
+    <text x="366" y="240">28</text>
+  </g>
+
+  <!-- PLACE NAMES -->
+  <g font-family="'Playfair Display',serif" font-size="8.5" fill="#19293a" font-style="italic" opacity=".3">
+    <text x="76" y="192"  transform="rotate(-8,76,192)">Underway Roads</text>
+    <text x="154" y="252" transform="rotate(-5,154,252)">Home Reach</text>
+    <text x="290" y="228" transform="rotate(-3,290,228)">Loon Channel</text>
+  </g>
+
+  <!-- VESSEL TRACK — from bottom left, heading toward the void -->
+  <!-- historical solid track -->
+  <path d="M74,322 C104,298 140,276 174,256 C208,236 238,218 264,196"
+    fill="none" stroke="#19293a" stroke-width="1" opacity=".28"/>
+  <!-- current animated dashed track — still going, off the edge -->
+  <path d="M264,196 C292,174 318,152 346,126 C368,106 390,82 412,54"
+    fill="none" stroke="#19293a" stroke-width="1.1"
+    stroke-dasharray="7,5" opacity=".4"
+    style="animation:dash 2.5s linear infinite;"/>
+
+  <!-- LAST KNOWN POSITION -->
+  <g transform="translate(264,196)">
+    <circle cx="0" cy="0" r="6" fill="none" stroke="#19293a" stroke-width="1.2" opacity=".55"/>
+    <circle cx="0" cy="0" r="2.2" fill="#19293a" opacity=".65"/>
+    <line x1="6" y1="0" x2="18" y2="-8" stroke="#19293a" stroke-width=".7" opacity=".4"/>
+    <text x="20" y="-10" font-family="'Space Mono',monospace" font-size="6" fill="#19293a" opacity=".5">LAST FIX</text>
+    <text x="20" y="0" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a" opacity=".3">52°03.2'N  0°58.7'W</text>
+  </g>
+
+  <!-- COMPASS ROSE — right side, needle spinning, can't find north -->
+  <g transform="translate(338,288)">
+    <circle cx="0" cy="0" r="46" fill="#ede5d8" stroke="#19293a" stroke-width=".9" opacity=".45"/>
+    <circle cx="0" cy="0" r="38" fill="none" stroke="#19293a" stroke-width=".4" stroke-dasharray="2,3" opacity=".3"/>
+    <g stroke="#19293a" opacity=".4">
+      <line x1="0" y1="-46" x2="0" y2="-34" stroke-width="1.5"/>
+      <line x1="0"  y1="46" x2="0"  y2="34" stroke-width="1"/>
+      <line x1="-46" y1="0" x2="-34" y2="0" stroke-width="1"/>
+      <line x1="46"  y1="0" x2="34"  y2="0" stroke-width="1"/>
+      <line x1="32" y1="-32" x2="25" y2="-25" stroke-width=".7"/>
+      <line x1="-32" y1="-32" x2="-25" y2="-25" stroke-width=".7"/>
+      <line x1="32" y1="32" x2="25" y2="25" stroke-width=".7"/>
+      <line x1="-32" y1="32" x2="-25" y2="25" stroke-width=".7"/>
+      <!-- minor ticks -->
+      <line x1="24" y1="-40" x2="20" y2="-34" stroke-width=".5"/>
+      <line x1="-24" y1="-40" x2="-20" y2="-34" stroke-width=".5"/>
+      <line x1="24" y1="40" x2="20" y2="34" stroke-width=".5"/>
+      <line x1="-24" y1="40" x2="-20" y2="34" stroke-width=".5"/>
+      <line x1="40" y1="-24" x2="34" y2="-20" stroke-width=".5"/>
+      <line x1="40" y1="24" x2="34" y2="20" stroke-width=".5"/>
+      <line x1="-40" y1="-24" x2="-34" y2="-20" stroke-width=".5"/>
+      <line x1="-40" y1="24" x2="-34" y2="20" stroke-width=".5"/>
+    </g>
+    <g font-family="'Space Mono',monospace" font-size="7.5" fill="#19293a" font-weight="700" opacity=".4" text-anchor="middle">
+      <text x="0" y="-52">N</text><text x="0" y="61">S</text>
+      <text x="-55" y="3">W</text><text x="55" y="3">E</text>
+    </g>
+    <!-- spinning needle -->
+    <g style="animation:spin 3.5s linear infinite;transform-origin:0 0;">
+      <polygon points="0,-30 4,2 0,-1 -4,2" fill="#19293a" opacity=".65"/>
+      <polygon points="0,30 4,2 0,-1 -4,2" fill="#19293a" opacity=".18"/>
+    </g>
+    <circle cx="0" cy="0" r="4" fill="#ede5d8" stroke="#19293a" stroke-width="1" opacity=".55"/>
+    <circle cx="0" cy="0" r="1.8" fill="#19293a" opacity=".45"/>
+    <text x="0" y="66" font-family="'Space Mono',monospace" font-size="6" fill="#19293a" opacity=".22" text-anchor="middle" letter-spacing="1.5">NO BEARING</text>
+  </g>
+
+  <!-- "YOU ARE HERE" pointing off the right edge — the whole joke -->
+  <g transform="translate(395,110)" opacity=".55">
+    <!-- arrow line pointing right (off edge) -->
+    <line x1="-50" y1="0" x2="8" y2="0" stroke="#19293a" stroke-width="1"/>
+    <!-- arrowhead off the edge -->
+    <polygon points="8,0 2,-3.5 2,3.5" fill="#19293a"/>
+    <!-- label above -->
+    <text x="-50" y="-10" font-family="'Space Mono',monospace" font-size="6.5" fill="#19293a" letter-spacing=".5" font-weight="700">YOU ARE HERE</text>
+    <!-- dashed circle where they'd be — but it's off the chart -->
+    <circle cx="14" cy="0" r="7" fill="none" stroke="#19293a" stroke-width=".9" stroke-dasharray="3,2"/>
+  </g>
+
+  <!-- CHART TITLE BLOCK -->
+  <g transform="translate(104,32)" opacity=".52">
+    <rect x="0" y="0" width="154" height="44" fill="#ede5d8" stroke="#19293a" stroke-width=".7"/>
+    <text x="8" y="14" font-family="'Space Mono',monospace" font-size="7" fill="#19293a" letter-spacing="1" font-weight="700">CHART NO. 404</text>
+    <line x1="8" y1="18" x2="146" y2="18" stroke="#19293a" stroke-width=".5" opacity=".3"/>
+    <text x="8" y="29" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a" opacity=".55">POSITION: UNKNOWN</text>
+    <text x="8" y="39" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a" opacity=".32">BEYOND CHARTED WATERS</text>
+  </g>
+
+  <!-- SCALE BAR -->
+  <g transform="translate(22,332)" opacity=".25">
+    <line x1="0" y1="0" x2="88" y2="0" stroke="#19293a" stroke-width=".9"/>
+    <line x1="0"  y1="-3.5" x2="0"  y2="3.5" stroke="#19293a" stroke-width=".9"/>
+    <line x1="44" y1="-2.5" x2="44" y2="2.5" stroke="#19293a" stroke-width=".6"/>
+    <line x1="88" y1="-3.5" x2="88" y2="3.5" stroke="#19293a" stroke-width=".9"/>
+    <text x="-2" y="11" font-family="'Space Mono',monospace" font-size="6" fill="#19293a">0</text>
+    <text x="40" y="11" font-family="'Space Mono',monospace" font-size="6" fill="#19293a">5</text>
+    <text x="82" y="11" font-family="'Space Mono',monospace" font-size="6" fill="#19293a">10</text>
+    <text x="18" y="21" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a">NAUTICAL MI.</text>
+  </g>
+
+  <!-- AXIS LABELS -->
+  <g font-family="'Space Mono',monospace" font-size="6" fill="#19293a" opacity=".2">
+    <text x="52" y="79" text-anchor="middle">52°08'N</text>
+    <text x="52" y="139" text-anchor="middle">52°04'N</text>
+    <text x="52" y="199" text-anchor="middle">52°00'N</text>
+    <text x="52" y="259" text-anchor="middle">51°56'N</text>
+    <text x="52" y="319" text-anchor="middle">51°52'N</text>
+    <text x="82"  y="355" text-anchor="middle">1°10'W</text>
+    <text x="142" y="355" text-anchor="middle">1°04'W</text>
+    <text x="202" y="355" text-anchor="middle">0°58'W</text>
+    <text x="262" y="355" text-anchor="middle">0°52'W</text>
+    <text x="322" y="355" text-anchor="middle">0°46'W</text>
+  </g>
+
+</g><!-- end clip + fade mask -->
+
+<!-- torn bottom shadow -->
+<polygon points="22,350 62,359 96,353 130,362 162,354 192,364 220,356 246,366 270,358 293,367 315,360 335,369 354,361 372,370 390,363 405,372 418,365 418,380 22,380"
+  fill="rgba(25,41,58,.05)"/>
+
+</svg>
     </div>
   </div>
+
 </div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">
-    <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#f7efe6" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0"/>
-    </svg>
-  </div>
-  <span class="footer-meta">&copy; 2021&ndash;2026 Underway. All rights reserved.</span>
-  <ul class="footer-links">
-    <li><a href="/">Home</a></li>
-    <li><a href="/#products">Catalogue</a></li>
-    <li><a href="/#discord">Updates</a></li>
-    <li><a href="/#community">Community</a></li>
-  </ul>
-</footer>
-
-<!-- COORDS -->
-<div class="coord coord-bl">LAT 00°00.000'N<br>LON 00°00.000'W</div>
-<div class="coord coord-br">HDG —°M<br>SPD — KT</div>
-
-<script>
-// Marquee — same logic as main site
-(function(){
-  var BP="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0";
-  var ITEMS=["Est. 2021","Built for the Long Haul","Est. 2021","Built for the Long Haul"];
-  var track=document.getElementById('mq-track');
-  for(var r=0;r<4;r++)ITEMS.forEach(function(txt){
-    var u=document.createElement('div');u.className='mq-unit';
-    u.innerHTML='<div class="mq-dot"></div><div class="mq-boll"><svg width="36" height="16" viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg"><path fill="#f7efe6" d="'+BP+'"/></svg></div><span class="mq-word">UNDERWAY</span><div class="mq-dot"></div><span style="font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,239,230,.45);white-space:nowrap;padding:0">'+txt+'</span>';
-    track.appendChild(u);
-  });
-  var pos=0,halfW=0;
-  function tick(){pos+=0.5;if(!halfW||pos>=halfW){halfW=track.scrollWidth/2;if(pos>=halfW)pos-=halfW;}track.style.transform='translateX(-'+pos+'px)';requestAnimationFrame(tick);}
-  requestAnimationFrame(tick);
-})();
-</script>
 </body>
 </html>
