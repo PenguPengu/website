@@ -1050,28 +1050,46 @@ document.querySelectorAll('.anim').forEach(function(el){el.style.animationPlaySt
 function toggleLike(btn){
   var type=btn.getAttribute('data-type');
   var id=btn.getAttribute('data-id');
-  var cl='liked-'+type;
-  var ce=btn.querySelector('.like-count');
-  // Already liked — locked, no undo (server-side permanent)
-  if(btn.classList.contains(cl))return;
-  if(btn.disabled)return;
-  // Optimistic UI update immediately
-  btn.classList.add(cl);
-  ce.textContent=parseInt(ce.textContent)+1;
-  btn.disabled=true;
-  // Persist liked state locally so it survives page refresh
-  try{localStorage.setItem('ul_'+id+'_'+type,'1');}catch(e){}
-  // Fire-and-forget to Apps Script (no-cors: response blocked but write goes through)
-  if(APPS_SCRIPT_URL&&APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
-    var ip=window._userIp||'unknown';
-    fetch(APPS_SCRIPT_URL,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({rowId:id,type:type,ip:ip})
-    }).catch(function(){});
+  var ip=window._userIp||'unknown';
+  // Get what this user currently voted on this photo (one vote per photo)
+  var current=null;
+  try{current=localStorage.getItem('vote_'+id);}catch(e){}
+  // Find both buttons on this card
+  var card=btn.closest('.photo-card');
+  var heartBtn=card.querySelector('[data-type="heart"]');
+  var fireBtn=card.querySelector('[data-type="fire"]');
+  var heartCount=heartBtn.querySelector('.like-count');
+  var fireCount=fireBtn.querySelector('.like-count');
+  if(current===type){
+    // Un-vote: remove this vote
+    btn.classList.remove('liked-'+type);
+    btn.querySelector('.like-count').textContent=Math.max(0,parseInt(btn.querySelector('.like-count').textContent)-1);
+    try{localStorage.removeItem('vote_'+id);}catch(e){}
+    sendVote(id,type,ip,'remove');
+  } else {
+    // If switching from the other type, undo it visually
+    if(current){
+      var oldBtn=card.querySelector('[data-type="'+current+'"]');
+      oldBtn.classList.remove('liked-'+current);
+      var oldCount=oldBtn.querySelector('.like-count');
+      oldCount.textContent=Math.max(0,parseInt(oldCount.textContent)-1);
+      sendVote(id,current,ip,'remove');
+    }
+    // Apply new vote
+    btn.classList.add('liked-'+type);
+    btn.querySelector('.like-count').textContent=parseInt(btn.querySelector('.like-count').textContent)+1;
+    try{localStorage.setItem('vote_'+id,type);}catch(e){}
+    sendVote(id,type,ip,'add');
   }
-  btn.disabled=false;
+}
+function sendVote(id,type,ip,action){
+  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE')return;
+  fetch(APPS_SCRIPT_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({rowId:id,type:type,ip:ip,action:action})
+  }).catch(function(){});
 }
 
 // ── SVG icons ─────────────────────────────────────────────────────────────────
@@ -1135,17 +1153,19 @@ function buildCard(entry){
   var ph='<div class="photo-placeholder">'+IMG_SVG+'</div>';
   var imgHtml=url?'<img src="'+url+'" alt="'+(entry.title||'').replace(/"/g,'&quot;')+'" loading="lazy" onerror="this.style.display=\'none\'">'+ph:ph;
   var imgClick=url?' style="cursor:zoom-in;" onclick="openLightboxSingle(\''+url.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"':'';
-  // Restore liked state from localStorage
-  var likedHeart=false,likedFire=false;
-  try{likedHeart=!!localStorage.getItem('ul_'+entry.id+'_heart');likedFire=!!localStorage.getItem('ul_'+entry.id+'_fire');}catch(e){}
+  // Restore vote state from localStorage (one vote per photo)
+  var currentVote=null;
+  try{currentVote=localStorage.getItem('vote_'+entry.id);}catch(e){}
+  var likedHeart=currentVote==='heart';
+  var likedFire=currentVote==='fire';
   return '<div class="photo-card">'+
     '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
       '<div class="photo-actions">'+
-        '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)"'+(likedHeart?' disabled':'')+'>'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
-        '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" onclick="toggleLike(this)"'+(likedFire?' disabled':'')+'>'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
+        '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
+        '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
       '</div>'+
     '</div>'+
   '</div>';
