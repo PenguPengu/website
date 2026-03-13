@@ -1047,7 +1047,32 @@ var observer=new IntersectionObserver(function(entries){entries.forEach(function
 document.querySelectorAll('.anim').forEach(function(el){el.style.animationPlayState='paused';observer.observe(el);});
 
 // ── Like toggle ───────────────────────────────────────────────────────────────
-function toggleLike(btn){var t=btn.getAttribute('data-type'),cl='liked-'+t,ce=btn.querySelector('.like-count'),n=parseInt(ce.textContent);if(btn.classList.contains(cl)){btn.classList.remove(cl);ce.textContent=n-1;}else{btn.classList.add(cl);ce.textContent=n+1;}}
+function toggleLike(btn){
+  var type=btn.getAttribute('data-type');
+  var id=btn.getAttribute('data-id');
+  var cl='liked-'+type;
+  var ce=btn.querySelector('.like-count');
+  // Already liked — locked, no undo (server-side permanent)
+  if(btn.classList.contains(cl))return;
+  if(btn.disabled)return;
+  // Optimistic UI update immediately
+  btn.classList.add(cl);
+  ce.textContent=parseInt(ce.textContent)+1;
+  btn.disabled=true;
+  // Persist liked state locally so it survives page refresh
+  try{localStorage.setItem('ul_'+id+'_'+type,'1');}catch(e){}
+  // Fire-and-forget to Apps Script (no-cors: response blocked but write goes through)
+  if(APPS_SCRIPT_URL&&APPS_SCRIPT_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+    var ip=window._userIp||'unknown';
+    fetch(APPS_SCRIPT_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({rowId:id,type:type,ip:ip})
+    }).catch(function(){});
+  }
+  btn.disabled=false;
+}
 
 // ── SVG icons ─────────────────────────────────────────────────────────────────
 var HEART_SVG='<svg width="14" height="13" viewBox="0 0 24 22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20S2 13 2 7a5 5 0 0 1 10 0 5 5 0 0 1 10 0c0 6-10 13-10 13Z"/></svg>';
@@ -1110,14 +1135,17 @@ function buildCard(entry){
   var ph='<div class="photo-placeholder">'+IMG_SVG+'</div>';
   var imgHtml=url?'<img src="'+url+'" alt="'+(entry.title||'').replace(/"/g,'&quot;')+'" loading="lazy" onerror="this.style.display=\'none\'">'+ph:ph;
   var imgClick=url?' style="cursor:zoom-in;" onclick="openLightboxSingle(\''+url.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"':'';
+  // Restore liked state from localStorage
+  var likedHeart=false,likedFire=false;
+  try{likedHeart=!!localStorage.getItem('ul_'+entry.id+'_heart');likedFire=!!localStorage.getItem('ul_'+entry.id+'_fire');}catch(e){}
   return '<div class="photo-card">'+
     '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
       '<div class="photo-actions">'+
-        '<button class="photo-like" data-type="heart" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
-        '<button class="photo-like" data-type="fire" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
+        '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)"'+(likedHeart?' disabled':'')+'>'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
+        '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" onclick="toggleLike(this)"'+(likedFire?' disabled':'')+'>'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -1192,6 +1220,9 @@ function closeSidebarGroup(name){document.querySelectorAll('[data-gname]').forEa
 function mobileThemeJump(val){if(val==='__all__'){showAllThemes();return;}var firstGroup=document.querySelector('.gallery-theme-btn[data-group]');if(firstGroup&&firstGroup.getAttribute('data-group')===val){var ms=document.getElementById('gallery-main-scroll');if(ms)ms.scrollTo({top:0,behavior:'smooth'});return;}document.querySelectorAll('[data-gname]').forEach(function(el){if(el.getAttribute('data-gname')===val){var grid=el.querySelector('.gallery-challenge-grid'),toggle=el.querySelector('.gallery-challenge-toggle');if(grid&&!grid.classList.contains('open')){grid.classList.add('open');var svg=toggle&&toggle.querySelector('svg');if(svg)svg.style.transform='rotate(180deg)';}setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},50);}});}
 
 // ── Sheet URLs ────────────────────────────────────────────────────────────────
+// ── Apps Script Web App URL (paste your deployed URL here) ───────────────────
+var APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxhZLhDSoNoiz9RNkmwixvqrnoXUKrJivWB69a42sj7yX_eishM9E3-5fI5dBNkhXPv/exec';
+
 var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=664706385&single=true&output=csv';
 var SUBMISSIONS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=802177609&single=true&output=csv';
@@ -1686,6 +1717,10 @@ document.addEventListener('DOMContentLoaded',function(){
     grid.innerHTML='';data.items.slice(0,3).forEach(function(item){var vid=item.id.videoId,title=item.snippet.title,thumb='https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg',pub=timeAgo(item.snippet.publishedAt);var card=document.createElement('div');card.className='video-card';card.innerHTML='<div class="video-thumb" style="position:relative;"><img src="'+thumb+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" alt="'+title+'"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div><div class="video-info"><div class="video-title">'+title+'</div><div class="video-meta">'+pub+'</div></div>';card.addEventListener('click',(function(id){return function(){openVideoModal('https://www.youtube.com/embed/'+id);};})(vid));grid.appendChild(card);});
   }).catch(function(){});
 });
+
+// ── Fetch user IP for like deduplication ──────────────────────────────────────
+window._userIp='unknown';
+fetch('https://api.ipify.org?format=json').then(function(r){return r.json();}).then(function(d){window._userIp=d.ip||'unknown';}).catch(function(){});
 
 // ── First-visit tour trigger ──────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
