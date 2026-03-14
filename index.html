@@ -345,15 +345,11 @@ footer>*{position:relative;z-index:1;}
 /* PRODUCT MODAL */
 .product-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(25,41,58,.85);align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:24px;}
 .product-modal.open{display:flex;}
-.product-modal-inner{background:var(--navy);color:var(--navy);width:min(820px,96vw);max-height:90vh;display:flex;flex-direction:column;position:relative;overflow:visible;}
+.product-modal-inner{background:var(--navy);color:var(--navy);width:min(820px,96vw);max-height:90vh;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .product-modal-close{position:absolute;top:16px;right:20px;background:rgba(247,239,230,.9);border:1px solid rgba(25,41,58,.12);font-size:14px;cursor:pointer;font-family:var(--mono);color:var(--navy);z-index:20;line-height:1;padding:6px 10px;transition:background .15s;}
 .product-modal-close:hover{background:var(--navy);color:var(--cream);}
-.product-modal-scroll{flex:1;overflow-y:scroll;display:flex;flex-direction:column;gap:0;background:var(--cream);scrollbar-width:none;-ms-overflow-style:none;}
+.product-modal-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;background:var(--cream);scrollbar-width:none;-ms-overflow-style:none;}
 .product-modal-scroll::-webkit-scrollbar{display:none;}
-.product-modal-clip{overflow:hidden;display:flex;flex-direction:column;flex:1;max-height:90vh;}
-.pm-custom-scrollbar-track{position:absolute;inset:0;background:rgba(100,160,220,.12);border-radius:2px;}
-.pm-custom-scrollbar-thumb{position:absolute;left:0;right:0;background:rgba(100,160,220,.55);border-radius:2px;transition:opacity .2s;min-height:24px;}
-.product-modal-inner:hover .pm-custom-scrollbar-thumb{background:rgba(100,160,220,.8);}
 .pm-gallery{position:relative;background:rgba(25,41,58,.06);border-bottom:1px solid rgba(25,41,58,.1);flex-shrink:0;}
 .pm-gallery-main{width:100%;aspect-ratio:16/7;position:relative;overflow:hidden;cursor:zoom-in;display:flex;align-items:center;justify-content:center;background:rgba(25,41,58,.04);}
 .pm-gallery-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
@@ -923,7 +919,6 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 <!-- Product Modal -->
 <div class="product-modal" id="product-modal" onclick="closeProductModal()">
   <div class="product-modal-inner" onclick="event.stopPropagation()">
-    <div class="product-modal-clip">
     <button class="product-modal-close" onclick="closeProductModal()">&#10005;</button>
     <div class="product-modal-scroll">
       <div class="pm-gallery" id="pm-gallery">
@@ -963,11 +958,6 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
         <div class="pm-updates-feed" id="pm-updates-feed"></div>
       </div>
     </div><!-- end product-modal-scroll -->
-    </div><!-- end product-modal-clip -->
-    <div class="pm-custom-scrollbar" id="pm-scrollbar">
-      <div class="pm-custom-scrollbar-track"></div>
-      <div class="pm-custom-scrollbar-thumb" id="pm-scrollbar-thumb"></div>
-    </div>
   </div>
 </div>
 
@@ -1598,32 +1588,6 @@ function updGalShow(eid,idx){
 }
 
 // ── PRODUCT MODAL ─────────────────────────────────────────────────────────────
-function _syncPmScrollbar(){
-  var el=document.querySelector('.product-modal-scroll');
-  var thumb=document.getElementById('pm-scrollbar-thumb');
-  var bar=document.getElementById('pm-scrollbar');
-  if(!el||!thumb||!bar)return;
-  var trackH=bar.offsetHeight;
-  var ratio=el.scrollHeight>el.clientHeight?el.clientHeight/el.scrollHeight:1;
-  if(ratio>=1){thumb.style.display='none';return;}
-  thumb.style.display='block';
-  var thumbH=Math.max(24,trackH*ratio);
-  var scrollFrac=el.scrollTop/(el.scrollHeight-el.clientHeight);
-  thumb.style.height=thumbH+'px';
-  thumb.style.top=(scrollFrac*(trackH-thumbH))+'px';
-}
-
-function _initPmScrollbar(){
-  var el=document.querySelector('.product-modal-scroll');
-  var bar=document.getElementById('pm-scrollbar');
-  if(!el||!bar)return;
-  // Position bar to match inner height
-  bar.style.height=el.clientHeight+'px';
-  el.removeEventListener('scroll',_syncPmScrollbar);
-  el.addEventListener('scroll',_syncPmScrollbar);
-  _syncPmScrollbar();
-}
-
 function openProductModal(num, status, name, type, desc, details, cta, imageStr, cta_url) {
   if (name.trim().toLowerCase() === 'example') {
     num='00';status='In Development';type='Demo Product \u00b7 Marine Hardware';
@@ -1703,7 +1667,6 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow='hidden';
   var scroll=document.querySelector('.product-modal-scroll');if(scroll)scroll.scrollTop=0;
-  setTimeout(_initPmScrollbar,50);
 }
 
 function pmOpenUpdateImg(lbIdx){pmOpenLightbox(lbIdx);}
