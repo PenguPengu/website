@@ -345,10 +345,10 @@ footer>*{position:relative;z-index:1;}
 /* PRODUCT MODAL */
 .product-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(25,41,58,.85);align-items:center;justify-content:center;backdrop-filter:blur(6px);padding:24px;}
 .product-modal.open{display:flex;}
-.product-modal-inner{background:var(--cream);color:var(--navy);width:min(820px,96vw);max-height:90vh;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.product-modal-inner{background:var(--navy);color:var(--navy);width:min(820px,96vw);max-height:90vh;display:flex;flex-direction:column;position:relative;overflow:hidden;}
 .product-modal-close{position:absolute;top:16px;right:20px;background:rgba(247,239,230,.9);border:1px solid rgba(25,41,58,.12);font-size:14px;cursor:pointer;font-family:var(--mono);color:var(--navy);z-index:20;line-height:1;padding:6px 10px;transition:background .15s;}
 .product-modal-close:hover{background:var(--navy);color:var(--cream);}
-.product-modal-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;}
+.product-modal-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;background:var(--cream);}
 .product-modal-scroll::-webkit-scrollbar{width:3px;}
 .product-modal-scroll::-webkit-scrollbar-thumb{background:rgba(25,41,58,.15);}
 .pm-gallery{position:relative;background:rgba(25,41,58,.06);border-bottom:1px solid rgba(25,41,58,.1);flex-shrink:0;}
@@ -380,7 +380,7 @@ footer>*{position:relative;z-index:1;}
 .pm-share-btn:hover{border-color:var(--navy);}
 .pm-share-btn.copied{border-color:var(--navy);color:var(--navy);}
 .pm-share-btn svg{flex-shrink:0;}
-.pm-updates-section{background:var(--navy);color:var(--cream);flex-shrink:0;position:relative;overflow:hidden;margin:0;align-self:stretch;}
+.pm-updates-section{background:var(--navy);color:var(--cream);flex:1 0 auto;position:relative;overflow:hidden;margin:0;}
 .pm-updates-section::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(247,239,230,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(247,239,230,.025) 1px,transparent 1px);background-size:80px 80px;}
 .pm-updates-section>*{position:relative;z-index:1;}
 .pm-updates-header{display:flex;align-items:center;justify-content:space-between;padding:20px 40px 16px;border-bottom:1px solid rgba(247,239,230,.1);}
@@ -1200,23 +1200,6 @@ function buildCard(entry){
     '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
-      (function(){
-        if(!entry.contestName||entry.contestName==='(no theme)')return'';
-        // Find a matching build update
-        var match=null;
-        for(var i=0;i<_announcements.length;i++){
-          var a=_announcements[i];
-          var t=(a.type||'').toLowerCase().trim();
-          if((t==='build update'||t==='build_update')&&(a.build||'').toLowerCase().trim()===entry.contestName.toLowerCase().trim()){
-            match=a;break;
-          }
-        }
-        if(!match)return'';
-        // Get update title from content
-        var lines=(match.content||'').trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
-        var title=lines.length>1?lines[0]:entry.contestName;
-        return'<a class="photo-update-link" href="#" onclick="event.preventDefault();closeGallery();setTimeout(function(){var el=document.getElementById(\'discord\');if(el)el.scrollIntoView({behavior:\'smooth\'});},80);">&#8593; '+title+'</a>';
-      })()+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
       '<div class="photo-actions">'+
         '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
