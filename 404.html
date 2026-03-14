@@ -333,6 +333,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   // No path at all — just show 404
   if(!path){ showNotFound(); return; }
 
+  // /gallery or /gallery/photo-id — instant redirect, no product lookup needed
+  if(path === 'gallery' || path.indexOf('gallery/') === 0){
+    var photoId = path.indexOf('gallery/') === 0 ? path.slice(8) : null;
+    window.location.replace('/?gallery=1' + (photoId ? '&photo='+encodeURIComponent(photoId) : ''));
+    return;
+  }
+
   // Animate progress bar while we check
   var bar = document.getElementById('progress-bar');
   var prog = 0;
