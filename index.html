@@ -168,6 +168,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .photo-info{padding:20px 24px 24px;display:flex;flex-direction:column;flex:1;}
 .photo-title{font-family:var(--serif);font-size:16px;font-weight:900;line-height:1.2;margin-bottom:7px;}
 .photo-desc{font-size:10px;line-height:1.8;opacity:.65;margin-bottom:14px;flex:1;}
+.photo-update-link{font-size:8px;letter-spacing:.15em;text-transform:uppercase;opacity:.4;margin-bottom:12px;display:block;text-decoration:none;color:var(--navy);transition:opacity .15s;}
+.photo-update-link:hover{opacity:.8;}
 .photo-meta-tag{font-size:8px;letter-spacing:.18em;text-transform:uppercase;opacity:.35;margin-bottom:10px;}
 .photo-actions{display:flex;gap:8px;margin-top:auto;}
 .photo-like{display:flex;align-items:center;gap:7px;background:none;border:1px solid rgba(25,41,58,.3);color:var(--navy);font-family:var(--mono);font-size:10px;padding:6px 13px;cursor:pointer;transition:.15s;letter-spacing:.05em;}
@@ -1198,6 +1200,7 @@ function buildCard(entry){
     '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
+      (entry.contestName&&entry.contestName!=='(no theme)'?'<a class="photo-update-link" href="#discord" onclick="event.preventDefault();closeGallery();setTimeout(function(){var el=document.getElementById(\'discord\');if(el)el.scrollIntoView({behavior:\'smooth\'});},50);">&#8593; '+entry.contestName+'</a>':'')+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
       '<div class="photo-actions">'+
         '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
@@ -1321,14 +1324,58 @@ var _announcementsReady=false;
 var _pendingDeepLink=null; // slug to open once announcements are ready
 function fixDiscordUrl(u){if(u&&u.indexOf('cdn.discordapp.com')!==-1)return u.replace('cdn.discordapp.com','media.discordapp.net');return u;}
 
+function _annReady(){
+  _announcementsReady=true;
+  // If a deep link was waiting on us, open it now
+  if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);return;}
+  // If product modal is already open (products loaded faster), re-render updates panel
+  if(document.getElementById('product-modal').classList.contains('open')){
+    var name=document.getElementById('pm-name').textContent||'';
+    if(name&&name!=='Example')_repopulateUpdates(name);
+  }
+}
+
+function _repopulateUpdates(name){
+  var buildUpdates=_announcements.filter(function(a){
+    var t=(a.type||'').toLowerCase().trim();
+    return(t==='build update'||t==='build_update')&&
+      (a.build||'').toLowerCase().trim()===name.toLowerCase().trim();
+  }).slice().reverse();
+  if(!buildUpdates.length)return;
+  var updatePanel=document.getElementById('pm-update-panel');
+  if(!updatePanel)return;
+  var allUpdateImgs=[];_updGals={};
+  var feedHtml=buildUpdates.map(function(upd,entryIdx){
+    var updContent=(upd.content||'').trim();
+    var updImgStr=(upd.images||'').trim();
+    if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
+    var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
+    var updUrls=updImgStr?updImgStr.split(',').map(function(s){s=s.trim();if(s.indexOf('cdn.discordapp.com')!==-1)s=s.replace('cdn.discordapp.com','media.discordapp.net');return s;}).filter(function(s){return s.indexOf('http')===0;}):[];
+    allUpdateImgs=allUpdateImgs.concat(updUrls);
+    var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
+    if(!updTitle)updTitle=name+' — Update';
+    var imgsHtml='';
+    if(updUrls.length){
+      var allEscUpd=updUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
+      imgsHtml='<div class="upd-img-strip">'+updUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('')+'</div>';
+    }
+    return'<div class="pm-update-entry"><div class="pm-update-entry-header">'+(updDate?'<span class="pm-update-entry-date">'+updDate+'</span>':'')+(entryIdx===0?'<span class="pm-update-entry-badge">Latest</span>':'')+'</div><div class="pm-update-entry-title">'+updTitle+'</div>'+(updBody?'<div class="pm-update-entry-body">'+parseMarkdown(updBody)+'</div>':'')+imgsHtml+'</div>';
+  }).join('');
+  document.getElementById('pm-updates-feed').innerHTML=feedHtml;
+  document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
+  updatePanel.style.display='block';
+}
+
 function loadAnnouncements(){
   fetch(ANNOUNCEMENTS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
-    var rows=parseCSV(text);if(!rows||!rows.length)return;
+    var rows=parseCSV(text);
+    if(!rows||!rows.length){_annReady();return;}
     _announcements=rows.map(function(row){
       var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});return r;
     });
     var annRows=_announcements.filter(function(r){var t=(r.type||'').toLowerCase();return t===''||t==='announcement';});
-    if(!annRows.length)return;
+    if(!annRows.length){_annReady();return;}
     var row=annRows[annRows.length-1];
     var rawContent=(row.content||'').trim();
     var author=row.author||'',ts=row.timestamp||'',imgStr=(row.images||'').trim();
@@ -1346,7 +1393,7 @@ function loadAnnouncements(){
       (annBody?'<div class="update-body" style="margin-top:10px;font-size:12px;line-height:1.85;">'+parseMarkdown(annBody)+'</div>':'')+
       '<div class="update-footer" style="margin-top:auto;padding-top:20px;"><span class="update-author">'+author+(dateStr?' · '+dateStr:'')+'</span></div>';
     var wrap=document.getElementById('ann-images-wrap');
-    if(!wrap)return;
+    if(!wrap){_annReady();return;}
     _annImgUrls=imgStr?imgStr.split(',').map(function(s){
       s=s.trim();
       if(s.indexOf('cdn.discordapp.com')!==-1)s=s.replace('cdn.discordapp.com','media.discordapp.net');
@@ -1373,13 +1420,10 @@ function loadAnnouncements(){
     }else{
       wrap.innerHTML='<div class="ann-img-gallery"><div class="ann-img-main"><div class="ann-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> No images yet</div></div></div>';
     }
-    // Mark announcements ready — open any pending deep link now
-    _announcementsReady=true;
-    if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);}
+    _annReady();
   }).catch(function(e){
     console.log('[Ann] error',e);
-    _announcementsReady=true;
-    if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);}
+    _annReady();
   });
 }
 
