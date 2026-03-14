@@ -1413,6 +1413,8 @@ function checkDeepLink(){
   if(!path)return;
   path=decodeURIComponent(path);
   if(!path||RESERVED_PATHS.indexOf(path.toLowerCase())!==-1)return;
+  // Clean ?p= and ?from404 from URL bar after reading
+  history.replaceState(null,'','/');
   openProductBySlug(path);
 }
 
