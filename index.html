@@ -188,6 +188,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .photo-like.liked-fire{background:#b84c2e;color:var(--cream);border-color:#b84c2e;}
 .photo-like.liked-heart svg,.photo-like.liked-fire svg{stroke:var(--cream);}
 .photo-like svg{flex-shrink:0;}
+.photo-share-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid rgba(25,41,58,.2);color:var(--navy);font-family:var(--mono);font-size:9px;padding:6px 10px;cursor:pointer;transition:.15s;letter-spacing:.05em;margin-left:auto;opacity:.5;}
+.photo-share-btn:hover{border-color:var(--navy);opacity:1;}
+.photo-share-btn.copied{border-color:var(--navy);opacity:1;}
 .photos-teaser-cta{margin:0 80px;border:1px solid var(--border);border-top:none;}
 .photos-see-all{width:100%;padding:18px 36px;background:none;border:none;color:var(--navy);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;opacity:.8;}
 .photos-see-all:hover{background:rgba(25,41,58,.04);opacity:1;}
@@ -1069,8 +1072,36 @@ function closeMobileNav(){document.getElementById('mobile-nav-drawer').classList
 (function(){var els=document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.section-rule');var ro=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('revealed');ro.unobserve(e.target);}});},{threshold:0.1});els.forEach(function(el){ro.observe(el);});var nav=document.querySelector('nav'),ht=document.querySelector('.hero-title');window.addEventListener('scroll',function(){nav.classList.toggle('scrolled',window.scrollY>40);if(ht&&window.scrollY<window.innerHeight)ht.style.transform='translateY('+(window.scrollY*0.12)+'px)';},{passive:true});})();
 
 // ── Gallery open/close ────────────────────────────────────────────────────────
-function openGallery(){document.getElementById('gallery-page').style.display='flex';document.body.style.overflow='hidden';}
-function closeGallery(){document.getElementById('gallery-page').style.display='none';document.body.style.overflow='';}
+function openGallery(photoId){
+  document.getElementById('gallery-page').style.display='flex';
+  document.body.style.overflow='hidden';
+  var url=photoId?'/?gallery=1&photo='+encodeURIComponent(photoId):'/?gallery=1';
+  history.pushState({gallery:true,photo:photoId||null},'',url);
+  if(photoId)setTimeout(function(){scrollGalleryToPhoto(photoId);},120);
+}
+function closeGallery(){
+  document.getElementById('gallery-page').style.display='none';
+  document.body.style.overflow='';
+  history.replaceState(null,'','/');
+}
+function scrollGalleryToPhoto(id){
+  var card=document.querySelector('.photo-card[data-photoid="'+id+'"]');
+  if(!card)return;
+  card.scrollIntoView({behavior:'smooth',block:'center'});
+  card.style.outline='2px solid rgba(25,41,58,.35)';
+  setTimeout(function(){card.style.outline='';},2000);
+}
+function sharePhoto(id,btn){
+  var url=window.location.origin+'/gallery/'+encodeURIComponent(id);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){
+      var orig=btn.innerHTML;
+      btn.innerHTML='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+      btn.classList.add('copied');
+      setTimeout(function(){btn.innerHTML=orig;btn.classList.remove('copied');},2000);
+    }).catch(function(){window.prompt('Copy link:',url);});
+  }else{window.prompt('Copy link:',url);}
+}
 
 // ── Announcement slider ───────────────────────────────────────────────────────
 var annCurrent=0;
@@ -1205,7 +1236,7 @@ function buildCard(entry){
   try{currentVote=localStorage.getItem('vote_'+entry.id);}catch(e){}
   var likedHeart=currentVote==='heart';
   var likedFire=currentVote==='fire';
-  return '<div class="photo-card">'+
+  return '<div class="photo-card" data-photoid="'+entry.id+'">'+
     '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
@@ -1213,6 +1244,7 @@ function buildCard(entry){
       '<div class="photo-actions">'+
         '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
         '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
+        '<button class="photo-share-btn" onclick="sharePhoto(\''+entry.id+'\',this)" title="Share this photo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>'+
       '</div>'+
     '</div>'+
   '</div>';
@@ -1470,6 +1502,25 @@ function openProductBySlug(slug){
 
 function checkDeepLink(){
   var params=new URLSearchParams(window.location.search);
+  // Gallery deep link
+  if(params.get('gallery')){
+    var photoId=params.get('photo')||null;
+    history.replaceState(null,'/','/');
+    // Wait for submissions to load then open gallery
+    function tryOpenGallery(){
+      document.getElementById('gallery-page').style.display='flex';
+      document.body.style.overflow='hidden';
+      if(photoId)setTimeout(function(){scrollGalleryToPhoto(photoId);},400);
+    }
+    // Submissions may not be loaded yet — poll briefly
+    var attempts=0;
+    var galleryInterval=setInterval(function(){
+      if(_allEntries.length||attempts>20){clearInterval(galleryInterval);tryOpenGallery();}
+      attempts++;
+    },150);
+    return;
+  }
+  // Product deep link
   var path=params.get('p');
   if(!path)return;
   path=decodeURIComponent(path);
@@ -1478,7 +1529,6 @@ function checkDeepLink(){
   if(_announcementsReady){
     openProductBySlug(path);
   }else{
-    // Announcements still loading — defer until they arrive
     _pendingDeepLink=path;
   }
 }
@@ -1702,10 +1752,15 @@ function closeProductModal(){
 
 // Handle browser back/forward through product pages
 window.addEventListener('popstate',function(e){
-  if(e.state&&e.state.product){
+  if(e.state&&e.state.gallery){
+    document.getElementById('gallery-page').style.display='flex';
+    document.body.style.overflow='hidden';
+    if(e.state.photo)setTimeout(function(){scrollGalleryToPhoto(e.state.photo);},120);
+  }else if(e.state&&e.state.product){
     openProductBySlug(e.state.product);
   }else{
     document.getElementById('product-modal').classList.remove('open');
+    document.getElementById('gallery-page').style.display='none';
     document.body.style.overflow='';
   }
 });
