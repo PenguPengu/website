@@ -1317,6 +1317,8 @@ function loadConfig(){
 
 // ── Announcements ─────────────────────────────────────────────────────────────
 var _announcements=[];
+var _announcementsReady=false;
+var _pendingDeepLink=null; // slug to open once announcements are ready
 function fixDiscordUrl(u){if(u&&u.indexOf('cdn.discordapp.com')!==-1)return u.replace('cdn.discordapp.com','media.discordapp.net');return u;}
 
 function loadAnnouncements(){
@@ -1371,7 +1373,14 @@ function loadAnnouncements(){
     }else{
       wrap.innerHTML='<div class="ann-img-gallery"><div class="ann-img-main"><div class="ann-img-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> No images yet</div></div></div>';
     }
-  }).catch(function(e){console.log('[Ann] error',e);});
+    // Mark announcements ready — open any pending deep link now
+    _announcementsReady=true;
+    if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);}
+  }).catch(function(e){
+    console.log('[Ann] error',e);
+    _announcementsReady=true;
+    if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);}
+  });
 }
 
 // ── Submissions ───────────────────────────────────────────────────────────────
@@ -1413,9 +1422,13 @@ function checkDeepLink(){
   if(!path)return;
   path=decodeURIComponent(path);
   if(!path||RESERVED_PATHS.indexOf(path.toLowerCase())!==-1)return;
-  // Clean ?p= and ?from404 from URL bar after reading
-  history.replaceState(null,'','/');
-  openProductBySlug(path);
+  history.replaceState(null,'/','/');
+  if(_announcementsReady){
+    openProductBySlug(path);
+  }else{
+    // Announcements still loading — defer until they arrive
+    _pendingDeepLink=path;
+  }
 }
 
 function renderProducts(products){
