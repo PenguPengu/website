@@ -143,16 +143,28 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .photo-img{aspect-ratio:4/3;background:rgba(25,41,58,.05);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--navy);font-size:9px;letter-spacing:.15em;text-transform:uppercase;overflow:hidden;position:relative;min-width:0;max-width:100%;}
 .photo-img .photo-placeholder{opacity:.2;display:flex;flex-direction:column;align-items:center;gap:10px;}
 .photo-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
-.photo-img .photo-zoom-overlay{
+.photo-img .photo-zoom-overlay,
+.ann-img-main .photo-zoom-overlay,
+.pm-gallery-main .photo-zoom-overlay,
+.upd-img-main .photo-zoom-overlay{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   background:rgba(25,41,58,0);transition:background .2s;pointer-events:none;z-index:2;
 }
-.photo-img .photo-zoom-overlay svg{
+.photo-img .photo-zoom-overlay svg,
+.ann-img-main .photo-zoom-overlay svg,
+.pm-gallery-main .photo-zoom-overlay svg,
+.upd-img-main .photo-zoom-overlay svg{
   opacity:0;transform:scale(.8);transition:opacity .2s,transform .2s;
   color:var(--cream);filter:drop-shadow(0 1px 4px rgba(0,0,0,.4));
 }
-.photo-img:hover .photo-zoom-overlay{background:rgba(25,41,58,.22);}
-.photo-img:hover .photo-zoom-overlay svg{opacity:1;transform:scale(1);}
+.photo-img:hover .photo-zoom-overlay,
+.ann-img-main:hover .photo-zoom-overlay,
+.pm-gallery-main:hover .photo-zoom-overlay,
+.upd-img-main:hover .photo-zoom-overlay{background:rgba(25,41,58,.22);}
+.photo-img:hover .photo-zoom-overlay svg,
+.ann-img-main:hover .photo-zoom-overlay svg,
+.pm-gallery-main:hover .photo-zoom-overlay svg,
+.upd-img-main:hover .photo-zoom-overlay svg{opacity:1;transform:scale(1);}
 .photo-info{padding:20px 24px 24px;display:flex;flex-direction:column;flex:1;}
 .photo-title{font-family:var(--serif);font-size:16px;font-weight:900;line-height:1.2;margin-bottom:7px;}
 .photo-desc{font-size:10px;line-height:1.8;opacity:.65;margin-bottom:14px;flex:1;}
@@ -1349,6 +1361,7 @@ function loadAnnouncements(){
         '<div class="ann-img-gallery">'+
           '<div class="ann-img-main" id="ann-img-main" onclick="openLightboxMulti([\''+allEsc.join("','")+'\'],_annImgCurrent)">'+
             '<img src="'+_annImgUrls[0]+'" alt="" onerror="this.style.display=\'none\'">'+
+            '<div class="photo-zoom-overlay">'+ZOOM_SVG+'</div>'+
             (hasNav?'<button class="ann-img-nav prev" onclick="event.stopPropagation();annImgShow(_annImgCurrent-1)">&#8592;</button>':'')+
             (hasNav?'<button class="ann-img-nav next" onclick="event.stopPropagation();annImgShow(_annImgCurrent+1)">&#8594;</button>':'')+
             (hasNav?'<div id="ann-img-counter" class="ann-img-counter">1 / '+_annImgUrls.length+'</div>':'')+
@@ -1549,7 +1562,7 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   if(productImgs.length>0){
     var showNav=productImgs.length>1;
     galleryMain.style.cursor='zoom-in';
-    galleryMain.innerHTML='<img src="'+productImgs[0]+'" alt="'+name+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;" onerror="this.style.display=\'none\'">'+(showNav?'<button class="pm-gallery-nav prev" onclick="event.stopPropagation();pmGalShow(_pmGalCurrent-1)">\u2190</button>':'')+
+    galleryMain.innerHTML='<img src="'+productImgs[0]+'" alt="'+name+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;" onerror="this.style.display=\'none\'">'+'<div class="photo-zoom-overlay">'+ZOOM_SVG+'</div>'+(showNav?'<button class="pm-gallery-nav prev" onclick="event.stopPropagation();pmGalShow(_pmGalCurrent-1)">\u2190</button>':'')+
       (showNav?'<button class="pm-gallery-nav next" onclick="event.stopPropagation();pmGalShow(_pmGalCurrent+1)">\u2192</button>':'')+
       (showNav?'<div id="pm-gal-counter" class="pm-gallery-counter">1 / '+productImgs.length+'</div>':'');
     galleryMain.onclick=function(){_lbImages=_pmGalImages.slice();pmOpenLightbox(_pmGalCurrent);};
@@ -1603,7 +1616,7 @@ function pmOpenUpdateImg(lbIdx){pmOpenLightbox(lbIdx);}
 function shareProduct(){
   var name=document.getElementById('pm-name').textContent||'';
   var slug=productSlug(name);
-  var url=slug?(window.location.origin+'/?p='+encodeURIComponent(slug)):window.location.href;
+  var url=slug?(window.location.origin+'/'+encodeURIComponent(slug)):window.location.href;
   var btn=document.getElementById('pm-share');
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(url).then(function(){
