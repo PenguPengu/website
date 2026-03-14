@@ -1697,10 +1697,7 @@ function shareProduct(){
 function closeProductModal(){
   document.getElementById('product-modal').classList.remove('open');
   document.body.style.overflow='';
-  // Clear product slug from URL if it's there
-  if(window.history.state&&window.history.state.product){
-    history.pushState(null,'','/');
-  }
+  history.replaceState(null,'','/');
 }
 
 // Handle browser back/forward through product pages
