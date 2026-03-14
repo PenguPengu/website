@@ -2034,6 +2034,8 @@ loadAnnouncements();
 loadSubmissions();
 setInterval(loadAnnouncements,60000);
 setInterval(loadSubmissions,60000);
+// Check for ?gallery=1 immediately on load (doesn't need products to be ready)
+(function(){var p=new URLSearchParams(window.location.search);if(p.get('gallery'))checkDeepLink();})();
 </script>
 </body>
 </html>
