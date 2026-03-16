@@ -127,6 +127,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .product-card:hover .status-cancelled{color:#a03030;}
 .product-card-hint{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,239,230,.3);margin-top:20px;transition:.2s;}
 .product-card:hover .product-card-hint{color:rgba(25,41,58,.3);}
+.product-card-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;margin-bottom:20px;opacity:.85;transition:opacity .2s;}
+.product-card:hover .product-card-img{opacity:1;}
+.product-card-img-ph{width:100%;aspect-ratio:16/9;background:rgba(247,239,230,.06);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.product-card-img-ph svg{opacity:.15;}
+.product-updated{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:rgba(247,239,230,.35);margin-top:14px;display:flex;align-items:center;gap:6px;}
+.product-updated::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#6fcf97;flex-shrink:0;}
+.product-card:hover .product-updated{color:rgba(25,41,58,.45);}
+.product-card:hover .product-updated::before{background:#2d8a5a;}
+/* Products see-all CTA */
+.products-teaser-cta{margin:0 80px;border:1px solid rgba(247,239,230,.12);border-top:none;}
+.products-see-all{width:100%;padding:18px 36px;background:none;border:none;color:var(--cream);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;opacity:.7;}
+.products-see-all:hover{background:rgba(247,239,230,.06);opacity:1;}
+/* Full catalogue overlay */
+#catalogue-page{position:fixed;inset:0;z-index:200;background:var(--navy);overflow:hidden;display:flex;flex-direction:column;}
+.catalogue-nav{height:60px;flex-shrink:0;border-bottom:1px solid rgba(247,239,230,.1);display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:var(--navy);}
+.catalogue-back{background:none;border:none;color:var(--cream);font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:9px;opacity:.5;transition:opacity .15s;}
+.catalogue-back:hover{opacity:1;}
+.catalogue-body{flex:1;overflow-y:auto;padding:40px 40px 80px;}
+.catalogue-body::-webkit-scrollbar{width:3px;}
+.catalogue-body::-webkit-scrollbar-thumb{background:rgba(247,239,230,.2);}
+.catalogue-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(247,239,230,.1);}
+.catalogue-title{font-family:var(--serif);font-size:clamp(24px,3vw,36px);font-weight:900;color:var(--cream);letter-spacing:-.02em;margin-bottom:32px;}
+.catalogue-title em{font-style:italic;font-weight:400;opacity:.45;}
 .product-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
 .product-number{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--cream);opacity:.3;}
 .product-status{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:4px 10px;border:1px solid;}
@@ -615,6 +638,10 @@ body{top:0!important;}
   .intro-stats{padding:36px 20px;grid-template-columns:1fr 1fr!important;gap:24px;}
   .stat-num{font-size:28px;}
   .products-grid{grid-template-columns:1fr!important;margin:0 16px;}
+  .products-teaser-cta{margin:0 16px;}
+  .catalogue-grid{grid-template-columns:1fr!important;}
+  .catalogue-nav{padding:0 16px;}
+  .catalogue-body{padding:20px 16px 60px;}
   .product-card{padding:28px 20px;}
   .product-card-header{flex-direction:column!important;align-items:flex-start!important;gap:8px;margin-bottom:16px;}
   .comp-info-bar{margin:0 16px 20px;flex-direction:column;align-items:flex-start;padding:20px;gap:16px;}
@@ -743,7 +770,7 @@ body{top:0!important;}
 <div class="coord coord-br">EST. 2021</div>
 
 <nav id="main-nav">
-  <a href="#home" class="nav-logo notranslate">
+  <a href="#home" class="nav-logo">
     <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;">
       <path fill="#1b2b3a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0"/>
     </svg>
@@ -816,7 +843,7 @@ body{top:0!important;}
   </svg>
   <div class="hero-left">
     <p class="hero-eyebrow anim">Marine · Industrial · Equipment</p>
-    <h1 class="hero-title anim delay-1 notranslate">UNDER<br>WAY<em>built for the<br>long haul.</em></h1>
+    <h1 class="hero-title anim delay-1">UNDER<br>WAY<em>built for the<br>long haul.</em></h1>
     <p class="hero-tagline anim delay-2">Professional-grade marine solutions since 2021</p>
     <div class="hero-btns anim delay-3">
       <a href="#products" class="btn-primary">View Products</a>
@@ -862,19 +889,25 @@ body{top:0!important;}
 <section class="products-section" id="products">
   <div class="section-header reveal">
     <p class="section-eyebrow">What we make</p>
-    <h2 class="section-title notranslate">The <em>Catalogue</em></h2>
+    <h2 class="section-title">The <em>Catalogue</em></h2>
     <div class="section-rule"></div>
   </div>
   <div class="sheets-config-notice" id="sheets-notice"></div>
   <div class="products-grid" id="products-grid">
     <div class="sheets-loading">Loading products…</div>
   </div>
+  <div class="products-teaser-cta">
+    <button class="products-see-all" id="products-see-all" onclick="openCatalogue()" style="display:none">
+      View full catalogue
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
 </section>
 
 <section class="photos-section" id="photos">
   <div class="section-header reveal">
     <p class="section-eyebrow">Photo Competition</p>
-    <h2 class="section-title notranslate">Latest <em>Entries</em></h2>
+    <h2 class="section-title">Latest <em>Entries</em></h2>
     <div class="section-rule"></div>
   </div>
   <div class="comp-info-bar reveal">
@@ -900,7 +933,7 @@ body{top:0!important;}
 <section class="announce-section" id="discord">
   <div class="section-header reveal">
     <p class="section-eyebrow">From the team</p>
-    <h2 class="section-title notranslate">Announce<em>ments</em></h2>
+    <h2 class="section-title">Announce<em>ments</em></h2>
     <div class="section-rule"></div>
   </div>
   <div class="update-announce reveal">
@@ -918,22 +951,22 @@ body{top:0!important;}
 <section class="community-section" id="community">
   <div class="section-header reveal">
     <p class="section-eyebrow">Join us</p>
-    <h2 class="section-title notranslate">The <em>Community</em></h2>
+    <h2 class="section-title">The <em>Community</em></h2>
     <div class="section-rule"></div>
   </div>
   <div class="community-channels">
     <a href="https://www.youtube.com/@Pengu672" class="channel-card reveal-scale" target="_blank" rel="noopener">
-      <div class="channel-name notranslate">YouTube</div>
+      <div class="channel-name">YouTube</div>
       <div class="channel-desc">Walkthroughs, Tutorials, Behind the Scenes &amp; More!</div>
       <div class="channel-cta">Watch Now</div>
     </a>
     <a href="https://discord.gg/jnMVGUbpFu" class="channel-card reveal-scale delay-r1" target="_blank" rel="noopener">
-      <div class="channel-name notranslate">Discord</div>
+      <div class="channel-name">Discord</div>
       <div class="channel-desc">Chat directly with the team, ask questions, get help, and partake in photography challenges!</div>
       <div class="channel-cta">Join Server</div>
     </a>
     <a href="https://steamcommunity.com/profiles/76561198811951629/" class="channel-card reveal-scale delay-r2" target="_blank" rel="noopener">
-      <div class="channel-name notranslate">Steam</div>
+      <div class="channel-name">Steam</div>
       <div class="channel-desc">See and use the latest products from our lineup and partners!</div>
       <div class="channel-cta">View Page</div>
     </a>
@@ -954,7 +987,7 @@ body{top:0!important;}
 <section class="partners-section" id="partners">
   <div class="section-header reveal">
     <p class="section-eyebrow">Our network</p>
-    <h2 class="section-title notranslate">Trusted <em>Partners</em></h2>
+    <h2 class="section-title">Trusted <em>Partners</em></h2>
     <div class="section-rule"></div>
   </div>
   <div class="partners-grid-wrap">
@@ -972,7 +1005,7 @@ body{top:0!important;}
         <div id="pm-partner-logo"></div>
         <div class="partner-modal-body-text">
           <div class="partner-modal-initial" id="pm-partner-initial"></div>
-          <div class="partner-modal-name notranslate" id="pm-partner-name"></div>
+          <div class="partner-modal-name" id="pm-partner-name"></div>
           <div class="partner-modal-type" id="pm-partner-type"></div>
         </div>
       </div>
@@ -999,7 +1032,7 @@ body{top:0!important;}
       <div class="pm-content" id="pm-content">
         <div class="pm-content-main">
           <div class="pm-eyebrow" id="pm-eyebrow"></div>
-          <div class="pm-name notranslate" id="pm-name"></div>
+          <div class="pm-name" id="pm-name"></div>
           <div class="pm-type" id="pm-type"></div>
           <div class="pm-desc" id="pm-desc"></div>
           <div class="pm-details" id="pm-details" style="display:none"></div>
@@ -1054,6 +1087,23 @@ body{top:0!important;}
     <li><a href="#" onclick="tourOpen(0);return false;">Site Tour</a></li>
   </ul>
 </footer>
+
+<!-- CATALOGUE PAGE -->
+<div id="catalogue-page" style="display:none">
+  <div class="catalogue-nav">
+    <button class="catalogue-back" onclick="closeCatalogue()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+      Back to Underway
+    </button>
+    <span style="font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.4">Full Catalogue</span>
+  </div>
+  <div class="catalogue-body">
+    <div class="catalogue-title">The <em>Full Catalogue</em></div>
+    <div class="catalogue-grid" id="catalogue-grid">
+      <div class="sheets-loading">Loading…</div>
+    </div>
+  </div>
+</div>
 
 <!-- GALLERY PAGE -->
 <div id="gallery-page" style="display:none">
@@ -1181,22 +1231,19 @@ document.querySelectorAll('.anim').forEach(function(el){el.style.animationPlaySt
 // ── Like toggle ───────────────────────────────────────────────────────────────
 function toggleLike(btn){
   var type=btn.getAttribute('data-type');
-  var id=btn.getAttribute('data-id');
+  var id=btn.getAttribute('data-id'); // stable hash id — used for localStorage & UI
+  var rowId=btn.getAttribute('data-rowid')||id; // sheet row id — used for backend
   var ip=window._visitorId||'unknown';
   var current=null;
   try{current=localStorage.getItem('vote_'+id);}catch(e){}
   var card=btn.closest('.photo-card');
-  var heartBtn=card.querySelector('[data-type="heart"]');
-  var fireBtn=card.querySelector('[data-type="fire"]');
 
   if(current===type){
-    // Un-vote: clicking same button removes it
     btn.classList.remove('liked-'+type);
     btn.querySelector('.like-count').textContent=Math.max(0,parseInt(btn.querySelector('.like-count').textContent)-1);
     try{localStorage.removeItem('vote_'+id);}catch(e){}
-    sendVote(id,type,ip,'remove');
+    sendVote(rowId,type,ip,'remove');
   } else {
-    // Switch or new vote — undo old UI first
     if(current){
       var oldBtn=card.querySelector('[data-type="'+current+'"]');
       oldBtn.classList.remove('liked-'+current);
@@ -1205,8 +1252,7 @@ function toggleLike(btn){
     btn.classList.add('liked-'+type);
     btn.querySelector('.like-count').textContent=parseInt(btn.querySelector('.like-count').textContent)+1;
     try{localStorage.setItem('vote_'+id,type);}catch(e){}
-    // Single 'set' request handles both new vote and switching server-side
-    sendVote(id,type,ip,'set');
+    sendVote(rowId,type,ip,'set');
   }
 }
 function sendVote(id,type,ip,action){
@@ -1295,8 +1341,8 @@ function buildCard(entry){
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
       '<div class="photo-actions">'+
-        '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
-        '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
+        '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" data-rowid="'+(entry.rowId||entry.id)+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
+        '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" data-rowid="'+(entry.rowId||entry.id)+'" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
         '<button class="photo-share-btn" onclick="sharePhoto(\''+entry.id+'\',this)" title="Share this photo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>'+
       '</div>'+
     '</div>'+
@@ -1324,7 +1370,14 @@ function showAllThemes(){
 
 function renderGallery(rows){
   var norm=rows.map(function(row){var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().replace(/[^a-z0-9]/g,'')]=(row[k]||'').trim();});return r;});
-  var entries=norm.filter(function(r){return r.id&&!isNaN(parseInt(r.id));}).map(function(r){return{id:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||''};});
+  // Generate a stable unique ID from contestName+title+timestamp so IDs don't
+  // reset when a new challenge starts (row IDs restart at 0 each contest).
+  function stableId(r){
+    var raw=(r.contestname||'')+'|'+(r.title||'')+'|'+(r.timestamp||'')+'|'+(r.image||'').slice(-20);
+    var h=0;for(var ci=0;ci<raw.length;ci++){h=((h<<5)-h+raw.charCodeAt(ci))|0;}
+    return'p'+(h>>>0).toString(36);
+  }
+  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){var sid=stableId(r);return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||''};});
   if(!entries.length){var empty='<div class="gallery-empty">No submissions yet</div>';var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=empty;var cg=document.getElementById('gallery-current-grid');if(cg)cg.innerHTML=empty;var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent='No active contest';return;}
   _allEntries=entries.slice();_showingAll=false;
   var map={};entries.forEach(function(e){var key=e.contestName;if(!map[key])map[key]={name:key,openedAt:'',entries:[]};if(e.contestOpenedAt&&e.contestOpenedAt>map[key].openedAt)map[key].openedAt=e.contestOpenedAt;map[key].entries.push(e);});
@@ -1419,6 +1472,8 @@ function fixDiscordUrl(u){if(u&&u.indexOf('cdn.discordapp.com')!==-1)return u.re
 
 function _annReady(){
   _announcementsReady=true;
+  // Re-render products now that we have update timestamps
+  if(PRODUCT_REGISTRY.length)renderProducts(PRODUCT_REGISTRY);
   // If a deep link was waiting on us, open it now
   if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);return;}
   // If product modal is already open (products loaded faster), re-render updates panel
@@ -1433,7 +1488,7 @@ function _repopulateUpdates(name){
     var t=(a.type||'').toLowerCase().trim();
     return(t==='build update'||t==='build_update')&&
       (a.build||'').toLowerCase().trim()===name.toLowerCase().trim();
-  }).slice().reverse();
+  }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   if(!buildUpdates.length)return;
   var updatePanel=document.getElementById('pm-update-panel');
   if(!updatePanel)return;
@@ -1586,23 +1641,115 @@ function checkDeepLink(){
   }
 }
 
+// ── Time-ago helper ───────────────────────────────────────────────────────────
+function timeAgoStr(dateStr){
+  if(!dateStr)return'';
+  var d=new Date(dateStr);if(isNaN(d.getTime()))return'';
+  var diff=(Date.now()-d)/1000;
+  if(diff<60)return'just now';
+  if(diff<3600)return Math.floor(diff/60)+'m ago';
+  if(diff<86400)return Math.floor(diff/3600)+'h ago';
+  if(diff<604800)return Math.floor(diff/86400)+'d ago';
+  if(diff<2592000)return Math.floor(diff/604800)+'w ago';
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+// ── Build a single product card HTML ─────────────────────────────────────────
+function buildProductCard(p,idx,opts){
+  opts=opts||{};
+  var r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
+  var num=String(idx+1).padStart(2,'0');
+  var firstImg='';
+  if(r.image){
+    var imgs=r.image.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;});
+    firstImg=imgs[imgs.length-1]||imgs[0]||'';
+  }
+  var imgHtml=firstImg
+    ?'<img class="product-card-img" src="'+firstImg+'" alt="'+(r.name||'')+'" onerror="this.style.display=\'none\'">'
+    :'<div class="product-card-img-ph"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
+  var updatedLabel=opts.updatedAt?'<div class="product-updated">Updated '+timeAgoStr(opts.updatedAt)+'</div>':'';
+  return '<div class="product-card anim" data-idx="'+idx+'">'+imgHtml+
+    '<div class="product-card-header"><span class="product-number notranslate">'+num+'</span><span class="product-status '+statusClass(r.status||'')+'">'+statusIcon(r.status||'')+' '+(r.status||'')+'</span></div>'+
+    '<div class="product-name notranslate">'+(r.name||'')+'</div>'+
+    '<div class="product-type notranslate">'+(r.type||'')+'</div>'+
+    '<p class="product-desc">'+(r.desc||r.description||'')+'</p>'+
+    updatedLabel+
+    '<div class="product-card-hint">Click to view</div></div>';
+}
+
+function _openProductFromCard(card){
+  var idx=parseInt(card.getAttribute('data-idx'));
+  var p=PRODUCT_REGISTRY[idx],r={};
+  Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
+  var slug=productSlug(r.name||'');
+  if(slug)history.pushState({product:slug},'','/?p='+encodeURIComponent(slug));
+  openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.image||'',r.cta_url||'');
+}
+
 function renderProducts(products){
   PRODUCT_REGISTRY=products;
+
+  // Build map of most-recent build-update timestamp per product
+  var latestUpdateMap={};
+  _announcements.forEach(function(a){
+    var t=(a.type||'').toLowerCase().trim();
+    if(t!=='build update'&&t!=='build_update')return;
+    var bn=(a.build||'').toLowerCase().trim();if(!bn)return;
+    var ts=a.timestamp||'';
+    if(!latestUpdateMap[bn]||ts>latestUpdateMap[bn])latestUpdateMap[bn]=ts;
+  });
+
+  // Sort all products by most-recent update (no-update products go to end)
+  var indexed=products.map(function(p,i){
+    var r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
+    var bn=(r.name||'').toLowerCase().trim();
+    return{p:p,i:i,ts:latestUpdateMap[bn]||''};
+  });
+  indexed.sort(function(a,b){
+    if(a.ts&&b.ts)return b.ts.localeCompare(a.ts);
+    if(a.ts)return-1;if(b.ts)return 1;return 0;
+  });
+
+  // Homepage: 3 most-recently-updated
+  var featured=indexed.slice(0,3);
   var grid=document.getElementById('products-grid');
-  grid.innerHTML=products.map(function(p,i){
-    var num=String(i+1).padStart(2,'0'),r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
-    return '<div class="product-card anim" data-idx="'+i+'"><div class="product-card-header"><span class="product-number">'+num+'</span><span class="product-status '+statusClass(r.status||'')+'">'+statusIcon(r.status||'')+' '+(r.status||'')+'</span></div><div class="product-name notranslate">'+(r.name||'')+'</div><div class="product-type notranslate">'+(r.type||'')+'</div><p class="product-desc">'+(r.desc||r.description||'')+'</p><div class="product-card-hint">Click to view</div></div>';
+  grid.innerHTML=featured.map(function(item){
+    var r={};Object.keys(item.p).forEach(function(k){r[k.toLowerCase()]=item.p[k];});
+    var bn=(r.name||'').toLowerCase().trim();
+    return buildProductCard(item.p,item.i,{updatedAt:latestUpdateMap[bn]||''});
   }).join('');
   grid.querySelectorAll('.product-card').forEach(function(card){
-    card.addEventListener('click',function(){
-      var idx=parseInt(this.getAttribute('data-idx')),p=PRODUCT_REGISTRY[idx],r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
-      var slug=productSlug(r.name||'');
-      if(slug)history.pushState({product:slug},'','/?p='+encodeURIComponent(slug));
-      openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.image||'',r.cta_url||'');
-    });
+    card.addEventListener('click',function(){_openProductFromCard(this);});
   });
   grid.querySelectorAll('.anim').forEach(function(el){el.style.animationPlayState='paused';observer.observe(el);});
+
+  // Show "view all" button only if >3 products
+  var seeAllBtn=document.getElementById('products-see-all');
+  if(seeAllBtn)seeAllBtn.style.display=indexed.length>3?'flex':'none';
+
+  // Full catalogue overlay: all products
+  var catGrid=document.getElementById('catalogue-grid');
+  if(catGrid){
+    catGrid.innerHTML=indexed.map(function(item){
+      var r={};Object.keys(item.p).forEach(function(k){r[k.toLowerCase()]=item.p[k];});
+      var bn=(r.name||'').toLowerCase().trim();
+      return buildProductCard(item.p,item.i,{updatedAt:latestUpdateMap[bn]||''});
+    }).join('');
+    catGrid.querySelectorAll('.product-card').forEach(function(card){
+      card.addEventListener('click',function(){_openProductFromCard(this);});
+    });
+  }
   checkDeepLink();
+}
+
+// ── Catalogue overlay open/close ──────────────────────────────────────────────
+function openCatalogue(){
+  document.getElementById('catalogue-page').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeCatalogue(){
+  document.getElementById('catalogue-page').style.display='none';
+  document.body.style.overflow='';
 }
 function renderComingSoon(){document.getElementById('products-grid').innerHTML='<div style="grid-column:1/-1;padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;"><div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream)">Catalogue Coming Soon</div><div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range.</div></div>';}
 function loadFromSheets(){fetch(PRODUCTS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){var p=parseCSV(text);if(!p.length)throw 0;renderProducts(p);}).catch(function(){renderComingSoon();});}
@@ -1614,7 +1761,7 @@ function renderPartners(partners){
   if(!partners||!partners.length){grid.innerHTML='<div style="padding:40px;opacity:.4;font-size:11px;letter-spacing:.15em;text-transform:uppercase;grid-column:1/-1">Partners coming soon</div>';return;}
   PARTNER_REGISTRY=partners.map(function(p){var r={};Object.keys(p).forEach(function(k){r[k.toLowerCase().trim()]=(p[k]||'').trim();});return r;});
   var sp=document.getElementById('stat-partners');if(sp)sp.textContent=PARTNER_REGISTRY.length;
-  grid.innerHTML=PARTNER_REGISTRY.map(function(r,i){var nm=r.name||'',init=nm?nm.charAt(0).toUpperCase():'?';return'<div class="partner-card" data-idx="'+i+'"><div class="partner-initial notranslate">'+init+'</div><div class="partner-name notranslate">'+nm+'</div>'+(r.type?'<div class="partner-type notranslate">'+r.type+'</div>':'')+'<div class="partner-hint" style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div></div>';}).join('');
+  grid.innerHTML=PARTNER_REGISTRY.map(function(r,i){var nm=r.name||'',init=nm?nm.charAt(0).toUpperCase():'?';return'<div class="partner-card" data-idx="'+i+'"><div class="partner-initial">'+init+'</div><div class="partner-name">'+nm+'</div>'+(r.type?'<div class="partner-type">'+r.type+'</div>':'')+'<div class="partner-hint" style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div></div>';}).join('');
   grid.querySelectorAll('.partner-card').forEach(function(card){card.addEventListener('click',function(){openPartnerModal(PARTNER_REGISTRY[parseInt(this.getAttribute('data-idx'))]);});});
 }
 function loadPartners(){fetch(PARTNERS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){renderPartners(parseCSV(text));}).catch(function(){});}
@@ -1750,7 +1897,7 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       var isBuild=t==='build update'||t==='build_update';
       var buildName=(a.build||'').toLowerCase().trim();
       return isBuild&&buildName===name.toLowerCase().trim();
-    }).slice().reverse();
+    }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   }
   if(buildUpdates.length){
     var allUpdateImgs=[];_updGals={};
@@ -2040,7 +2187,7 @@ document.addEventListener('keydown',function(e){
     if(e.key==='ArrowRight'){tourNext();return;}
     if(e.key==='ArrowLeft'){tourPrev();return;}
   }
-  if(e.key==='Escape'){closeProductModal();closeVideoModal();pmLightboxClose();closePartnerModal();closeGallery();closeMobileNav();}
+  if(e.key==='Escape'){closeProductModal();closeVideoModal();pmLightboxClose();closePartnerModal();closeGallery();closeCatalogue();closeMobileNav();}
   if(document.getElementById('pm-lightbox').classList.contains('open')){if(e.key==='ArrowLeft')pmLightboxNav(-1);if(e.key==='ArrowRight')pmLightboxNav(1);}
 });
 
