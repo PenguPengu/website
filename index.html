@@ -568,6 +568,28 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
 /* Mobile tour link */
 .mobile-tour-link{display:block;padding:16px 24px;font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--navy);background:none;border:none;border-top:1px solid var(--border);opacity:.7;cursor:pointer;text-align:left;width:100%;}
 
+/* LANGUAGE SELECTOR */
+.lang-selector{position:relative;}
+.lang-btn{display:flex;align-items:center;gap:7px;background:none;border:1.5px solid rgba(25,41,58,.25);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:border-color .2s;}
+.lang-btn:hover{border-color:var(--navy);}
+.lang-chevron{transition:transform .2s;flex-shrink:0;}
+.lang-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--cream);border:1.5px solid rgba(25,41,58,.18);min-width:170px;display:none;flex-direction:column;z-index:200;box-shadow:0 8px 32px rgba(25,41,58,.13);}
+.lang-dropdown.open{display:flex;}
+.lang-option{padding:11px 16px;font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--navy);cursor:pointer;transition:background .15s;border:none;background:none;text-align:left;width:100%;display:flex;align-items:center;gap:10px;}
+.lang-option:hover{background:rgba(25,41,58,.06);}
+.lang-option.active{background:rgba(25,41,58,.09);font-weight:700;}
+.lang-flag{font-size:14px;line-height:1;flex-shrink:0;}
+/* Suppress Google Translate bar */
+.goog-te-banner-frame,.skiptranslate{display:none!important;}
+body{top:0!important;}
+#goog-gt-tt,.goog-te-balloon-frame{display:none!important;}
+.goog-logo-link,.goog-te-gadget>span{display:none!important;}
+.goog-te-gadget{font-size:0!important;}
+/* Mobile language chips */
+.mobile-lang-row{display:flex;flex-wrap:wrap;gap:6px;padding:14px 16px 18px;border-top:1px solid var(--border);}
+.mobile-lang-chip{font-family:var(--mono);font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--navy);background:none;border:1px solid rgba(25,41,58,.25);padding:7px 10px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:5px;}
+.mobile-lang-chip:hover,.mobile-lang-chip.active{background:var(--navy);color:var(--cream);border-color:var(--navy);}
+
 /* RESPONSIVE */
 @media(max-width:900px){
   html{scroll-padding-top:60px;}
@@ -575,6 +597,7 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
   nav{padding:0 20px;height:60px;}
   .nav-links{display:none;}
   .nav-logo-tag{display:none;}
+  .lang-selector{display:none;}
   .nav-hamburger{display:flex;}
   .mobile-nav-drawer{display:block;top:60px;}
   .marquee-wrap{display:none;}
@@ -732,6 +755,24 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <li><a href="#community">Community</a></li>
     <li><a href="#partners" class="nav-cta">Partners</a></li>
   </ul>
+
+  <div class="lang-selector" id="lang-selector">
+    <button class="lang-btn" id="lang-btn" onclick="toggleLangDropdown(event)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="lang-current">EN</span>
+      <svg class="lang-chevron" id="lang-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="lang-dropdown" id="lang-dropdown">
+      <button class="lang-option active" data-lang="en" onclick="setLang('en','EN',this)"><span class="lang-flag">🇬🇧</span>English</button>
+      <button class="lang-option" data-lang="no" onclick="setLang('no','NO',this)"><span class="lang-flag">🇳🇴</span>Norwegian</button>
+      <button class="lang-option" data-lang="de" onclick="setLang('de','DE',this)"><span class="lang-flag">🇩🇪</span>German</button>
+      <button class="lang-option" data-lang="fr" onclick="setLang('fr','FR',this)"><span class="lang-flag">🇫🇷</span>French</button>
+      <button class="lang-option" data-lang="es" onclick="setLang('es','ES',this)"><span class="lang-flag">🇪🇸</span>Spanish</button>
+      <button class="lang-option" data-lang="nl" onclick="setLang('nl','NL',this)"><span class="lang-flag">🇳🇱</span>Dutch</button>
+      <button class="lang-option" data-lang="sv" onclick="setLang('sv','SV',this)"><span class="lang-flag">🇸🇪</span>Swedish</button>
+      <button class="lang-option" data-lang="da" onclick="setLang('da','DA',this)"><span class="lang-flag">🇩🇰</span>Danish</button>
+    </div>
+  </div>
   <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -744,6 +785,18 @@ nav.scrolled{box-shadow:0 2px 24px rgba(25,41,58,.08);}
     <li><a href="#community" onclick="closeMobileNav()">Community</a></li>
     <li><a href="#partners" onclick="closeMobileNav()">Partners</a></li>
     <li><button class="mobile-tour-link" onclick="closeMobileNav();tourOpen(0);">&#9432; Take a Site Tour</button></li>
+    <li>
+      <div class="mobile-lang-row">
+        <button class="mobile-lang-chip active" data-lang="en" onclick="setLang('en','EN',this);closeMobileNav()">🇬🇧 EN</button>
+        <button class="mobile-lang-chip" data-lang="no" onclick="setLang('no','NO',this);closeMobileNav()">🇳🇴 NO</button>
+        <button class="mobile-lang-chip" data-lang="de" onclick="setLang('de','DE',this);closeMobileNav()">🇩🇪 DE</button>
+        <button class="mobile-lang-chip" data-lang="fr" onclick="setLang('fr','FR',this);closeMobileNav()">🇫🇷 FR</button>
+        <button class="mobile-lang-chip" data-lang="es" onclick="setLang('es','ES',this);closeMobileNav()">🇪🇸 ES</button>
+        <button class="mobile-lang-chip" data-lang="nl" onclick="setLang('nl','NL',this);closeMobileNav()">🇳🇱 NL</button>
+        <button class="mobile-lang-chip" data-lang="sv" onclick="setLang('sv','SV',this);closeMobileNav()">🇸🇪 SV</button>
+        <button class="mobile-lang-chip" data-lang="da" onclick="setLang('da','DA',this);closeMobileNav()">🇩🇰 DA</button>
+      </div>
+    </li>
   </ul>
 </div>
 
@@ -2037,5 +2090,82 @@ setInterval(loadSubmissions,60000);
 // Check for ?gallery=1 immediately on load (doesn't need products to be ready)
 (function(){var p=new URLSearchParams(window.location.search);if(p.get('gallery'))checkDeepLink();})();
 </script>
+<!-- Google Translate hidden widget -->
+<div id="google_translate_element" style="display:none;visibility:hidden;height:0;overflow:hidden;"></div>
+
+<script>
+// ── Language Selector ─────────────────────────────────────────────────────────
+var LANG_CODES={no:'NO',de:'DE',fr:'FR',es:'ES',nl:'NL',sv:'SV',da:'DA',en:'EN'};
+
+function toggleLangDropdown(e){
+  e.stopPropagation();
+  var dd=document.getElementById('lang-dropdown');
+  var ch=document.getElementById('lang-chevron');
+  dd.classList.toggle('open');
+  if(ch)ch.style.transform=dd.classList.contains('open')?'rotate(180deg)':'';
+}
+
+function setLang(lang,code,btn){
+  document.querySelectorAll('.lang-option,.mobile-lang-chip').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-lang')===lang);
+  });
+  var cur=document.getElementById('lang-current');
+  if(cur)cur.textContent=code;
+  var dd=document.getElementById('lang-dropdown');
+  if(dd)dd.classList.remove('open');
+  var ch=document.getElementById('lang-chevron');
+  if(ch)ch.style.transform='';
+  if(lang==='en'){
+    // Reset to English — clear cookie and reload
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain='+window.location.hostname+'; path=/;';
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.'+window.location.hostname+'; path=/;';
+    window.location.reload();
+    return;
+  }
+  // Use Google Translate combo if ready, else set cookie + reload
+  var sel=document.querySelector('.goog-te-combo');
+  if(sel){sel.value=lang;sel.dispatchEvent(new Event('change'));}
+  else{
+    document.cookie='googtrans=/en/'+lang+'; path=/';
+    document.cookie='googtrans=/en/'+lang+'; domain=.'+window.location.hostname+'; path=/';
+    window.location.reload();
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click',function(e){
+  var sel=document.getElementById('lang-selector');
+  if(sel&&!sel.contains(e.target)){
+    var dd=document.getElementById('lang-dropdown');
+    if(dd)dd.classList.remove('open');
+    var ch=document.getElementById('lang-chevron');
+    if(ch)ch.style.transform='';
+  }
+});
+
+// Restore active language from cookie on load
+(function(){
+  var match=document.cookie.match(/googtrans=\/en\/([a-z]+)/);
+  var active=(match&&match[1]&&match[1]!=='en')?match[1]:'en';
+  var code=LANG_CODES[active]||'EN';
+  var cur=document.getElementById('lang-current');
+  if(cur)cur.textContent=code;
+  document.querySelectorAll('.lang-option,.mobile-lang-chip').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-lang')===active);
+  });
+})();
+
+// Google Translate init callback
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    autoDisplay:false,
+    layout:google.translate.TranslateElement.InlineLayout.SIMPLE
+  },'google_translate_element');
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async defer></script>
+
 </body>
 </html>
