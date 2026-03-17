@@ -28,8 +28,8 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 :root{--navy:#19293a;--cream:#f7efe6;--rust:#b84c2e;--gold:#c9a84c;--mid:#4a6478;--border:rgba(25,41,58,0.18);--serif:'Playfair Display',serif;--mono:'Space Mono',monospace;}
 html{scroll-behavior:smooth;scroll-padding-top:72px;}
-body{background:var(--cream);color:var(--navy);font-family:var(--mono);overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(25,41,58,.042) 1px,transparent 1px),linear-gradient(90deg,rgba(25,41,58,.042) 1px,transparent 1px);background-size:120px 120px;}
+body{background:var(--cream);color:var(--navy);font-family:var(--mono);overflow-x:hidden;background-image:linear-gradient(rgba(25,41,58,.042) 1px,transparent 1px),linear-gradient(90deg,rgba(25,41,58,.042) 1px,transparent 1px);background-size:120px 120px;}
+body::before{display:none;}
 nav,.marquee-wrap,section,footer,.coord,.cursor-dot,.product-modal,.video-modal{position:relative;z-index:1;}
 .products-section{isolation:isolate;}
 .products-section::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(247,239,230,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(247,239,230,.05) 1px,transparent 1px);background-size:120px 120px;}
@@ -45,6 +45,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .nav-links a{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;text-decoration:none;color:var(--navy);opacity:.8;transition:opacity .2s;}
 .nav-links a:hover{opacity:1;}
 .nav-cta{background:var(--navy)!important;color:var(--cream)!important;opacity:1!important;padding:10px 20px;}
+.nav-tools-link{display:inline-flex!important;align-items:center;gap:5px;}
+.nav-tools-link svg{opacity:.55;transition:opacity .2s;}
+.nav-tools-link:hover svg{opacity:1;}
 .nav-cta:hover{background:var(--mid)!important;}
 .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:110;}
 .nav-hamburger span{display:block;width:24px;height:2px;background:var(--navy);transition:all .3s ease;}
@@ -124,7 +127,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .product-card:hover .product-status{border-color:rgba(25,41,58,.3);}
 .product-card:hover .status-active{color:#2d8a5a;}
 .product-card:hover .status-dev{color:#b8860b;}
-.product-card:hover .status-soon{color:rgba(25,41,58,.55);border-color:rgba(25,41,58,.3);}
+.product-card:hover .status-soon{color:var(--navy);border-color:rgba(25,41,58,.45);}
 .product-card:hover .status-cancelled{color:#c0392b;border-color:rgba(192,57,43,.4);}
 .product-card-hint{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,239,230,.3);margin-top:20px;transition:.2s;}
 .product-card:hover .product-card-hint{color:rgba(25,41,58,.3);}
@@ -156,7 +159,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .product-status{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:4px 10px;border:1px solid;}
 .status-active{color:#6fcf97;border-color:rgba(111,207,151,.35);}
 .status-dev{color:#f2c94c;border-color:rgba(242,201,76,.35);}
-.status-soon{color:rgba(247,239,230,.7);border-color:rgba(247,239,230,.35);}
+.status-soon{color:rgba(247,239,230,.85);border-color:rgba(247,239,230,.4);}
 .status-cancelled{color:#f09090;border-color:rgba(240,144,144,.45);}
 .product-name{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--cream);margin-bottom:8px;letter-spacing:-.01em;}
 .product-type{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;margin-bottom:18px;}
@@ -715,6 +718,56 @@ body{top:0!important;}
   .photos-grid{grid-template-columns:1fr!important;}
   .intro-stats{grid-template-columns:1fr 1fr!important;}
 }
+
+/* ── TOOLS PAGE ─────────────────────────────────────────────── */
+#tools-page{position:fixed;inset:0;z-index:200;background:var(--navy);overflow:hidden;flex-direction:column;display:none;}
+#tools-page::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(247,239,230,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(247,239,230,.03) 1px,transparent 1px);
+  background-size:120px 120px;}
+.tools-nav{height:60px;flex-shrink:0;border-bottom:1px solid rgba(247,239,230,.1);display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(25,41,58,.85);backdrop-filter:blur(8px);position:relative;z-index:1;}
+.tools-back{display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--cream);font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;opacity:.45;transition:opacity .2s;padding:0;}
+.tools-back:hover{opacity:1;}
+.tools-back-arrow{font-size:14px;line-height:1;}
+.tools-nav-title{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--cream);letter-spacing:.04em;opacity:.65;}
+.tools-body{flex:1;overflow-y:auto;padding:52px 56px 100px;position:relative;z-index:1;}
+.tools-header-row{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:40px;flex-wrap:wrap;}
+.tools-intro{max-width:480px;}
+.tools-intro h2{font-family:var(--serif);font-size:clamp(32px,4vw,52px);font-weight:900;color:var(--cream);line-height:.88;letter-spacing:-.03em;margin-bottom:14px;}
+.tools-intro h2 em{display:block;font-style:italic;font-weight:400;opacity:.35;font-size:.72em;line-height:1.3;}
+.tools-intro p{font-size:10px;color:rgba(247,239,230,.4);line-height:1.95;max-width:380px;}
+.tools-count{font-family:var(--serif);font-size:clamp(48px,7vw,88px);font-weight:900;color:rgba(247,239,230,.06);line-height:1;letter-spacing:-.04em;flex-shrink:0;}
+.tools-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid rgba(247,239,230,.07);}
+.tools-filter-btn{font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:8px 16px;border:1px solid rgba(247,239,230,.15);background:none;color:rgba(247,239,230,.35);cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px;}
+.tools-filter-btn:hover{border-color:rgba(247,239,230,.4);color:rgba(247,239,230,.6);}
+.tools-filter-btn.active{background:rgba(247,239,230,.08);border-color:rgba(247,239,230,.35);color:var(--cream);}
+.tools-filter-count{font-size:7px;opacity:.5;background:rgba(247,239,230,.1);padding:2px 5px;}
+.tools-filter-btn.active .tools-filter-count{opacity:.7;}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:rgba(247,239,230,.07);}
+.tool-card{background:rgba(25,41,58,.6);padding:32px 28px 26px;display:flex;flex-direction:column;cursor:pointer;transition:background .2s;text-decoration:none;position:relative;overflow:hidden;}
+.tool-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.15),transparent);opacity:0;transition:opacity .3s;}
+.tool-card:hover{background:rgba(31,51,73,.9);}
+.tool-card:hover::after{opacity:1;}
+.tool-card-cat{font-size:7px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);opacity:.55;margin-bottom:16px;}
+.tool-card-icon{font-size:26px;line-height:1;margin-bottom:16px;}
+.tool-card-name{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--cream);margin-bottom:10px;line-height:1.05;}
+.tool-card-desc{font-size:9px;color:rgba(247,239,230,.38);line-height:1.85;flex:1;margin-bottom:20px;}
+.tool-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
+.tool-card-link{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:rgba(247,239,230,.35);transition:color .2s;}
+.tool-card:hover .tool-card-link{color:var(--gold);}
+.tool-card-arrow{font-size:13px;color:rgba(247,239,230,.2);transition:color .2s,transform .2s;}
+.tool-card:hover .tool-card-arrow{color:var(--gold);transform:translate(2px,-2px);}
+.tools-empty{padding:60px 0;text-align:center;color:rgba(247,239,230,.2);font-size:10px;letter-spacing:.2em;text-transform:uppercase;}
+@media(max-width:900px){
+  .tools-body{padding:36px 24px 80px;}
+  .tools-nav{padding:0 24px;}
+  .tools-grid{grid-template-columns:1fr 1fr;}
+  .tools-header-row{flex-direction:column;gap:0;}
+  .tools-count{display:none;}
+}
+@media(max-width:600px){
+  .tools-grid{grid-template-columns:1fr;}
+}
+
 </style>
 </head>
 <body>
@@ -782,6 +835,7 @@ body{top:0!important;}
     <li><a href="#photos">Photos</a></li>
     <li><a href="#community">Community</a></li>
     <li><a href="#partners" class="nav-cta">Partners</a></li>
+    <li><a href="/tools.html" class="nav-tools-link"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Tools</a></li>
   </ul>
 
   <div class="lang-selector" id="lang-selector">
@@ -812,6 +866,7 @@ body{top:0!important;}
     <li><a href="#photos" onclick="closeMobileNav()">Photos</a></li>
     <li><a href="#community" onclick="closeMobileNav()">Community</a></li>
     <li><a href="#partners" onclick="closeMobileNav()">Partners</a></li>
+    <li><a href="#" href="/tools.html" onclick="closeMobileNav();" style="display:block;padding:16px 24px;font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--navy);text-decoration:none;border-bottom:1px solid var(--border);">Tools</a></li>
     <li><button class="mobile-tour-link" onclick="closeMobileNav();tourOpen(0);">&#9432; Take a Site Tour</button></li>
     <li>
       <div class="mobile-lang-row">
@@ -1098,6 +1153,36 @@ body{top:0!important;}
     </button>
     <span style="font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.4">Full Catalogue</span>
   </div>
+
+<!-- ── TOOLS PAGE ──────────────────────────────────────────────────────────── -->
+<div id="tools-page">
+  <div class="tools-nav">
+    <button class="tools-back" onclick="closeTools()">
+      <span class="tools-back-arrow">&#8592;</span>
+      <span>Back</span>
+    </button>
+    <div class="tools-nav-title">Tools &amp; Resources</div>
+    <div style="width:80px;"></div>
+  </div>
+  <div class="tools-body" id="tools-body">
+    <div class="tools-header-row">
+      <div class="tools-intro">
+        <h2>SW Tools<br><em>&amp; Resources</em></h2>
+        <p>Useful links, tools, and references for Stormworks builders — from official docs to community-made utilities.</p>
+      </div>
+      <div class="tools-count" id="tools-count">12</div>
+    </div>
+    <div class="tools-filter-row" id="tools-filters">
+      <button class="tools-filter-btn active" data-cat="all" onclick="filterTools('all',this)">All <span class="tools-filter-count" id="fc-all">12</span></button>
+      <button class="tools-filter-btn" data-cat="reference" onclick="filterTools('reference',this)">Reference <span class="tools-filter-count" id="fc-reference"></span></button>
+      <button class="tools-filter-btn" data-cat="community" onclick="filterTools('community',this)">Community <span class="tools-filter-count" id="fc-community"></span></button>
+      <button class="tools-filter-btn" data-cat="tools" onclick="filterTools('tools',this)">Tools <span class="tools-filter-count" id="fc-tools"></span></button>
+      <button class="tools-filter-btn" data-cat="workshop" onclick="filterTools('workshop',this)">Workshop <span class="tools-filter-count" id="fc-workshop"></span></button>
+    </div>
+    <div class="tools-grid" id="tools-grid"></div>
+  </div>
+</div>
+
   <div class="catalogue-body">
     <div class="catalogue-title">The <em>Full Catalogue</em></div>
     <div class="catalogue-grid" id="catalogue-grid">
@@ -1591,7 +1676,7 @@ var PRODUCT_REGISTRY=[];
 function productSlug(name){return(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 
 // Reserved path names that should never be treated as product slugs
-var RESERVED_PATHS=['products','photos','discord','community','partners','home','tour','about','gallery'];
+var RESERVED_PATHS=['products','photos','discord','community','partners','home','tour','about','gallery','tools'];
 
 function openProductBySlug(slug){
   if(!slug||!PRODUCT_REGISTRY)return false;
@@ -1627,6 +1712,12 @@ function checkDeepLink(){
       if(_allEntries.length||attempts>20){clearInterval(galleryInterval);tryOpenGallery();}
       attempts++;
     },150);
+    return;
+  }
+  // Tools deep link
+  if(params.get('tools')){
+    history.replaceState(null,'/','/?tools=1');
+    setTimeout(openTools, 100);
     return;
   }
   // Product deep link
@@ -2237,6 +2328,98 @@ setInterval(loadAnnouncements,60000);
 setInterval(loadSubmissions,60000);
 // Check for ?gallery=1 immediately on load (doesn't need products to be ready)
 (function(){var p=new URLSearchParams(window.location.search);if(p.get('gallery'))checkDeepLink();})();
+
+
+// ── TOOLS PAGE ───────────────────────────────────────────────────────────────
+var TOOLS_DATA = [
+  {name:'Stormworks Wiki',cat:'reference',icon:'📖',desc:'The official community wiki — game mechanics, blocks, scripting APIs, and everything in between.',url:'https://stormworks.wiki.gg/',link:'stormworks.wiki.gg'},
+  {name:'Lua Scripting API',cat:'reference',icon:'🖥',desc:'Full reference for the Lua scripting environment in Stormworks. Property types, callbacks, screen drawing, and more.',url:'https://stormworks.wiki.gg/wiki/Lua',link:'stormworks.wiki.gg/wiki/Lua'},
+  {name:'Block Reference',cat:'reference',icon:'🧱',desc:'Complete list of every block in Stormworks with dimensions, stats, and connection points.',url:'https://stormworks.wiki.gg/wiki/Category:Blocks',link:'stormworks.wiki.gg'},
+  {name:'Steam Workshop',cat:'workshop',icon:'🔧',desc:'Browse, download, and publish creations. The main hub for sharing vehicles and addons with the community.',url:'https://steamcommunity.com/app/573090/workshop/',link:'steamcommunity.com'},
+  {name:'Official Discord',cat:'community',icon:'💬',desc:'The official Stormworks Discord server — dev announcements, community channels, build showcases, and bug reports.',url:'https://discord.gg/stormworks',link:'discord.gg/stormworks'},
+  {name:'r/Stormworks',cat:'community',icon:'🌐',desc:'The Stormworks subreddit — screenshots, questions, guides, and community discussions.',url:'https://www.reddit.com/r/Stormworks/',link:'reddit.com/r/Stormworks'},
+  {name:'Stormworks Calculator',cat:'tools',icon:'🔢',desc:'Community tool for calculating engine performance, fuel consumption, thrust ratios, and buoyancy.',url:'https://stormworks.wiki.gg/wiki/Calculators',link:'stormworks.wiki.gg'},
+  {name:'Paint Hex Lookup',cat:'tools',icon:'🎨',desc:'Find exact paint colour codes and preview combinations before applying them in-game.',url:'https://stormworks.wiki.gg/wiki/Paint',link:'stormworks.wiki.gg'},
+  {name:'Underway Discord',cat:'community',icon:'⚓',desc:'Our own community server — build previews, early releases, feedback, and crew.',url:'https://discord.gg/underway',link:'discord.gg/underway'},
+  {name:'Modding Guide',cat:'reference',icon:'📦',desc:'How to create and publish addon mods for Stormworks — XML structure, mission scripting, custom locations.',url:'https://stormworks.wiki.gg/wiki/Modding',link:'stormworks.wiki.gg'},
+  {name:'Multiplayer Servers',cat:'community',icon:'🌍',desc:'Find public and private servers to explore, race, and build with other players worldwide.',url:'https://steamcommunity.com/app/573090/discussions/',link:'steamcommunity.com'},
+  {name:'Workbench Tips',cat:'tools',icon:'🛠',desc:'Community-collected tips for the vehicle workbench — keybinds, mass optimisation, and build best practices.',url:'https://stormworks.wiki.gg/wiki/Workbench',link:'stormworks.wiki.gg'},
+];
+
+function buildToolCard(t){
+  var el=document.createElement('a');
+  el.className='tool-card';
+  el.href=t.url;
+  el.target='_blank';
+  el.rel='noopener noreferrer';
+  el.setAttribute('data-cat',t.cat);
+  el.innerHTML='<div class="tool-card-cat">'+t.cat+'</div>'
+    +'<div class="tool-card-icon">'+t.icon+'</div>'
+    +'<div class="tool-card-name">'+t.name+'</div>'
+    +'<div class="tool-card-desc">'+t.desc+'</div>'
+    +'<div class="tool-card-footer">'
+    +'<span class="tool-card-link">'+t.link+'</span>'
+    +'<span class="tool-card-arrow">&#8599;</span>'
+    +'</div>';
+  return el;
+}
+
+function _updateToolsCounts(){
+  var cats=['reference','community','tools','workshop'];
+  var allEl=document.getElementById('fc-all');
+  if(allEl)allEl.textContent=TOOLS_DATA.length;
+  var countEl=document.getElementById('tools-count');
+  if(countEl)countEl.textContent=TOOLS_DATA.length;
+  cats.forEach(function(cat){
+    var el=document.getElementById('fc-'+cat);
+    if(el)el.textContent=TOOLS_DATA.filter(function(t){return t.cat===cat;}).length;
+  });
+}
+
+function renderTools(cat){
+  var grid=document.getElementById('tools-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  var list=cat==='all'?TOOLS_DATA:TOOLS_DATA.filter(function(t){return t.cat===cat;});
+  if(list.length===0){
+    grid.innerHTML='<div class="tools-empty">No resources in this category yet</div>';
+    return;
+  }
+  list.forEach(function(t){grid.appendChild(buildToolCard(t));});
+  // Update count display
+  var countEl=document.getElementById('tools-count');
+  if(countEl)countEl.textContent=list.length;
+}
+
+function filterTools(cat,btn){
+  document.querySelectorAll('.tools-filter-btn').forEach(function(b){b.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  renderTools(cat);
+}
+
+function openTools(){
+  var tp=document.getElementById('tools-page');
+  if(!tp)return;
+  _updateToolsCounts();
+  renderTools('all');
+  tp.style.display='flex';
+  document.body.style.overflow='hidden';
+  document.getElementById('tools-body').scrollTop=0;
+  document.querySelectorAll('.tools-filter-btn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-cat')==='all');});
+  try{history.replaceState(null,'','/?tools=1');}catch(e){}
+}
+
+function closeTools(){
+  var tp=document.getElementById('tools-page');
+  if(tp)tp.style.display='none';
+  document.body.style.overflow='';
+  try{history.replaceState(null,'','/');}catch(e){}
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.getElementById('tools-page')&&document.getElementById('tools-page').style.display==='flex'){closeTools();}
+});
+
 </script>
 <!-- Google Translate hidden widget -->
 <div id="google_translate_element" style="display:none;visibility:hidden;height:0;overflow:hidden;"></div>
