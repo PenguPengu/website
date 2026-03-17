@@ -33,7 +33,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(rgba(25,41,58,.042) 1px,transparent 1px),linear-gradient(90deg,rgba(25,41,58,.042) 1px,transparent 1px);
   background-size:120px 120px;}
 
-/* NAV — exact match */
+/* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;
   justify-content:space-between;padding:0 56px;height:72px;
   background:rgba(247,239,230,0.92);backdrop-filter:blur(12px);
@@ -43,9 +43,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .nav-logo-tag{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.45;
   padding-left:16px;border-left:1px solid var(--border);}
 
-/* MARQUEE — exact match */
+/* LANGUAGE SELECTOR */
+.lang-selector{position:relative;}
+.lang-btn{display:flex;align-items:center;gap:7px;background:none;border:1.5px solid rgba(25,41,58,.25);color:var(--navy);font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:border-color .2s;}
+.lang-btn:hover{border-color:var(--navy);}
+.lang-chevron{transition:transform .2s;flex-shrink:0;}
+.lang-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:var(--cream);border:1.5px solid rgba(25,41,58,.18);min-width:170px;display:none;flex-direction:column;z-index:200;box-shadow:0 8px 32px rgba(25,41,58,.13);}
+.lang-dropdown.open{display:flex;}
+.lang-option{padding:11px 16px;font-family:var(--mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--navy);cursor:pointer;transition:background .15s;border:none;background:none;text-align:left;width:100%;display:flex;align-items:center;gap:10px;}
+.lang-option:hover{background:rgba(25,41,58,.06);}
+.lang-option.active{background:rgba(25,41,58,.09);font-weight:700;}
+.lang-flag{font-size:14px;line-height:1;flex-shrink:0;}
+/* Suppress Google Translate bar */
+.goog-te-banner-frame,.skiptranslate{display:none!important;}
+#goog-gt-tt,.goog-te-balloon-frame{display:none!important;}
+.goog-logo-link,.goog-te-gadget>span{display:none!important;}
+.goog-te-gadget{font-size:0!important;}
+body{top:0!important;}
+
+/* MARQUEE */
 .marquee-wrap{position:fixed;top:72px;left:0;right:0;z-index:99;background:var(--navy);
-  border-bottom:1px solid rgba(247,239,230,.12);overflow:hidden;height:42px;}
+  border-bottom:1px solid rgba(247,239,230,.12);overflow:hidden;height:42px;
+  transition:opacity .4s,visibility .4s;}
+.marquee-wrap.hidden{opacity:0;visibility:hidden;}
 .marquee-track{display:flex;align-items:center;width:max-content;height:42px;will-change:transform;}
 .mq-unit{display:flex;align-items:center;padding:0;gap:0;flex-shrink:0;}
 .mq-dot{width:4px;height:4px;border-radius:50%;background:rgba(247,239,230,.3);margin:0 28px;flex-shrink:0;}
@@ -53,7 +73,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .mq-word{font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cream);padding-left:14px;}
 
 /* PAGE */
-.page{position:relative;z-index:1;height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:114px;}
+.page{position:relative;z-index:1;height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:114px;transition:padding-top .3s;}
 
 /* LEFT PANEL */
 .left{display:flex;flex-direction:column;justify-content:center;padding:80px;
@@ -84,7 +104,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 #state-redirecting{display:flex;}
 #state-404{display:none;}
 
-/* pulse dot for redirecting */
+/* pulse dot */
 .pulse-row{display:flex;align-items:center;gap:14px;margin-bottom:32px;}
 .pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--navy);
   animation:pulse 1.4s ease-in-out infinite;}
@@ -95,21 +115,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .redirect-headline em{display:block;font-style:italic;font-weight:400;font-size:.6em;opacity:.4;line-height:1.4;}
 .redirect-sub{font-size:10px;opacity:.4;line-height:1.9;max-width:300px;}
 .progress-bar-wrap{width:220px;height:1px;background:rgba(25,41,58,.1);margin-top:32px;overflow:hidden;}
-.progress-bar{height:100%;width:0%;background:var(--navy);opacity:.35;
-  transition:width .1s linear;}
+.progress-bar{height:100%;width:0%;background:var(--navy);opacity:.35;transition:width .1s linear;}
 
 /* ANIMATIONS */
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes drift{0%,100%{transform:translateY(0) rotate(-.4deg);}50%{transform:translateY(-7px) rotate(.4deg);}}
 @keyframes dash{to{stroke-dashoffset:-22;}}
 @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 @keyframes fadeToErr{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-
 .chart-wrap{animation:fadeIn .9s ease .15s both;}
 
 @media(max-width:700px){
-  nav{padding:0 24px;}.nav-logo-tag{display:none;}
+  nav{padding:0 24px;}.nav-logo-tag{display:none;}.lang-selector{display:none;}
   .page{grid-template-columns:1fr;padding-top:114px;}
   .left{padding:48px 32px;}
   .right{display:none;}
@@ -118,21 +135,42 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 </head>
 <body>
 
+<div id="google_translate_element" style="display:none;"></div>
+
 <!-- NAV -->
 <nav>
   <a href="/" class="nav-logo">
-    <svg viewBox="0 0 620.05 279.02" xmlns="http://www.w3.org/2000/svg">
-      <path fill="#19293a" d="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0"/>
+    <svg viewBox="193 327 640 299" xmlns="http://www.w3.org/2000/svg" style="height:32px;width:auto;">
+      <path fill="#c9a84c" opacity=".22" d="M425.684753,336.767639 C437.392059,338.410187 446.660889,342.747711 450.265961,354.645172 C454.468353,368.514008 447.527222,381.608856 433.046478,386.442596 C429.216675,387.720978 428.357391,389.125885 429.097015,393.145142 C435.557281,428.251587 463.348450,455.598572 498.626190,460.650452 C532.039673,465.435333 560.298035,456.028107 581.360901,428.767273 C589.414307,418.344055 594.024597,406.209625 596.879944,393.353424 C597.727234,389.538574 597.234741,387.907410 593.078674,386.672241 C580.157532,382.832092 573.596130,373.221405 574.489136,360.605713 C575.505249,346.250763 586.080017,336.893402 602.021729,336.819916 C628.184509,336.699310 654.348938,336.802032 680.511963,336.942169 C704.501099,337.070679 728.489014,337.419922 752.478027,337.581940 C767.833496,337.685638 779.041992,347.498840 779.328979,361.283966 C779.673035,377.809113 769.746399,388.535492 753.335205,389.113464 C740.350830,389.570709 727.375793,390.096252 714.427246,391.208710 C695.973755,392.794128 683.139343,403.321655 678.411133,421.402863 C673.636841,439.659668 671.268921,458.338654 670.434875,477.145752 C669.898254,489.246857 668.527283,501.319916 670.027100,513.538513 C672.030945,529.862976 681.330078,539.526062 695.656311,545.058533 C697.250854,544.760254 697.546997,543.739441 697.988281,542.865295 C701.446655,536.014465 707.331726,533.097839 714.677979,532.969360 C725.174194,532.785767 735.676270,532.731506 746.173279,532.850769 C757.906128,532.984009 764.294434,539.568665 764.327820,551.210144 C764.352051,559.634277 764.352051,559.644226 772.885681,559.656494 C785.384399,559.674377 797.883301,559.644592 810.381836,559.695801 C819.453735,559.732971 822.350769,562.670044 822.344666,571.642822 C822.339478,579.308716 822.238647,586.976013 822.362183,594.639771 C822.412231,597.743774 821.433105,599.463989 818.256653,600.416931 C796.987915,606.797241 775.257690,610.750977 753.234192,613.302368 C728.341614,616.186157 703.352478,616.003906 678.394897,615.183594 C653.445312,614.363525 628.558105,612.281921 603.721191,609.631836 C587.836670,607.937012 571.900269,606.727966 555.986206,605.310364 C534.768311,603.420410 513.559998,601.410645 492.327850,599.696350 C476.068115,598.383423 459.787811,597.264587 443.499084,596.384338 C410.371460,594.594238 377.191406,594.285706 344.064331,595.538879 C301.975037,597.131104 259.988464,600.399048 218.673569,609.320862 C214.765518,610.164734 211.039963,611.417114 206.954285,610.183838 C204.339737,609.394653 203.063522,608.080566 203.072433,605.262512 C203.110397,593.264221 202.890808,581.263489 203.061584,569.267883 C203.150406,563.029602 207.092072,559.743652 214.067444,559.701477 C227.898880,559.617798 241.735046,559.486694 255.561035,559.772949 C260.477203,559.874695 261.800598,558.146973 261.755402,553.436768 C261.615814,538.880127 267.710724,532.946411 282.303070,532.879089 C290.968536,532.839111 299.637970,533.049927 308.299133,532.857544 C317.209564,532.659546 324.302185,535.455933 328.530090,543.780823 C328.815002,544.341858 329.385315,544.757996 329.777863,545.191711 C344.691772,540.755798 355.131317,528.116516 355.721802,513.132629 C356.879700,483.749237 354.927795,454.582794 348.563293,425.805634 C343.434814,402.617340 329.440887,391.301392 305.031738,390.405396 C294.046906,390.002167 283.053772,389.713440 272.083832,389.051117 C261.998505,388.442261 253.377747,384.649078 249.105621,374.886658 C245.014511,365.537872 244.987762,356.077240 251.338898,347.403259 C256.251282,340.694214 263.300690,337.786469 271.264801,337.719055 C322.583221,337.284760 373.903320,337.050476 425.684753,336.767639 M317.500000,576.711426 C458.449707,576.433044 599.401611,577.584167 740.349487,576.055969 C757.175903,575.873535 774.004150,575.823425 790.829163,575.560913 C796.009766,575.480103 801.182495,574.897461 806.358887,574.544556 C805.247803,573.340149 804.160339,573.044495 803.065613,573.014526 C782.093384,572.440002 761.121338,571.465088 740.147278,571.418396 C619.350647,571.149353 498.553497,571.017761 377.756531,571.018921 C327.612305,571.019348 277.461334,570.745117 227.330368,572.370056 C224.164017,572.472656 221.006943,572.861450 217.845551,573.117126 C217.858444,573.790100 217.871323,574.463074 217.884216,575.136047 C250.725418,576.678101 283.610077,576.781982 317.500000,576.711426 M378.334290,493.286560 C380.146027,512.117065 379.979462,530.869507 375.779968,549.412659 C374.975800,552.963562 376.351440,553.908081 379.542664,553.887756 C386.875305,553.841064 394.214813,553.738281 401.539551,553.997620 C406.160431,554.161255 407.962463,552.206787 407.617920,547.783508 C406.855804,537.998169 406.203796,528.198486 404.183105,518.564575 C399.352356,495.533478 391.846344,473.298553 383.943542,451.193207 C377.794800,433.994263 371.441833,416.868286 365.179657,399.709900 C366.555542,411.625946 368.704590,423.310944 370.741241,435.015503 C374.048553,454.022858 376.911346,473.091919 378.334290,493.286560 M373.510284,351.275360 C366.030182,351.538269 358.550903,351.829407 351.069794,352.058990 C325.968170,352.829407 300.865662,353.571075 275.764282,354.348022 C273.839996,354.407562 271.823700,354.354950 270.041565,356.282837 C272.735535,357.436371 275.309692,357.624908 277.921448,357.662140 C286.236969,357.780670 294.556305,358.363831 302.848267,358.458954 C342.604980,358.915161 382.316406,361.565765 422.092590,360.855011 C423.752747,360.825378 425.435883,360.810242 427.062469,360.525940 C428.750000,360.230957 430.248718,359.411194 430.669464,357.526337 C431.125610,355.482849 430.216644,354.010223 428.575348,352.846893 C426.102325,351.094147 423.281891,351.071381 420.436768,351.082581 C405.127014,351.142700 389.817261,351.195984 373.510284,351.275360 M693.757751,352.923431 C685.605530,352.642883 677.450256,352.431610 669.301758,352.068512 C646.999268,351.074799 624.687317,350.880676 602.370056,351.227661 C598.523987,351.287445 594.380371,352.135834 594.391052,356.853546 C594.402405,361.839325 598.914551,360.794769 602.032654,360.792023 C618.179565,360.777863 634.316162,360.795288 650.468018,360.057281 C676.406067,358.872131 702.379150,358.470245 728.333740,357.622162 C735.918823,357.374298 743.491211,356.735443 751.069397,356.275818 C751.056702,355.996033 751.044067,355.716248 751.031372,355.436462 C732.257996,354.608917 713.484619,353.781403 693.757751,352.923431 M581.127930,460.628693 C604.431213,448.224396 612.992981,420.581329 613.237976,393.060211 C605.352356,428.307648 587.350769,454.405243 553.569275,469.272156 C563.709412,467.823761 572.438232,465.513916 581.127930,460.628693 M712.656982,544.905640 C712.047485,545.561768 710.770142,545.878052 711.683105,547.662048 C724.573975,547.613831 737.666199,548.278381 751.363647,547.393066 C748.286560,542.875000 744.340271,543.836060 740.876282,543.755066 C731.649292,543.539246 722.378296,542.376404 712.656982,544.905640 M280.941040,547.674377 C292.210388,547.674377 303.479767,547.674377 314.749115,547.674377 C310.089905,542.411560 279.360870,543.002563 276.304565,546.976807 C277.424561,547.992737 278.816742,547.506104 280.941040,547.674377 z"/>
+      <path fill="#1b2b3a" d="M425.684753,336.767639 C437.392059,338.410187 446.660889,342.747711 450.265961,354.645172 C454.468353,368.514008 447.527222,381.608856 433.046478,386.442596 C429.216675,387.720978 428.357391,389.125885 429.097015,393.145142 C435.557281,428.251587 463.348450,455.598572 498.626190,460.650452 C532.039673,465.435333 560.298035,456.028107 581.360901,428.767273 C589.414307,418.344055 594.024597,406.209625 596.879944,393.353424 C597.727234,389.538574 597.234741,387.907410 593.078674,386.672241 C580.157532,382.832092 573.596130,373.221405 574.489136,360.605713 C575.505249,346.250763 586.080017,336.893402 602.021729,336.819916 C628.184509,336.699310 654.348938,336.802032 680.511963,336.942169 C704.501099,337.070679 728.489014,337.419922 752.478027,337.581940 C767.833496,337.685638 779.041992,347.498840 779.328979,361.283966 C779.673035,377.809113 769.746399,388.535492 753.335205,389.113464 C740.350830,389.570709 727.375793,390.096252 714.427246,391.208710 C695.973755,392.794128 683.139343,403.321655 678.411133,421.402863 C673.636841,439.659668 671.268921,458.338654 670.434875,477.145752 C669.898254,489.246857 668.527283,501.319916 670.027100,513.538513 C672.030945,529.862976 681.330078,539.526062 695.656311,545.058533 C697.250854,544.760254 697.546997,543.739441 697.988281,542.865295 C701.446655,536.014465 707.331726,533.097839 714.677979,532.969360 C725.174194,532.785767 735.676270,532.731506 746.173279,532.850769 C757.906128,532.984009 764.294434,539.568665 764.327820,551.210144 C764.352051,559.634277 764.352051,559.644226 772.885681,559.656494 C785.384399,559.674377 797.883301,559.644592 810.381836,559.695801 C819.453735,559.732971 822.350769,562.670044 822.344666,571.642822 C822.339478,579.308716 822.238647,586.976013 822.362183,594.639771 C822.412231,597.743774 821.433105,599.463989 818.256653,600.416931 C796.987915,606.797241 775.257690,610.750977 753.234192,613.302368 C728.341614,616.186157 703.352478,616.003906 678.394897,615.183594 C653.445312,614.363525 628.558105,612.281921 603.721191,609.631836 C587.836670,607.937012 571.900269,606.727966 555.986206,605.310364 C534.768311,603.420410 513.559998,601.410645 492.327850,599.696350 C476.068115,598.383423 459.787811,597.264587 443.499084,596.384338 C410.371460,594.594238 377.191406,594.285706 344.064331,595.538879 C301.975037,597.131104 259.988464,600.399048 218.673569,609.320862 C214.765518,610.164734 211.039963,611.417114 206.954285,610.183838 C204.339737,609.394653 203.063522,608.080566 203.072433,605.262512 C203.110397,593.264221 202.890808,581.263489 203.061584,569.267883 C203.150406,563.029602 207.092072,559.743652 214.067444,559.701477 C227.898880,559.617798 241.735046,559.486694 255.561035,559.772949 C260.477203,559.874695 261.800598,558.146973 261.755402,553.436768 C261.615814,538.880127 267.710724,532.946411 282.303070,532.879089 C290.968536,532.839111 299.637970,533.049927 308.299133,532.857544 C317.209564,532.659546 324.302185,535.455933 328.530090,543.780823 C328.815002,544.341858 329.385315,544.757996 329.777863,545.191711 C344.691772,540.755798 355.131317,528.116516 355.721802,513.132629 C356.879700,483.749237 354.927795,454.582794 348.563293,425.805634 C343.434814,402.617340 329.440887,391.301392 305.031738,390.405396 C294.046906,390.002167 283.053772,389.713440 272.083832,389.051117 C261.998505,388.442261 253.377747,384.649078 249.105621,374.886658 C245.014511,365.537872 244.987762,356.077240 251.338898,347.403259 C256.251282,340.694214 263.300690,337.786469 271.264801,337.719055 C322.583221,337.284760 373.903320,337.050476 425.684753,336.767639 M317.500000,576.711426 C458.449707,576.433044 599.401611,577.584167 740.349487,576.055969 C757.175903,575.873535 774.004150,575.823425 790.829163,575.560913 C796.009766,575.480103 801.182495,574.897461 806.358887,574.544556 C805.247803,573.340149 804.160339,573.044495 803.065613,573.014526 C782.093384,572.440002 761.121338,571.465088 740.147278,571.418396 C619.350647,571.149353 498.553497,571.017761 377.756531,571.018921 C327.612305,571.019348 277.461334,570.745117 227.330368,572.370056 C224.164017,572.472656 221.006943,572.861450 217.845551,573.117126 C217.858444,573.790100 217.871323,574.463074 217.884216,575.136047 C250.725418,576.678101 283.610077,576.781982 317.500000,576.711426 M378.334290,493.286560 C380.146027,512.117065 379.979462,530.869507 375.779968,549.412659 C374.975800,552.963562 376.351440,553.908081 379.542664,553.887756 C386.875305,553.841064 394.214813,553.738281 401.539551,553.997620 C406.160431,554.161255 407.962463,552.206787 407.617920,547.783508 C406.855804,537.998169 406.203796,528.198486 404.183105,518.564575 C399.352356,495.533478 391.846344,473.298553 383.943542,451.193207 C377.794800,433.994263 371.441833,416.868286 365.179657,399.709900 C366.555542,411.625946 368.704590,423.310944 370.741241,435.015503 C374.048553,454.022858 376.911346,473.091919 378.334290,493.286560 M373.510284,351.275360 C366.030182,351.538269 358.550903,351.829407 351.069794,352.058990 C325.968170,352.829407 300.865662,353.571075 275.764282,354.348022 C273.839996,354.407562 271.823700,354.354950 270.041565,356.282837 C272.735535,357.436371 275.309692,357.624908 277.921448,357.662140 C286.236969,357.780670 294.556305,358.363831 302.848267,358.458954 C342.604980,358.915161 382.316406,361.565765 422.092590,360.855011 C423.752747,360.825378 425.435883,360.810242 427.062469,360.525940 C428.750000,360.230957 430.248718,359.411194 430.669464,357.526337 C431.125610,355.482849 430.216644,354.010223 428.575348,352.846893 C426.102325,351.094147 423.281891,351.071381 420.436768,351.082581 C405.127014,351.142700 389.817261,351.195984 373.510284,351.275360 M693.757751,352.923431 C685.605530,352.642883 677.450256,352.431610 669.301758,352.068512 C646.999268,351.074799 624.687317,350.880676 602.370056,351.227661 C598.523987,351.287445 594.380371,352.135834 594.391052,356.853546 C594.402405,361.839325 598.914551,360.794769 602.032654,360.792023 C618.179565,360.777863 634.316162,360.795288 650.468018,360.057281 C676.406067,358.872131 702.379150,358.470245 728.333740,357.622162 C735.918823,357.374298 743.491211,356.735443 751.069397,356.275818 C751.056702,355.996033 751.044067,355.716248 751.031372,355.436462 C732.257996,354.608917 713.484619,353.781403 693.757751,352.923431 M581.127930,460.628693 C604.431213,448.224396 612.992981,420.581329 613.237976,393.060211 C605.352356,428.307648 587.350769,454.405243 553.569275,469.272156 C563.709412,467.823761 572.438232,465.513916 581.127930,460.628693 M712.656982,544.905640 C712.047485,545.561768 710.770142,545.878052 711.683105,547.662048 C724.573975,547.613831 737.666199,548.278381 751.363647,547.393066 C748.286560,542.875000 744.340271,543.836060 740.876282,543.755066 C731.649292,543.539246 722.378296,542.376404 712.656982,544.905640 M280.941040,547.674377 C292.210388,547.674377 303.479767,547.674377 314.749115,547.674377 C310.089905,542.411560 279.360870,543.002563 276.304565,546.976807 C277.424561,547.992737 278.816742,547.506104 280.941040,547.674377 z"/>
     </svg>
     <span class="nav-logo-tag">Est. 2021</span>
   </a>
+
+  <div class="lang-selector" id="lang-selector">
+    <button class="lang-btn" id="lang-btn" onclick="toggleLangDropdown(event)">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="lang-current">EN</span>
+      <svg class="lang-chevron" id="lang-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="lang-dropdown" id="lang-dropdown">
+      <button class="lang-option active" data-lang="en" onclick="setLang('en','EN',this)"><span class="lang-flag">&#127468;&#127463;</span>English</button>
+      <button class="lang-option" data-lang="no" onclick="setLang('no','NO',this)"><span class="lang-flag">&#127475;&#127476;</span>Norwegian</button>
+      <button class="lang-option" data-lang="de" onclick="setLang('de','DE',this)"><span class="lang-flag">&#127465;&#127466;</span>German</button>
+      <button class="lang-option" data-lang="fr" onclick="setLang('fr','FR',this)"><span class="lang-flag">&#127467;&#127479;</span>French</button>
+      <button class="lang-option" data-lang="es" onclick="setLang('es','ES',this)"><span class="lang-flag">&#127466;&#127480;</span>Spanish</button>
+      <button class="lang-option" data-lang="nl" onclick="setLang('nl','NL',this)"><span class="lang-flag">&#127475;&#127473;</span>Dutch</button>
+      <button class="lang-option" data-lang="sv" onclick="setLang('sv','SV',this)"><span class="lang-flag">&#127480;&#127466;</span>Swedish</button>
+      <button class="lang-option" data-lang="da" onclick="setLang('da','DA',this)"><span class="lang-flag">&#127465;&#127472;</span>Danish</button>
+    </div>
+  </div>
 </nav>
 
 <!-- MARQUEE -->
-<div class="marquee-wrap"><div class="marquee-track" id="mq-track"></div></div>
+<div class="marquee-wrap" id="marquee-wrap"><div class="marquee-track" id="mq-track"></div></div>
 
 <!-- PAGE -->
-<div class="page">
+<div class="page" id="page">
 
   <div class="left">
     <div class="ghost-num" aria-hidden="true" id="ghost-num">...</div>
@@ -146,7 +184,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
         </div>
         <div class="redirect-headline">Plotting<br><em>your route</em></div>
         <div class="rule"></div>
-        <p class="redirect-sub">Looking up that page — if it's one of ours you'll be there in a moment.</p>
+        <p class="redirect-sub">Looking up that page &mdash; if it's one of ours you'll be there in a moment.</p>
         <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
       </div>
     </div>
@@ -156,10 +194,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
       <div class="eyebrow">Error 404 &mdash; Underway</div>
       <div class="headline">Off<br><em>the charts</em></div>
       <div class="rule"></div>
-      <p class="desc">You've sailed past the last charted coordinate. There's nothing plotted here — no depth readings, no landmarks, no heading home. Turn back while you still can.</p>
+      <p class="desc">You've sailed past the last charted coordinate. There's nothing plotted here &mdash; no depth readings, no landmarks, no heading home. Turn back while you still can.</p>
       <a class="btn" href="/">&#8592;&nbsp;&nbsp;Back to Shore</a>
       <div class="coords">
-        LAST FIX: 52°03.2'N / 0°58.7'W<br>
+        LAST FIX: 52&deg;03.2'N / 0&deg;58.7'W<br>
         CURRENT POSITION: UNKNOWN<br>
         SIGNAL LOST &middot; CHART ENDS HERE
       </div>
@@ -167,7 +205,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 
   </div>
 
-  <!-- CHART — always visible on right -->
+  <!-- CHART -->
   <div class="right">
     <div class="chart-wrap">
 <svg class="chart" viewBox="0 0 440 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"
@@ -238,9 +276,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <circle cx="0" cy="0" r="2.2" fill="#19293a" opacity=".65"/>
     <line x1="6" y1="0" x2="18" y2="-8" stroke="#19293a" stroke-width=".7" opacity=".4"/>
     <text x="20" y="-10" font-family="'Space Mono',monospace" font-size="6" fill="#19293a" opacity=".5">LAST FIX</text>
-    <text x="20" y="0" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a" opacity=".3">52°03.2'N  0°58.7'W</text>
+    <text x="20" y="0" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a" opacity=".3">52&#176;03.2'N  0&#176;58.7'W</text>
   </g>
-  <!-- YOU ARE HERE label — shown during redirect, hidden on 404 -->
   <g id="you-are-here" transform="translate(395,110)" opacity=".55">
     <line x1="-50" y1="0" x2="8" y2="0" stroke="#19293a" stroke-width="1"/>
     <polygon points="8,0 2,-3.5 2,3.5" fill="#19293a"/>
@@ -290,16 +327,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
     <text x="18" y="21" font-family="'Space Mono',monospace" font-size="5.5" fill="#19293a">NAUTICAL MI.</text>
   </g>
   <g font-family="'Space Mono',monospace" font-size="6" fill="#19293a" opacity=".2">
-    <text x="52" y="79" text-anchor="middle">52°08'N</text>
-    <text x="52" y="139" text-anchor="middle">52°04'N</text>
-    <text x="52" y="199" text-anchor="middle">52°00'N</text>
-    <text x="52" y="259" text-anchor="middle">51°56'N</text>
-    <text x="52" y="319" text-anchor="middle">51°52'N</text>
-    <text x="82"  y="355" text-anchor="middle">1°10'W</text>
-    <text x="142" y="355" text-anchor="middle">1°04'W</text>
-    <text x="202" y="355" text-anchor="middle">0°58'W</text>
-    <text x="262" y="355" text-anchor="middle">0°52'W</text>
-    <text x="322" y="355" text-anchor="middle">0°46'W</text>
+    <text x="52" y="79" text-anchor="middle">52&#176;08'N</text>
+    <text x="52" y="139" text-anchor="middle">52&#176;04'N</text>
+    <text x="52" y="199" text-anchor="middle">52&#176;00'N</text>
+    <text x="52" y="259" text-anchor="middle">51&#176;56'N</text>
+    <text x="52" y="319" text-anchor="middle">51&#176;52'N</text>
+    <text x="82"  y="355" text-anchor="middle">1&#176;10'W</text>
+    <text x="142" y="355" text-anchor="middle">1&#176;04'W</text>
+    <text x="202" y="355" text-anchor="middle">0&#176;58'W</text>
+    <text x="262" y="355" text-anchor="middle">0&#176;52'W</text>
+    <text x="322" y="355" text-anchor="middle">0&#176;46'W</text>
   </g>
 </g>
 <polygon points="22,350 62,359 96,353 130,362 162,354 192,364 220,356 246,366 270,358 293,367 315,360 335,369 354,361 372,370 390,363 405,372 418,365 418,380 22,380"
@@ -311,7 +348,64 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 </div>
 
 <script>
-// ── Marquee ──────────────────────────────────────────────────────────────────
+var LANG_CODES={en:'EN',no:'NO',de:'DE',fr:'FR',es:'ES',nl:'NL',sv:'SV',da:'DA'};
+
+function toggleLangDropdown(e){
+  e.stopPropagation();
+  var dd=document.getElementById('lang-dropdown');
+  var ch=document.getElementById('lang-chevron');
+  dd.classList.toggle('open');
+  if(ch)ch.style.transform=dd.classList.contains('open')?'rotate(180deg)':'';
+}
+
+function setLang(lang,code,btn){
+  document.querySelectorAll('.lang-option').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-lang')===lang);
+  });
+  var cur=document.getElementById('lang-current');
+  if(cur)cur.textContent=code;
+  var dd=document.getElementById('lang-dropdown');
+  if(dd)dd.classList.remove('open');
+  var ch=document.getElementById('lang-chevron');
+  if(ch)ch.style.transform='';
+  if(lang==='en'){
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain='+window.location.hostname+'; path=/;';
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.'+window.location.hostname+'; path=/;';
+    window.location.reload();
+    return;
+  }
+  var sel=document.querySelector('.goog-te-combo');
+  if(sel){sel.value=lang;sel.dispatchEvent(new Event('change'));}
+  else{
+    document.cookie='googtrans=/en/'+lang+'; path=/';
+    document.cookie='googtrans=/en/'+lang+'; domain=.'+window.location.hostname+'; path=/';
+    window.location.reload();
+  }
+}
+
+document.addEventListener('click',function(e){
+  var sel=document.getElementById('lang-selector');
+  if(sel&&!sel.contains(e.target)){
+    var dd=document.getElementById('lang-dropdown');
+    if(dd)dd.classList.remove('open');
+    var ch=document.getElementById('lang-chevron');
+    if(ch)ch.style.transform='';
+  }
+});
+
+(function(){
+  var match=document.cookie.match(/googtrans=\/en\/([a-z]+)/);
+  var active=(match&&match[1]&&match[1]!=='en')?match[1]:'en';
+  var code=LANG_CODES[active]||'EN';
+  var cur=document.getElementById('lang-current');
+  if(cur)cur.textContent=code;
+  document.querySelectorAll('.lang-option').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-lang')===active);
+  });
+})();
+
+// Marquee
 (function(){
   var BP="M222.97,0c29,.88,36.01,40.65,7.36,49.68-3.83,1.28-4.69,2.68-3.95,6.7,6.46,35.11,34.25,62.45,69.53,67.51,45.68,8.64,89.78-21.32,98.25-67.3.85-3.81.36-5.44-3.8-6.68-12.92-3.84-19.48-13.45-18.59-26.07,1.02-14.35,11.59-23.71,27.53-23.79,26.16-.12,52.33-.02,78.49.12,23.99.13,47.98.48,71.97.64,35.89-.81,35.03,51.73.86,51.53-28.03,1.42-67.24-2.93-74.92,32.29-4.78,18.26-7.14,36.93-7.98,55.74-2.34,25.14-4.3,59.04,25.22,67.91,1.59-.3,1.89-1.32,2.33-2.19,3.46-6.85,9.34-9.77,16.69-9.9,17.32,1.51,49.77-8.27,49.65,18.24q.02,8.42,8.56,8.45c12.5.02,25-.01,37.5.04,19.1-1.13,9.8,23.16,11.98,34.94,1.02,11.46-58.48,16.36-69.13,18.66-65.83,7.05-131.68-2.61-197.25-7.99-70.42-6.58-141.14-12.84-211.92-9.77-46.17.16-91.84,8.64-137.11,14.65-2.61-.79-3.89-2.11-3.88-4.93-1.05-59.9-3.37-43.3,52.49-45.49,14.19.79-4.29-27.31,26.74-26.89,16.51,1.42,38.32-5.9,47.47,12.31,43.21-11.37,23.1-86.72,18.79-119.39-6.32-39.15-45.21-35.6-76.48-36.75-20.95.71-33.42-25.09-20.74-41.65C53.54,3.93,60.59,1.02,68.55.95,119.87.52,171.19.28,222.97,0";
   var ITEMS=["Est. 2021","Built for the Long Haul","Est. 2021","Built for the Long Haul"];
@@ -326,81 +420,89 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
   requestAnimationFrame(tick);
 })();
 
-// ── Redirect logic ────────────────────────────────────────────────────────────
+// Redirect logic
 (function(){
-  var path = window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
+  var path=window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
 
-  // No path at all — just show 404
-  if(!path){ showNotFound(); return; }
+  if(!path){showNotFound();return;}
 
-  // /gallery or /gallery/photo-id — instant redirect, no product lookup needed
-  if(path === 'gallery' || path.indexOf('gallery/') === 0){
-    var photoId = path.indexOf('gallery/') === 0 ? path.slice(8) : null;
-    window.location.replace('/?gallery=1' + (photoId ? '&photo='+encodeURIComponent(photoId) : ''));
+  if(path==='gallery'||path.indexOf('gallery/')===0){
+    var photoId=path.indexOf('gallery/')===0?path.slice(8):null;
+    window.location.replace('/?gallery=1'+(photoId?'&photo='+encodeURIComponent(photoId):''));
     return;
   }
 
-  // Animate progress bar while we check
-  var bar = document.getElementById('progress-bar');
-  var prog = 0;
-  var barInterval = setInterval(function(){
-    prog = Math.min(prog + (prog < 70 ? 2 : 0.3), 90);
-    bar.style.width = prog + '%';
-  }, 60);
+  var bar=document.getElementById('progress-bar');
+  var prog=0;
+  var barInterval=setInterval(function(){
+    prog=Math.min(prog+(prog<70?2:0.3),90);
+    bar.style.width=prog+'%';
+  },60);
+
+  function showNotFound(){
+    clearInterval(barInterval);
+    bar.style.width='100%';
+    bar.style.opacity='.12';
+    // Fade out marquee and slide page up
+    var mq=document.getElementById('marquee-wrap');
+    if(mq)mq.classList.add('hidden');
+    document.getElementById('page').style.paddingTop='72px';
+    document.getElementById('ghost-num').textContent='404';
+    document.getElementById('state-redirecting').style.display='none';
+    document.getElementById('state-404').style.display='block';
+    document.getElementById('state-404').style.animation='fadeToErr .5s ease both';
+    document.getElementById('chart-status-1').textContent='POSITION: UNKNOWN';
+    document.getElementById('chart-status-2').textContent='BEYOND CHARTED WATERS';
+    document.getElementById('compass-label').textContent='NO BEARING';
+    document.title='404 \u2014 Underway';
+  }
 
   function slugify(name){
     return (name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   }
 
-  function showNotFound(){
-    clearInterval(barInterval);
-    bar.style.width = '100%';
-    bar.style.opacity = '.12';
-    document.getElementById('ghost-num').textContent = '404';
-    document.getElementById('state-redirecting').style.display = 'none';
-    document.getElementById('state-404').style.display = 'block';
-    document.getElementById('state-404').style.animation = 'fadeToErr .5s ease both';
-    document.getElementById('chart-status-1').textContent = 'POSITION: UNKNOWN';
-    document.getElementById('chart-status-2').textContent = 'BEYOND CHARTED WATERS';
-    document.getElementById('compass-label').textContent = 'NO BEARING';
-    document.title = '404 — Underway';
-  }
-
-  var PRODUCTS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
+  var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 
   fetch(PRODUCTS_URL)
-    .then(function(r){ if(!r.ok) throw new Error('fetch failed'); return r.text(); })
+    .then(function(r){if(!r.ok)throw new Error('fetch failed');return r.text();})
     .then(function(csv){
-      var lines = csv.split('\n');
-      // Find name column index from header
-      var headers = lines[0].split(',').map(function(h){ return h.replace(/^"|"$/g,'').trim().toLowerCase(); });
-      var nameIdx = headers.indexOf('name');
-      if(nameIdx < 0) nameIdx = 0; // fallback to first column
-
-      for(var i = 1; i < lines.length; i++){
-        // Parse CSV row — handle quoted fields
-        var row = lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g) || [];
-        var cell = (row[nameIdx] || '').replace(/^"|"$/g,'').replace(/""/g,'"').trim();
-        if(cell && slugify(cell) === path.toLowerCase()){
-          // Found — complete bar then redirect
+      var lines=csv.split('\n');
+      var headers=lines[0].split(',').map(function(h){return h.replace(/^"|"$/g,'').trim().toLowerCase();});
+      var nameIdx=headers.indexOf('name');
+      if(nameIdx<0)nameIdx=0;
+      for(var i=1;i<lines.length;i++){
+        var row=lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g)||[];
+        var cell=(row[nameIdx]||'').replace(/^"|"$/g,'').replace(/""/g,'"').trim();
+        if(cell&&slugify(cell)===path.toLowerCase()){
           clearInterval(barInterval);
-          bar.style.width = '100%';
-          bar.style.background = 'var(--navy)';
-          bar.style.opacity = '.5';
-          document.getElementById('chart-status-1').textContent = 'POSITION FOUND';
-          document.getElementById('chart-status-2').textContent = 'REDIRECTING NOW';
-          document.getElementById('you-are-here').style.opacity = '0.9';
-          document.getElementById('compass-label').textContent = 'COURSE SET';
+          bar.style.width='100%';
+          bar.style.background='var(--navy)';
+          bar.style.opacity='.5';
+          document.getElementById('chart-status-1').textContent='POSITION FOUND';
+          document.getElementById('chart-status-2').textContent='REDIRECTING NOW';
+          document.getElementById('you-are-here').style.opacity='0.9';
+          document.getElementById('compass-label').textContent='COURSE SET';
           setTimeout(function(){
-            window.location.replace('/?p=' + encodeURIComponent(path));
-          }, 400);
+            window.location.replace('/?p='+encodeURIComponent(path));
+          },400);
           return;
         }
       }
       showNotFound();
     })
-    .catch(function(){ showNotFound(); });
+    .catch(function(){showNotFound();});
 })();
 </script>
+
+<script>
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({
+    pageLanguage:'en',
+    autoDisplay:false,
+    layout:google.translate.TranslateElement.InlineLayout.SIMPLE
+  },'google_translate_element');
+}
+</script>
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
