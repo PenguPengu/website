@@ -1659,6 +1659,23 @@ function openProductBySlug(slug){
 
 function checkDeepLink(){
   var params=new URLSearchParams(window.location.search);
+
+  // ── Pathname routing: /community → scroll to #community ──────────────────
+  var _pathname=window.location.pathname.replace(/^\/|\/$/g,'').toLowerCase();
+  var _scrollSections=['home', 'about', 'products', 'photos', 'community', 'partners', 'discord', 'gallery'];
+  if(_pathname&&_scrollSections.indexOf(_pathname)!==-1){
+    history.replaceState(null,'','/');
+    // Scroll after a short delay so the page has painted
+    setTimeout(function(){
+      var el=document.getElementById(_pathname);
+      if(el){
+        var yOffset=el.getBoundingClientRect().top+window.pageYOffset-72;
+        window.scrollTo({top:yOffset,behavior:'smooth'});
+      }
+    }, 300);
+    return;
+  }
+
   // Gallery deep link
   if(params.get('gallery')){
     var photoId=params.get('photo')||null;
@@ -1919,7 +1936,31 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   if(details){detEl.textContent=details;detEl.style.display='block';}else{detEl.style.display='none';}
   var ctaBtn=document.getElementById('pm-cta');
   ctaBtn.textContent=(cta||'Request a Quote')+' \u2192';
-  ctaBtn.onclick=function(){if(cta_url)window.open(cta_url,'_blank');else closeProductModal();};
+  ctaBtn.onclick=function(){
+    if(!cta_url){closeProductModal();return;}
+    // Detect internal links (underwayco.com or relative paths)
+    var _isInternal=cta_url.indexOf('underwayco.com')!==-1
+      ||cta_url.indexOf('underway.co')!==-1
+      ||(cta_url.charAt(0)==='/'&&cta_url.charAt(1)!=='/');
+    if(_isInternal){
+      // Strip domain if present, keep just the path
+      var _path=cta_url.replace(/^https?:\/\/(www\.)?(underwayco\.com|underway\.co)/,'');
+      closeProductModal();
+      // If it's a hash/section link, scroll to it
+      var _hash=_path.replace(/^\//,'').replace(/^#/,'').toLowerCase();
+      var _ss=['home', 'about', 'products', 'photos', 'community', 'partners', 'discord', 'gallery'];
+      if(_ss.indexOf(_hash)!==-1){
+        setTimeout(function(){
+          var el=document.getElementById(_hash);
+          if(el){var y=el.getBoundingClientRect().top+window.pageYOffset-72;window.scrollTo({top:y,behavior:'smooth'});}
+        },200);
+      }else{
+        window.location.href=_path||'/';
+      }
+    }else{
+      window.open(cta_url,'_blank');
+    }
+  };
   var productImgs=imageStr?imageStr.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}).reverse():[];
   _pmGalImages=productImgs.slice();_pmGalCurrent=0;_lbImages=[];
   var galleryMain=document.getElementById('pm-gallery-main');
@@ -2283,7 +2324,12 @@ loadSubmissions();
 setInterval(loadAnnouncements,60000);
 setInterval(loadSubmissions,60000);
 // Check for ?gallery=1 immediately on load (doesn't need products to be ready)
-(function(){var p=new URLSearchParams(window.location.search);if(p.get('gallery'))checkDeepLink();})();
+(function(){
+  var p=new URLSearchParams(window.location.search);
+  var _pn=window.location.pathname.replace(/^\/|\/$/g,'').toLowerCase();
+  var _ss=['home', 'about', 'products', 'photos', 'community', 'partners', 'discord', 'gallery'];
+  if(p.get('gallery')||(_pn&&_ss.indexOf(_pn)!==-1))checkDeepLink();
+})();
 
 
 // ── TOOLS PAGE ───────────────────────────────────────────────────────────────
