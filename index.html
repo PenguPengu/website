@@ -1676,6 +1676,24 @@ function checkDeepLink(){
     return;
   }
 
+  // ── ?scroll= param from 404.html section redirects ──────────────────────────
+  var _scrollParam=params.get('scroll');
+  if(_scrollParam){
+    var _sp=_scrollParam.toLowerCase();
+    var _scrollSecs=['home','about','products','photos','community','partners','discord','gallery'];
+    if(_scrollSecs.indexOf(_sp)!==-1){
+      history.replaceState(null,'','/');
+      setTimeout(function(){
+        var el=document.getElementById(_sp);
+        if(el){
+          var yOff=el.getBoundingClientRect().top+window.pageYOffset-72;
+          window.scrollTo({top:yOff,behavior:'smooth'});
+        }
+      },300);
+      return;
+    }
+  }
+
   // Gallery deep link
   if(params.get('gallery')){
     var photoId=params.get('photo')||null;
@@ -2327,8 +2345,8 @@ setInterval(loadSubmissions,60000);
 (function(){
   var p=new URLSearchParams(window.location.search);
   var _pn=window.location.pathname.replace(/^\/|\/$/g,'').toLowerCase();
-  var _ss=['home', 'about', 'products', 'photos', 'community', 'partners', 'discord', 'gallery'];
-  if(p.get('gallery')||(_pn&&_ss.indexOf(_pn)!==-1))checkDeepLink();
+  var _ss=['home','about','products','photos','community','partners','discord','gallery'];
+  if(p.get('gallery')||p.get('scroll')||(_pn&&_ss.indexOf(_pn)!==-1))checkDeepLink();
 })();
 
 
