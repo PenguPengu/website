@@ -23,7 +23,13 @@
 <meta name="twitter:image" content="https://underway.co/og-image.png">
 <meta name="twitter:image:alt" content="Underway — Built for the Long Haul">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="config.js"></script>
+<script>
+// ── Site Config — paste your YouTube API key and Channel ID here ──────────────
+var UNDERWAY_CONFIG = {
+  ytKey: "",        // e.g. "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXX"
+  ytChannelId: ""   // e.g. "UCxxxxxxxxxxxxxxxxxxxxxxxxx"
+};
+</script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 :root{--navy:#19293a;--cream:#f7efe6;--rust:#b84c2e;--gold:#c9a84c;--mid:#4a6478;--border:rgba(25,41,58,0.18);--serif:'Playfair Display',serif;--mono:'Space Mono',monospace;}
@@ -721,6 +727,7 @@ body{top:0!important;}
 .tools-intro h2 em{display:block;font-style:italic;font-weight:400;opacity:.35;font-size:.72em;line-height:1.3;}
 .tools-intro p{font-size:10px;color:rgba(247,239,230,.4);line-height:1.95;max-width:380px;}
 .tools-filter-btn.active{background:rgba(247,239,230,.08);border-color:rgba(247,239,230,.35);color:var(--cream);}
+.tools-filter-btn.active 
 .tool-card{background:rgba(25,41,58,.6);padding:32px 28px 26px;display:flex;flex-direction:column;cursor:pointer;transition:background .2s;text-decoration:none;position:relative;overflow:hidden;}
 .tool-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.15),transparent);opacity:0;transition:opacity .3s;}
 .tool-card:hover{background:rgba(31,51,73,.9);}
@@ -1540,15 +1547,32 @@ function _repopulateUpdates(name){
     var updImgStr=(upd.images||'').trim();
     if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
     var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
-    var updUrls=updImgStr?updImgStr.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
-    allUpdateImgs=allUpdateImgs.concat(updUrls);
+    var _isAlbumStr=updImgStr&&updImgStr.startsWith('__album__:');
+      var _imgContent=_isAlbumStr?updImgStr.slice('__album__:'.length):updImgStr;
+      var updUrls=_imgContent?_imgContent.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
+      if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
+    // Filter out album-only images from the main gallery aggregation
+    allUpdateImgs=allUpdateImgs.concat(updUrls.filter(function(u){return!u.startsWith('__album__:');}));
     var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
     var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
     if(!updTitle)updTitle=name+' — Update';
     var imgsHtml='';
     if(updUrls.length){
-      var allEscUpd=updUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
-      imgsHtml='<div class="upd-img-strip">'+updUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('')+'</div>';
+      var isAlbum=updUrls.length===1&&updUrls[0].startsWith('__album__:');
+      var realUrls=isAlbum
+        ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
+        :updUrls.filter(function(u){return!u.startsWith('__album__:');});
+      if(realUrls.length){
+        var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
+        var thumbsHtml=realUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('');
+        if(isAlbum){
+          var stripId='upd-album-'+entryIdx;
+          imgsHtml='<button class="upd-album-btn" onclick="(function(btn){var s=document.getElementById(\''+stripId+'\');s.classList.toggle(\'open\');btn.classList.toggle(\'open\');})(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>'+realUrls.length+' photo'+(realUrls.length!==1?'s':'')+' &mdash; click to view<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>'
+            +'<div class="upd-album-strip" id="'+stripId+'">'+thumbsHtml+'</div>';
+        }else{
+          imgsHtml='<div class="upd-img-strip">'+thumbsHtml+'</div>';
+        }
+      }
     }
     return'<div class="pm-update-entry"><div class="pm-update-entry-header">'+(updDate?'<span class="pm-update-entry-date">'+updDate+'</span>':'')+(entryIdx===0?'<span class="pm-update-entry-badge">Latest</span>':'')+'</div><div class="pm-update-entry-title">'+updTitle+'</div>'+(updBody?'<div class="pm-update-entry-body">'+parseMarkdown(updBody)+'</div>':'')+imgsHtml+'</div>';
   }).join('');
@@ -2012,15 +2036,32 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       var updImgStr=(upd.images||'').trim();
       if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
       var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
-      var updUrls=updImgStr?updImgStr.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
-      allUpdateImgs=allUpdateImgs.concat(updUrls);
+      var _isAlbumStr=updImgStr&&updImgStr.startsWith('__album__:');
+      var _imgContent=_isAlbumStr?updImgStr.slice('__album__:'.length):updImgStr;
+      var updUrls=_imgContent?_imgContent.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
+      if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
+      // Filter out album-only images from the main gallery aggregation
+    allUpdateImgs=allUpdateImgs.concat(updUrls.filter(function(u){return!u.startsWith('__album__:');}));
       var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
       var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
       if(!updTitle)updTitle=name+' \u2014 Update';
       var imgsHtml='';
       if(updUrls.length){
-        var allEscUpd=updUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
-        imgsHtml='<div class="upd-img-strip">'+updUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('')+'</div>';
+        var isAlbum=updUrls.length===1&&updUrls[0].startsWith('__album__:');
+        var realUrls=isAlbum
+          ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
+          :updUrls.filter(function(u){return!u.startsWith('__album__:');});
+        if(realUrls.length){
+          var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
+          var thumbsHtml=realUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('');
+          if(isAlbum){
+            var stripId='upd-album-'+entryIdx;
+            imgsHtml='<button class="upd-album-btn" onclick="(function(btn){var s=document.getElementById(\''+stripId+'\');s.classList.toggle(\'open\');btn.classList.toggle(\'open\');})(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>'+realUrls.length+' photo'+(realUrls.length!==1?'s':'')+' &mdash; click to view<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>'
+              +'<div class="upd-album-strip" id="'+stripId+'">'+thumbsHtml+'</div>';
+          }else{
+            imgsHtml='<div class="upd-img-strip">'+thumbsHtml+'</div>';
+          }
+        }
       }
       return '<div class="pm-update-entry"><div class="pm-update-entry-header">'+(updDate?'<span class="pm-update-entry-date">'+updDate+'</span>':'')+(entryIdx===0?'<span class="pm-update-entry-badge">Latest</span>':'')+'</div><div class="pm-update-entry-title">'+updTitle+'</div>'+(updBody?'<div class="pm-update-entry-body">'+parseMarkdown(updBody)+'</div>':'')+imgsHtml+'</div>';
     }).join('');
