@@ -422,9 +422,16 @@ document.addEventListener('click',function(e){
 
 // Redirect logic
 (function(){
-  var path=window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
+  var path=window.location.pathname.replace(/^\//,'').replace(/\/$/,'').toLowerCase();
 
   if(!path){showNotFound();return;}
+
+  // ── Section slugs — redirect to main page with ?scroll= param ──────────────
+  var _sections=['home', 'about', 'products', 'photos', 'community', 'partners', 'discord', 'gallery'];
+  if(_sections.indexOf(path)!==-1){
+    window.location.replace('/?scroll='+path);
+    return;
+  }
 
   if(path==='gallery'||path.indexOf('gallery/')===0){
     var photoId=path.indexOf('gallery/')===0?path.slice(8):null;
