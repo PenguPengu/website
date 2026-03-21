@@ -806,30 +806,7 @@ body{top:0!important;}
   </div>
 </div>
 
-<svg class="nautical-bg-icons" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <g transform="translate(1267,162)" stroke="currentColor" stroke-width="1" fill="none" opacity=".07">
-    <line x1="0" y1="-44" x2="0" y2="44"/><line x1="-44" y1="0" x2="44" y2="0"/>
-    <line x1="-31" y1="-31" x2="31" y2="31"/><line x1="31" y1="-31" x2="-31" y2="31"/>
-    <circle cx="0" cy="0" r="18"/><circle cx="0" cy="0" r="4" fill="currentColor"/>
-    <polygon points="0,-44 -5,-20 0,-28 5,-20" fill="currentColor"/>
-    <text x="5" y="-48" font-family="monospace" font-size="8" fill="currentColor" stroke="none">N</text>
-  </g>
-  <g transform="translate(86,495)" stroke="currentColor" stroke-width=".8" fill="none" opacity=".05">
-    <line x1="0" y1="-32" x2="0" y2="32"/><line x1="-32" y1="0" x2="32" y2="0"/>
-    <circle cx="0" cy="0" r="14"/><circle cx="0" cy="0" r="3" fill="currentColor"/>
-    <polygon points="0,-32 -4,-14 0,-20 4,-14" fill="currentColor"/>
-  </g>
-  <g transform="translate(1339,378)" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".05">
-    <circle cx="0" cy="-18" r="6"/><line x1="0" y1="-12" x2="0" y2="18"/>
-    <line x1="-14" y1="-8" x2="14" y2="-8"/>
-    <path d="M-14,18 Q-20,10 -14,6 M14,18 Q20,10 14,6"/>
-    <circle cx="0" cy="18" r="2.5" fill="currentColor"/>
-  </g>
-  <g transform="translate(144,252)" stroke="currentColor" stroke-width="1" fill="none" opacity=".05">
-    <path d="M-30,0 Q-20,-12 -10,0 Q0,12 10,0 Q20,-12 30,0"/>
-    <path d="M-30,10 Q-20,-2 -10,10 Q0,22 10,10 Q20,-2 30,10" opacity=".5"/>
-  </g>
-</svg>
+
 
 <div class="coord coord-bl">59°54'N 10°44'E — UNDERWAY-MK2</div>
 <div class="coord coord-br">EST. 2021</div>
@@ -895,15 +872,6 @@ body{top:0!important;}
 </div>
 
 <section class="hero" id="home">
-  <svg class="hero-bg-lines" viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg">
-    <g stroke="#19293a" stroke-width=".5" fill="none">
-      <line x1="0" y1="150" x2="1440" y2="150"/><line x1="0" y1="300" x2="1440" y2="300"/>
-      <line x1="0" y1="450" x2="1440" y2="450"/><line x1="0" y1="600" x2="1440" y2="600"/>
-      <line x1="0" y1="750" x2="1440" y2="750"/><line x1="240" y1="0" x2="240" y2="900"/>
-      <line x1="480" y1="0" x2="480" y2="900"/><line x1="720" y1="0" x2="720" y2="900"/>
-      <line x1="960" y1="0" x2="960" y2="900"/><line x1="1200" y1="0" x2="1200" y2="900"/>
-    </g>
-  </svg>
   <div class="hero-left">
     <p class="hero-eyebrow anim">Marine · Industrial · Equipment</p>
     <h1 class="hero-title anim delay-1">UNDER<br>WAY<em>built for the<br>long haul.</em></h1>
@@ -1898,6 +1866,7 @@ function renderPartners(partners){
   _checkPartners(PARTNER_REGISTRY.length);
   grid.innerHTML=PARTNER_REGISTRY.map(function(r,i){var nm=r.name||'',init=nm?nm.charAt(0).toUpperCase():'?';return'<div class="partner-card" data-idx="'+i+'"><div class="partner-initial">'+init+'</div><div class="partner-name">'+nm+'</div>'+(r.type?'<div class="partner-type">'+r.type+'</div>':'')+'<div class="partner-hint" style="font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.25;margin-top:auto;padding-top:16px">Click to view</div></div>';}).join('');
   grid.querySelectorAll('.partner-card').forEach(function(card){card.addEventListener('click',function(){openPartnerModal(PARTNER_REGISTRY[parseInt(this.getAttribute('data-idx'))]);});});
+  var _n=PARTNER_REGISTRY.length,_cols=4;var _copts=[4,3,6,5,2];for(var _ci=0;_ci<_copts.length;_ci++){if(_n%_copts[_ci]===0){_cols=_copts[_ci];break;}}if(_cols===4&&_n>0&&_n<=5)_cols=_n;grid.style.gridTemplateColumns='repeat('+_cols+',1fr)';
 }
 function loadPartners(){fetch(PARTNERS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){renderPartners(parseCSV(text));}).catch(function(){});}
 function openPartnerModal(p){
