@@ -1762,9 +1762,11 @@ function buildProductCard(p,idx,opts){
   var r={};Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
   var num=String(idx+1).padStart(2,'0');
   var firstImg='';
-  if(r.image){
+  if(r.cover_image&&r.cover_image.indexOf('http')===0){
+    firstImg=fixDiscordUrl(r.cover_image.trim());
+  }else if(r.image){
     var imgs=r.image.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;});
-    firstImg=imgs[imgs.length-1]||imgs[0]||'';
+    firstImg=imgs[0]||'';
   }
   var imgHtml=firstImg
     ?'<img class="product-card-img" src="'+firstImg+'" alt="'+(r.name||'')+'" onerror="this.style.display=\'none\'">'
@@ -1785,7 +1787,12 @@ function _openProductFromCard(card){
   Object.keys(p).forEach(function(k){r[k.toLowerCase()]=p[k];});
   var slug=productSlug(r.name||'');
   if(slug)history.pushState({product:slug},'','/?p='+encodeURIComponent(slug));
-  openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',r.image||'',r.cta_url||'');
+  var coverFirst=(r.cover_image&&r.cover_image.indexOf('http')===0)?r.cover_image.trim():'';
+  var imgStr=coverFirst?(coverFirst+(r.image?','+r.image:'')):r.image||'';
+  // Deduplicate: if cover was already first in image col, don't show it twice
+  var imgParts=imgStr.split(',').map(function(s){return s.trim();}).filter(function(s){return s.indexOf('http')===0;});
+  var seen={};imgParts=imgParts.filter(function(u){if(seen[u])return false;seen[u]=true;return true;});
+  openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',imgParts.join(','),r.cta_url||'');
 }
 
 function renderProducts(products){
@@ -2000,7 +2007,7 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       window.open(cta_url,'_blank');
     }
   };
-  var productImgs=imageStr?imageStr.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}).reverse():[];
+  var productImgs=imageStr?imageStr.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
   _pmGalImages=productImgs.slice();_pmGalCurrent=0;_lbImages=[];
   var galleryMain=document.getElementById('pm-gallery-main');
   var thumbStrip=document.getElementById('pm-gallery-thumbs');
