@@ -518,6 +518,38 @@ footer>*{position:relative;z-index:1;}
 .ann-img-thumb.active{border-color:rgba(247,239,230,.9);opacity:1;}
 .ann-img-thumb:hover{opacity:.85;}
 .upd-img-strip{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;}
+/* ── PRODUCT MODAL TABS ──────────────────────────────────────────────────── */
+.pm-tabs{display:flex;border-bottom:1px solid rgba(25,41,58,.12);background:var(--cream);flex-shrink:0;overflow-x:auto;}
+.pm-tabs::-webkit-scrollbar{display:none;}
+.pm-tab{padding:13px 22px;font-family:var(--mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--navy);opacity:.35;border-bottom:2px solid transparent;margin-bottom:-1px;transition:opacity .15s,border-color .15s;flex-shrink:0;white-space:nowrap;}
+.pm-tab:hover{opacity:.7;}
+.pm-tab.active{opacity:1;border-bottom-color:var(--navy);}
+.pm-tab-panel{display:none;}
+.pm-tab-panel.active{display:block;}
+
+/* Gallery tab — photo grid */
+.pm-gal-panel{padding:16px;}
+.pm-gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
+.pm-gal-cell{aspect-ratio:1;overflow:hidden;cursor:zoom-in;background:rgba(25,41,58,.06);position:relative;}
+.pm-gal-cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s;}
+.pm-gal-cell:hover img{opacity:.8;}
+.pm-gal-empty{padding:40px 32px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.3;text-align:center;}
+
+/* Update entry photos — bigger grid instead of tiny squares */
+.upd-img-grid{display:grid;gap:3px;margin-top:12px;}
+.upd-img-grid.one{grid-template-columns:1fr;}
+.upd-img-grid.two{grid-template-columns:1fr 1fr;}
+.upd-img-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.upd-img-grid.many{grid-template-columns:1fr 1fr 1fr;}
+.upd-img-grid-cell{aspect-ratio:16/9;overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.06);position:relative;}
+.upd-img-grid-cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s;}
+.upd-img-grid-cell:hover img{opacity:.8;}
+@media(max-width:600px){
+  .pm-tab{padding:12px 16px;}
+  .pm-gal-grid{grid-template-columns:repeat(3,1fr);}
+  .upd-img-grid.three,.upd-img-grid.many{grid-template-columns:1fr 1fr;}
+}
+
 .upd-album-label{font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:rgba(247,239,230,.3);margin-top:10px;margin-bottom:5px;}
 .upd-img-thumb-sq{width:44px;height:44px;object-fit:cover;cursor:zoom-in;border:1px solid rgba(247,239,230,.15);opacity:.7;transition:.15s;flex-shrink:0;}
 .upd-img-thumb-sq:hover{opacity:1;border-color:rgba(247,239,230,.5);}
@@ -1063,32 +1095,50 @@ body{top:0!important;}
         </div>
         <div class="pm-gallery-thumbs" id="pm-gallery-thumbs" style="display:none"></div>
       </div>
-      <div class="pm-content" id="pm-content">
-        <div class="pm-content-main">
-          <div class="pm-eyebrow" id="pm-eyebrow"></div>
-          <div class="pm-name" id="pm-name"></div>
-          <div class="pm-type" id="pm-type"></div>
-          <div class="pm-desc" id="pm-desc"></div>
-          <div class="pm-details" id="pm-details" style="display:none"></div>
-        </div>
-        <div class="pm-content-meta">
-          <span class="pm-status-badge" id="pm-status"></span>
-          <button class="pm-cta-btn" id="pm-cta">Request a Quote →</button>
-          <button class="pm-share-btn" id="pm-share" onclick="shareProduct()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            Share
-          </button>
+      <!-- Tab bar -->
+      <div class="pm-tabs" id="pm-tabs">
+        <button class="pm-tab active" onclick="pmSwitchTab('info',this)">Info</button>
+        <button class="pm-tab" id="pm-tab-gallery" onclick="pmSwitchTab('gallery',this)" style="display:none">Gallery</button>
+        <button class="pm-tab" id="pm-tab-updates" onclick="pmSwitchTab('updates',this)" style="display:none">Updates</button>
+      </div>
+      <!-- Info panel -->
+      <div class="pm-tab-panel active" id="pm-panel-info">
+        <div class="pm-content" id="pm-content">
+          <div class="pm-content-main">
+            <div class="pm-eyebrow" id="pm-eyebrow"></div>
+            <div class="pm-name" id="pm-name"></div>
+            <div class="pm-type" id="pm-type"></div>
+            <div class="pm-desc" id="pm-desc"></div>
+            <div class="pm-details" id="pm-details" style="display:none"></div>
+          </div>
+          <div class="pm-content-meta">
+            <span class="pm-status-badge" id="pm-status"></span>
+            <button class="pm-cta-btn" id="pm-cta">Request a Quote →</button>
+            <button class="pm-share-btn" id="pm-share" onclick="shareProduct()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+              Share
+            </button>
+          </div>
         </div>
       </div>
-      <div class="pm-updates-section" id="pm-update-panel" style="display:none">
-        <div class="pm-updates-header">
-          <div class="pm-updates-label">
-            <span class="pm-update-label-dot"></span>
-            Build Updates
-          </div>
-          <span class="pm-updates-count" id="pm-updates-count"></span>
+      <!-- Gallery panel -->
+      <div class="pm-tab-panel" id="pm-panel-gallery">
+        <div class="pm-gal-panel">
+          <div class="pm-gal-grid" id="pm-gal-grid"></div>
         </div>
-        <div class="pm-updates-feed" id="pm-updates-feed"></div>
+      </div>
+      <!-- Updates panel -->
+      <div class="pm-tab-panel" id="pm-panel-updates">
+        <div class="pm-updates-section" id="pm-update-panel">
+          <div class="pm-updates-header">
+            <div class="pm-updates-label">
+              <span class="pm-update-label-dot"></span>
+              Build Updates
+            </div>
+            <span class="pm-updates-count" id="pm-updates-count"></span>
+          </div>
+          <div class="pm-updates-feed" id="pm-updates-feed"></div>
+        </div>
       </div>
     </div><!-- end product-modal-scroll -->
   </div>
@@ -1564,11 +1614,12 @@ function _repopulateUpdates(name){
         :updUrls.filter(function(u){return!u.startsWith('__album__:');});
       if(realUrls.length){
         var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
-        var thumbsHtml=realUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('');
+        var _nc=realUrls.length===1?'one':realUrls.length===2?'two':'three';
+        var _cells=realUrls.map(function(u,i){return'<div class="upd-img-grid-cell" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')"><img src="'+u+'" alt="" onerror="this.parentNode.style.display=\'none\'"></div>';}).join('');
         if(isAlbum){
-          imgsHtml='<div class="upd-album-label">Update photos — not in main gallery</div><div class="upd-img-strip">'+thumbsHtml+'</div>';
+          imgsHtml='<div class="upd-album-label">Update photos — not in main gallery</div><div class="upd-img-grid '+_nc+'">'+_cells+'</div>';
         }else{
-          imgsHtml='<div class="upd-img-strip">'+thumbsHtml+'</div>';
+          imgsHtml='<div class="upd-img-grid '+_nc+'">'+_cells+'</div>';
         }
       }
     }
@@ -2062,11 +2113,12 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
           :updUrls.filter(function(u){return!u.startsWith('__album__:');});
         if(realUrls.length){
           var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
-          var thumbsHtml=realUrls.map(function(u,i){return'<img class="upd-img-thumb-sq" src="'+u+'" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')" alt="" onerror="this.style.display=\'none\'">';}).join('');
+          var _nc2=realUrls.length===1?'one':realUrls.length===2?'two':'three';
+          var _cells2=realUrls.map(function(u,i){return'<div class="upd-img-grid-cell" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')"><img src="'+u+'" alt="" onerror="this.parentNode.style.display=\'none\'"></div>';}).join('');
           if(isAlbum){
-            imgsHtml='<div class="upd-album-label">Update photos \u2014 not in main gallery</div><div class="upd-img-strip">'+thumbsHtml+'</div>';
+            imgsHtml='<div class="upd-album-label">Update photos — not in main gallery</div><div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
           }else{
-            imgsHtml='<div class="upd-img-strip">'+thumbsHtml+'</div>';
+            imgsHtml='<div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
           }
         }
       }
@@ -2078,6 +2130,19 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
     _lbImages=_pmGalImages.concat(allUpdateImgs);
     updatePanel.style.display='block';
   }else{updatePanel.style.display='none';_lbImages=_pmGalImages.slice();}
+
+  // ── Tab wiring ────────────────────────────────────────────────────────────
+  pmSwitchTab('info', document.querySelector('.pm-tab'));
+
+  // Gallery tab: show if any photos
+  var tabGal = document.getElementById('pm-tab-gallery');
+  if(tabGal) tabGal.style.display = productImgs.length ? '' : 'none';
+  pmBuildGalleryTab(productImgs);
+
+  // Updates tab: show if any updates
+  var tabUpd = document.getElementById('pm-tab-updates');
+  if(tabUpd) tabUpd.style.display = buildUpdates.length ? '' : 'none';
+
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow='hidden';
   var scroll=document.querySelector('.product-modal-scroll');if(scroll)scroll.scrollTop=0;
@@ -2096,6 +2161,39 @@ function shareProduct(){
       setTimeout(function(){btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share';btn.classList.remove('copied');},2000);
     }).catch(function(){window.prompt('Copy this link:',url);});
   }else{window.prompt('Copy this link:',url);}
+}
+
+
+function pmSwitchTab(tab, btn) {
+  document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.pm-tab-panel').forEach(function(p){p.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  var panel = document.getElementById('pm-panel-'+tab);
+  if(panel) panel.classList.add('active');
+  var scroll = document.querySelector('.product-modal-scroll');
+  if(scroll) scroll.scrollTop = 0;
+}
+
+function pmBuildGalleryTab(imageUrls) {
+  var grid = document.getElementById('pm-gal-grid');
+  if(!grid) return;
+  if(!imageUrls.length) {
+    grid.innerHTML = '<div class="pm-gal-empty">No photos yet</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  imageUrls.forEach(function(url, i) {
+    var cell = document.createElement('div');
+    cell.className = 'pm-gal-cell';
+    var img = document.createElement('img');
+    img.src = url; img.alt = '';
+    img.onerror = function(){cell.style.display='none';};
+    cell.appendChild(img);
+    cell.addEventListener('click', function(){
+      openLightboxMulti(imageUrls, i);
+    });
+    grid.appendChild(cell);
+  });
 }
 
 function closeProductModal(){
