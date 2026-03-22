@@ -535,8 +535,8 @@ footer>*{position:relative;z-index:1;}
 .pm-gal-cell:hover img{opacity:.8;}
 .pm-gal-empty{padding:40px 32px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.3;text-align:center;}
 .pm-gal-tag{position:absolute;bottom:0;left:0;right:0;font-size:7px;letter-spacing:.1em;text-transform:uppercase;padding:3px 6px;background:rgba(27,43,58,.72);color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.pm-gal-tag.gallery{border-top:2px solid rgba(111,207,151,.65);}
-.pm-gal-tag.update{border-top:2px solid rgba(247,239,230,.25);}
+.pm-gal-tag.gallery{border-top:2px solid rgba(201,168,76,.9);}
+.pm-gal-tag.update{border-top:2px solid rgba(184,76,46,.85);}
 
 /* Update entry photos — bigger grid instead of tiny squares */
 .upd-img-grid{display:grid;gap:3px;margin-top:12px;}
@@ -2092,24 +2092,35 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       return isBuild&&buildName===name.toLowerCase().trim();
     }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   }
+  // Collect all update photos with labels (deduplicated against gallery)
+  var _galPhotoSet = {};
+  productImgs.forEach(function(u){ _galPhotoSet[u] = true; });
+  var _labelledGalPhotos = [];
+
   if(buildUpdates.length){
-    var allUpdateImgs=[];var _labelledGalPhotos=[];_updGals={};
+    var allUpdateImgs=[];_updGals={};
     var feedHtml=buildUpdates.map(function(upd,entryIdx){
       var updContent=(upd.content||'').trim();
       var updImgStr=(upd.images||'').trim();
       if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
       var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
+      // Derive title FIRST so we can use it for the gallery label below
+      var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
+      if(!updTitle)updTitle=updDate||'Update';
       var _isAlbumStr=updImgStr&&updImgStr.startsWith('__album__:');
       var _imgContent=_isAlbumStr?updImgStr.slice('__album__:'.length):updImgStr;
       var updUrls=_imgContent?_imgContent.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
       if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
-      // Filter out album-only images from the main gallery aggregation
-    var _plainUrls=updUrls.filter(function(u){return!u.startsWith('__album__:');});
-    allUpdateImgs=allUpdateImgs.concat(_plainUrls);
-    _plainUrls.forEach(function(u){_labelledGalPhotos.push({url:u,label:updTitle||updDate||'Update',cls:'update'});});
-      var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-      var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
-      if(!updTitle)updTitle=name+' \u2014 Update';
+      var _plainUrls=updUrls.filter(function(u){return!u.startsWith('__album__:');});
+      allUpdateImgs=allUpdateImgs.concat(_plainUrls);
+      // Add to gallery tab: if already in the gallery column, mark as gallery, else update
+      _plainUrls.forEach(function(u){
+        if(!_galPhotoSet[u]) {
+          _labelledGalPhotos.push({url:u,label:updTitle,cls:'update'});
+          _galPhotoSet[u]=true; // prevent duplicates from multiple updates
+        }
+      });
       var imgsHtml='';
       if(updUrls.length){
         var isAlbum=updUrls.length===1&&updUrls[0].startsWith('__album__:');
@@ -2117,11 +2128,11 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
           ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
           :updUrls.filter(function(u){return!u.startsWith('__album__:');});
         if(realUrls.length){
-          var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
+          var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\'");});
           var _nc2=realUrls.length===1?'one':realUrls.length===2?'two':'three';
-          var _cells2=realUrls.map(function(u,i){return'<div class="upd-img-grid-cell" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')"><img src="'+u+'" alt="" onerror="this.parentNode.style.display=\'none\'"></div>';}).join('');
+          var _cells2=realUrls.map(function(u,i){return'<div class="upd-img-grid-cell" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'\'],'+i+')"><img src="'+u+'" alt="" onerror="this.parentNode.style.display=\'none\'"></div>';}).join('');
           if(isAlbum){
-            imgsHtml='<div class="upd-album-label">Update photos — not in main gallery</div><div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
+            imgsHtml='<div class="upd-album-label">Update photos \u2014 not in main gallery</div><div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
           }else{
             imgsHtml='<div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
           }
@@ -2139,9 +2150,9 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   // ── Tab wiring ────────────────────────────────────────────────────────────
   pmSwitchTab('info', document.querySelector('.pm-tab'));
 
-  // Gallery tab: combine gallery + update photos with labels
+  // Gallery tab: gallery photos first (gold), then update-only photos (rust), no duplicates
   var _allGalPhotos = productImgs.map(function(u){return{url:u,label:'Gallery',cls:'gallery'};});
-  if(typeof _labelledGalPhotos !== 'undefined') _allGalPhotos = _allGalPhotos.concat(_labelledGalPhotos);
+  _allGalPhotos = _allGalPhotos.concat(_labelledGalPhotos);
   var tabGal = document.getElementById('pm-tab-gallery');
   if(tabGal) tabGal.style.display = _allGalPhotos.length ? '' : 'none';
   pmBuildGalleryTab(_allGalPhotos);
