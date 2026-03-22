@@ -760,6 +760,66 @@ body{top:0!important;}
 .demo-card-wrap.hidden{display:none;}
 .product-card.demo-card{position:relative;}
 .demo-card-label{position:absolute;top:10px;left:10px;background:rgba(201,168,76,.9);color:#1b2b3a;font-family:var(--mono);font-size:7px;letter-spacing:.18em;text-transform:uppercase;padding:2px 7px;z-index:2;pointer-events:none;}
+
+/* ── EXTRA MODAL PANELS (Specs / Progress / FAQ / Docs) ─────────────────── */
+.pm-extra-panel{padding:26px 32px 28px;}
+/* Specs */
+.pm-spec-group{margin-bottom:22px;}
+.pm-spec-group-title{font-family:var(--mono);font-size:7px;letter-spacing:.28em;text-transform:uppercase;opacity:.28;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(25,41,58,.1);}
+.pm-dim-row{display:grid;gap:1px;background:rgba(25,41,58,.1);border:1px solid rgba(25,41,58,.1);margin-bottom:16px;}
+.pm-dim-cell{background:var(--cream);padding:12px;text-align:center;}
+.pm-dim-lbl{font-size:7px;letter-spacing:.2em;text-transform:uppercase;opacity:.3;margin-bottom:4px;font-family:var(--mono);}
+.pm-dim-val{font-family:var(--mono);font-size:18px;font-weight:700;}
+.pm-dim-unit{font-size:8px;opacity:.4;margin-left:2px;}
+.pm-spec-table{width:100%;border-collapse:collapse;}
+.pm-spec-table tr{border-bottom:1px solid rgba(25,41,58,.08);}
+.pm-spec-table tr:last-child{border-bottom:none;}
+.pm-spec-table td{padding:8px 0;font-size:12px;}
+.pm-spec-table td:first-child{opacity:.42;width:48%;font-size:11px;}
+.pm-spec-table td:last-child{font-weight:500;}
+/* Progress */
+.pm-prog-item{margin-bottom:16px;}
+.pm-prog-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+.pm-prog-lbl{font-size:12px;font-weight:500;}
+.pm-prog-pct{font-family:var(--mono);font-size:10px;opacity:.38;}
+.pm-prog-track{height:2px;background:rgba(25,41,58,.1);}
+.pm-prog-fill{height:100%;background:var(--navy);transition:width .5s ease;}
+.pm-prog-fill.g{background:#6fcf97;}
+.pm-prog-fill.a{background:#c9a84c;}
+.pm-milestones{border-top:1px solid rgba(25,41,58,.1);padding-top:18px;margin-top:6px;display:flex;flex-direction:column;gap:0;}
+.pm-ms{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(25,41,58,.07);}
+.pm-ms:last-child{border-bottom:none;}
+.pm-ms-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.pm-ms-dot.done{background:#6fcf97;}
+.pm-ms-dot.now{background:var(--navy);box-shadow:0 0 0 3px rgba(25,41,58,.1);}
+.pm-ms-dot.tbd{background:rgba(25,41,58,.15);}
+.pm-ms-text{font-size:12px;line-height:1.4;}
+.pm-ms-date{font-size:9px;opacity:.3;margin-top:1px;font-family:var(--mono);}
+/* FAQ */
+.pm-faq-item{border-bottom:1px solid rgba(25,41,58,.08);}
+.pm-faq-item:first-child{border-top:1px solid rgba(25,41,58,.08);}
+.pm-faq-btn{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;gap:14px;font-size:12px;font-weight:500;color:var(--navy);line-height:1.4;}
+.pm-faq-btn:hover{background:rgba(25,41,58,.025);}
+.pm-faq-chevron{font-size:14px;opacity:.25;flex-shrink:0;transition:transform .18s;font-family:var(--mono);}
+.pm-faq-ans{display:none;padding:0 32px 13px;font-size:12px;line-height:1.85;opacity:.55;}
+.pm-faq-item.open .pm-faq-ans{display:block;}
+.pm-faq-item.open .pm-faq-chevron{transform:rotate(180deg);}
+/* Docs */
+.pm-doc-row{display:flex;align-items:center;gap:16px;padding:13px 16px;border:1px solid rgba(25,41,58,.1);margin-bottom:9px;cursor:pointer;transition:background .15s;text-decoration:none;color:var(--navy);}
+.pm-doc-row:last-child{margin-bottom:0;}
+.pm-doc-row:hover{background:rgba(25,41,58,.04);}
+.pm-doc-icon{width:30px;height:38px;background:var(--navy);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;flex-shrink:0;}
+.pm-doc-icon span{font-family:var(--mono);font-size:6px;letter-spacing:.08em;color:var(--cream);opacity:.6;text-transform:uppercase;}
+.pm-doc-info{flex:1;min-width:0;}
+.pm-doc-name{font-size:12px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pm-doc-meta{font-size:10px;opacity:.32;font-family:var(--mono);}
+.pm-doc-dl{font-family:var(--mono);font-size:9px;letter-spacing:.12em;opacity:.28;flex-shrink:0;}
+.pm-doc-row:hover .pm-doc-dl{opacity:.8;}
+@media(max-width:600px){
+  .pm-extra-panel{padding:18px 20px 22px;}
+  .pm-faq-btn{padding:13px 20px;}
+  .pm-faq-ans{padding:0 20px 12px;}
+}
 /* ── MOBILE TOUCH / SWIPE IMPROVEMENTS ──────────────────────────────────── */
 /* Dot indicators for gallery on mobile */
 .pm-gallery-dots{display:none;justify-content:center;gap:6px;padding:8px 0 6px;background:rgba(25,41,58,.04);border-top:1px solid rgba(25,41,58,.08);}
@@ -1154,6 +1214,10 @@ body{top:0!important;}
         <button class="pm-tab active" onclick="pmSwitchTab('info',this)">Info</button>
         <button class="pm-tab" id="pm-tab-updates" onclick="pmSwitchTab('updates',this)" style="display:none">Updates</button>
         <button class="pm-tab" id="pm-tab-allphotos" onclick="pmSwitchTab('allphotos',this)" style="display:none">All Photos</button>
+        <button class="pm-tab" id="pm-tab-specs" onclick="pmSwitchTab('specs',this)" style="display:none">Specs</button>
+        <button class="pm-tab" id="pm-tab-progress" onclick="pmSwitchTab('progress',this)" style="display:none">Progress</button>
+        <button class="pm-tab" id="pm-tab-faq" onclick="pmSwitchTab('faq',this)" style="display:none">FAQ</button>
+        <button class="pm-tab" id="pm-tab-docs" onclick="pmSwitchTab('docs',this)" style="display:none">Docs</button>
       </div>
       <!-- Info panel -->
       <div class="pm-tab-panel active" id="pm-panel-info">
@@ -1197,6 +1261,22 @@ body{top:0!important;}
           </div>
           <div class="pm-allphotos-grid" id="pm-allphotos-grid"></div>
         </div>
+      </div>
+      <!-- Specs panel -->
+      <div class="pm-tab-panel" id="pm-panel-specs">
+        <div class="pm-extra-panel" id="pm-specs-content"></div>
+      </div>
+      <!-- Progress panel -->
+      <div class="pm-tab-panel" id="pm-panel-progress">
+        <div class="pm-extra-panel" id="pm-progress-content"></div>
+      </div>
+      <!-- FAQ panel -->
+      <div class="pm-tab-panel" id="pm-panel-faq">
+        <div id="pm-faq-content"></div>
+      </div>
+      <!-- Docs panel -->
+      <div class="pm-tab-panel" id="pm-panel-docs">
+        <div class="pm-extra-panel" id="pm-docs-content"></div>
       </div>
     </div><!-- end product-modal-scroll -->
   </div>
@@ -1927,6 +2007,67 @@ function _addDemoCard(grid) {
     '<div class="product-updated">Updated just now</div>' +
     '<div class="product-card-hint">Click to view</div>';
   card.addEventListener('click', function() {
+    _pmExtraData = {
+      specs: {
+        dims: [
+          {l:'Length', v:'24.6', u:'m'},
+          {l:'Beam',   v:'6.2',  u:'m'},
+          {l:'Draught',v:'1.8',  u:'m'},
+        ],
+        groups: [
+          {title:'Performance', rows:[
+            {k:'Max speed',    v:'28 kn'},
+            {k:'Cruise speed', v:'18 kn'},
+            {k:'Range',        v:'620 nm'},
+            {k:'Endurance',    v:'72 hrs'},
+          ]},
+          {title:'Propulsion', rows:[
+            {k:'Engines',       v:'2× Diesel inline-6'},
+            {k:'Output',        v:'1,200 kW combined'},
+            {k:'Drive',         v:'Twin shaft, fixed pitch'},
+            {k:'Fuel capacity', v:'4,200 L'},
+          ]},
+          {title:'Complement', rows:[
+            {k:'Crew',          v:'4 min / 8 max'},
+            {k:'Cargo',         v:'12 t'},
+            {k:'Part count',    v:'~3,400'},
+          ]},
+        ],
+      },
+      progress: {
+        bars: [
+          {label:'Hull & Structure',         pct:100},
+          {label:'Propulsion & Engineering', pct:85},
+          {label:'Bridge & Electronics',     pct:60},
+          {label:'Interior Fit-out',         pct:30},
+          {label:'Sea Trials',               pct:0},
+        ],
+        milestones: [
+          {text:'Hull plating complete',    date:'Nov 2025',                  state:'done'},
+          {text:'Engine room sealed',       date:'Jan 2026',                  state:'done'},
+          {text:'Bridge instrumentation',   date:'Mar 2026 — In progress', state:'now'},
+          {text:'Interior cabins & galley', date:'Est. May 2026',             state:'tbd'},
+          {text:'Steam Workshop release',   date:'Est. Q3 2026',              state:'tbd'},
+        ],
+      },
+      faq: [
+        {q:'Is this on the Steam Workshop?',
+         a:'Yes — search “Example Build Underway” or use the button above. Kept up to date with every release.'},
+        {q:'What game version is required?',
+         a:'Tested on Stormworks 1.9.x. No experimental parts so it stays stable across minor patches.'},
+        {q:'Can I modify and redistribute?',
+         a:'Personal modifications welcome. Redistribution requires credit to Underway.'},
+        {q:'Is there a multiplayer-optimised version?',
+         a:'Not yet — a lower part-count MP edition is on the roadmap for Q3 2026.'},
+        {q:'How do I report bugs or request features?',
+         a:'Join the Discord — there is a dedicated channel per build.'},
+      ],
+      docs: [
+        {name:'Example Build — Full Spec Sheet', meta:'PDF · 2 pages · Mar 2026', url:'#'},
+        {name:'Engine Room Layout Diagram',           meta:'PDF · 1 page · Jan 2026',  url:'#'},
+        {name:'Electrical & Sensor Schematic',        meta:'PDF · 3 pages · Feb 2026', url:'#'},
+      ],
+    };
     openProductModal('00', 'In Development', 'Example', 'Patrol / Utility',
       'This is an example product card. It shows how the modal looks with a description, status badge, gallery area, and the build updates feed below. In a real entry all of this comes from your sheet.',
       'Material: Marine-grade steel · Length: 24m · Beam: 6m · Part count: ~3,200',
@@ -2220,6 +2361,8 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   // ── Tabs ──────────────────────────────────────────────────────────────────
   // Always reset to Info tab when opening
   pmSwitchTab('info', document.querySelector('.pm-tab'));
+  _pmPopulateExtras(_pmExtraData);
+  _pmExtraData = null;
 
   // Show/hide Updates tab
   var tabUpd=document.getElementById('pm-tab-updates');
@@ -2263,6 +2406,112 @@ function shareProduct(){
   }else{window.prompt('Copy this link:',url);}
 }
 
+
+// ── EXTRA MODAL PANEL DATA ────────────────────────────────────────────────────
+// Set this before calling openProductModal to populate Specs/Progress/FAQ/Docs.
+// Each key is optional — omit any you don't need.
+// Shape:
+//   specs:    { dims:[{l,v,u}], groups:[{title, rows:[{k,v}]}] }
+//   progress: { bars:[{label,pct}], milestones:[{text,date,state}] }  state: done|now|tbd
+//   faq:      [ {q, a} ]
+//   docs:     [ {name, meta, url} ]
+var _pmExtraData = null;
+
+function _pmPopulateExtras(data) {
+  var tabs = ['specs','progress','faq','docs'];
+  tabs.forEach(function(t){
+    var btn = document.getElementById('pm-tab-'+t);
+    if(btn) btn.style.display = 'none';
+  });
+  if(!data) return;
+
+  // ── Specs ──────────────────────────────────────────────────────────────────
+  if(data.specs) {
+    var sc = document.getElementById('pm-specs-content');
+    if(sc) {
+      var html = '';
+      var s = data.specs;
+      if(s.dims && s.dims.length) {
+        html += '<div class="pm-spec-group"><div class="pm-spec-group-title">Dimensions</div>';
+        html += '<div class="pm-dim-row" style="grid-template-columns:repeat('+s.dims.length+',1fr)">';
+        s.dims.forEach(function(d){
+          html += '<div class="pm-dim-cell"><div class="pm-dim-lbl">'+d.l+'</div><div class="pm-dim-val">'+d.v+'<span class="pm-dim-unit">'+d.u+'</span></div></div>';
+        });
+        html += '</div></div>';
+      }
+      if(s.groups) s.groups.forEach(function(g){
+        html += '<div class="pm-spec-group"><div class="pm-spec-group-title">'+g.title+'</div><table class="pm-spec-table">';
+        g.rows.forEach(function(r){ html += '<tr><td>'+r.k+'</td><td>'+r.v+'</td></tr>'; });
+        html += '</table></div>';
+      });
+      sc.innerHTML = html;
+      var btn = document.getElementById('pm-tab-specs');
+      if(btn) btn.style.display = '';
+    }
+  }
+
+  // ── Progress ───────────────────────────────────────────────────────────────
+  if(data.progress) {
+    var pc = document.getElementById('pm-progress-content');
+    if(pc) {
+      var p = data.progress, html2 = '';
+      if(p.bars) p.bars.forEach(function(b){
+        var pct = Math.round(b.pct);
+        var cls = pct===100?'g':pct>=50?'a':'';
+        html2 += '<div class="pm-prog-item"><div class="pm-prog-row"><span class="pm-prog-lbl">'+b.label+'</span><span class="pm-prog-pct">'+pct+'%</span></div><div class="pm-prog-track"><div class="pm-prog-fill '+cls+'" style="width:'+pct+'%"></div></div></div>';
+      });
+      if(p.milestones && p.milestones.length) {
+        html2 += '<div class="pm-milestones">';
+        p.milestones.forEach(function(m){
+          html2 += '<div class="pm-ms"><div class="pm-ms-dot '+m.state+'"></div><div><div class="pm-ms-text">'+m.text+'</div><div class="pm-ms-date">'+m.date+'</div></div></div>';
+        });
+        html2 += '</div>';
+      }
+      pc.innerHTML = html2;
+      var btn2 = document.getElementById('pm-tab-progress');
+      if(btn2) btn2.style.display = '';
+    }
+  }
+
+  // ── FAQ ────────────────────────────────────────────────────────────────────
+  if(data.faq && data.faq.length) {
+    var fc = document.getElementById('pm-faq-content');
+    if(fc) {
+      fc.innerHTML = data.faq.map(function(item){
+        return '<div class="pm-faq-item">'
+          +'<button class="pm-faq-btn" onclick="pmFaqToggle(this)">'+item.q+'<span class="pm-faq-chevron">&#8964;</span></button>'
+          +'<div class="pm-faq-ans">'+item.a+'</div>'
+          +'</div>';
+      }).join('');
+      var btn3 = document.getElementById('pm-tab-faq');
+      if(btn3) btn3.style.display = '';
+    }
+  }
+
+  // ── Docs ───────────────────────────────────────────────────────────────────
+  if(data.docs && data.docs.length) {
+    var dc = document.getElementById('pm-docs-content');
+    if(dc) {
+      dc.innerHTML = data.docs.map(function(d){
+        return '<a class="pm-doc-row" href="'+d.url+'" target="_blank" rel="noopener">'
+          +'<div class="pm-doc-icon"><span>PDF</span></div>'
+          +'<div class="pm-doc-info"><div class="pm-doc-name">'+d.name+'</div><div class="pm-doc-meta">'+d.meta+'</div></div>'
+          +'<div class="pm-doc-dl">↓ Download</div>'
+          +'</a>';
+      }).join('');
+      var btn4 = document.getElementById('pm-tab-docs');
+      if(btn4) btn4.style.display = '';
+    }
+  }
+}
+
+function pmFaqToggle(btn) {
+  var item = btn.closest('.pm-faq-item');
+  var wasOpen = item.classList.contains('open');
+  btn.closest('#pm-faq-content').querySelectorAll('.pm-faq-item').forEach(function(i){i.classList.remove('open');});
+  if(!wasOpen) item.classList.add('open');
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 function pmSwitchTab(tab, btn) {
   document.querySelectorAll('.pm-tab').forEach(function(t){t.classList.remove('active');});
