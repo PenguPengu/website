@@ -1634,6 +1634,22 @@ function _repopulateUpdates(name){
   _entries.forEach(function(n){_feed.appendChild(n);});
   document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
   updatePanel.style.display='block';
+  // Also refresh gallery tab with new update photos
+  var _rGalSeen={};var _rGalPhotos=[];
+  _pmGalImages.forEach(function(u){if(!_rGalSeen[u]){_rGalSeen[u]=true;_rGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}});
+  buildUpdates.forEach(function(upd){
+    var s=(upd.images||'').trim();var isA=s.startsWith('__album__:');
+    var c=isA?s.slice('__album__:'.length):s;
+    var lines=(upd.content||'').trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var lbl=lines.length>1?lines[0]:(lines[0]||'Update');
+    if(!c&&(upd.content||'').indexOf('http')===0)c=upd.content.trim();
+    c.split(',').map(function(u){return fixDiscordUrl(u.trim());}).filter(function(u){return u.indexOf('http')===0;}).forEach(function(u){
+      if(!_rGalSeen[u]){_rGalSeen[u]=true;_rGalPhotos.push({url:u,label:lbl,cls:'update'});}
+    });
+  });
+  pmBuildGalleryTab(_rGalPhotos);
+  var _tg=document.getElementById('pm-tab-gallery');
+  if(_tg)_tg.style.display=_rGalPhotos.length?'':'none';
 }
 
 function loadAnnouncements(){
@@ -1897,9 +1913,11 @@ function renderProducts(products){
   var seeAllBtn=document.getElementById('products-see-all');
   if(seeAllBtn)seeAllBtn.style.display=indexed.length>3?'flex':'none';
 
-  // Full catalogue overlay: all products
+  // Full catalogue overlay: all products — preserve scroll position on refresh
   var catGrid=document.getElementById('catalogue-grid');
   if(catGrid){
+    var _catBody=document.querySelector('.catalogue-body');
+    var _catScroll=_catBody?_catBody.scrollTop:0;
     catGrid.innerHTML=indexed.map(function(item){
       var r={};Object.keys(item.p).forEach(function(k){r[k.toLowerCase()]=item.p[k];});
       var bn=(r.name||'').toLowerCase().trim();
@@ -1908,6 +1926,7 @@ function renderProducts(products){
     catGrid.querySelectorAll('.product-card').forEach(function(card){
       card.addEventListener('click',function(){_openProductFromCard(this);});
     });
+    if(_catBody&&_catScroll)_catBody.scrollTop=_catScroll;
   }
   checkDeepLink();
 }
@@ -2096,8 +2115,6 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
     }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   }
   // Collect all update photos with labels (deduplicated against gallery)
-  var _galPhotoSet = {};
-  productImgs.forEach(function(u){ _galPhotoSet[u] = true; });
   var _labelledGalPhotos = [];
 
   if(buildUpdates.length){
@@ -2118,11 +2135,9 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
       var _plainUrls=updUrls.filter(function(u){return!u.startsWith('__album__:');});
       allUpdateImgs=allUpdateImgs.concat(_plainUrls);
+      // Collect ALL update photo URLs — dedup happens later when building gallery tab
       _plainUrls.forEach(function(u){
-        if(!_galPhotoSet[u]){
-          _labelledGalPhotos.push({url:u,label:updTitle,cls:'update'});
-          _galPhotoSet[u]=true;
-        }
+        _labelledGalPhotos.push({url:u,label:updTitle,cls:'update'});
       });
       // Build entry DOM node
       var entry=document.createElement('div');
@@ -2154,9 +2169,15 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   // ── Tab wiring ────────────────────────────────────────────────────────────
   pmSwitchTab('info', document.querySelector('.pm-tab'));
 
-  // Gallery tab: gallery photos first (gold), then update-only photos (rust), no duplicates
-  var _allGalPhotos = productImgs.map(function(u){return{url:u,label:'Gallery',cls:'gallery'};});
-  _allGalPhotos = _allGalPhotos.concat(_labelledGalPhotos);
+  // Gallery tab: gallery photos first, then ALL update photos — dedupe by URL, gallery label wins
+  var _seen={};
+  var _allGalPhotos=[];
+  productImgs.forEach(function(u){
+    if(!_seen[u]){_seen[u]=true;_allGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
+  });
+  _labelledGalPhotos.forEach(function(o){
+    if(!_seen[o.url]){_seen[o.url]=true;_allGalPhotos.push(o);}
+  });
   var tabGal = document.getElementById('pm-tab-gallery');
   if(tabGal) tabGal.style.display = _allGalPhotos.length ? '' : 'none';
   pmBuildGalleryTab(_allGalPhotos);
