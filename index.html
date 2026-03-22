@@ -1595,7 +1595,7 @@ function _repopulateUpdates(name){
   var updatePanel=document.getElementById('pm-update-panel');
   if(!updatePanel)return;
   var allUpdateImgs=[];_updGals={};
-  var feedHtml=buildUpdates.map(function(upd,entryIdx){
+  var _entries=buildUpdates.map(function(upd,entryIdx){
     var updContent=(upd.content||'').trim();
     var updImgStr=(upd.images||'').trim();
     if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
@@ -1615,20 +1615,23 @@ function _repopulateUpdates(name){
       var realUrls=isAlbum
         ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
         :updUrls.filter(function(u){return!u.startsWith('__album__:');});
-      if(realUrls.length){
-        var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\\'");});
-        var _nc=realUrls.length===1?'one':realUrls.length===2?'two':'three';
-        var _cells=realUrls.map(function(u,i){return'<div class="upd-img-grid-cell" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'],'+i+')"><img src="'+u+'" alt="" onerror="this.parentNode.style.display=\'none\'"></div>';}).join('');
-        if(isAlbum){
-          imgsHtml='<div class="upd-album-label">Update photos — not in main gallery</div><div class="upd-img-grid '+_nc+'">'+_cells+'</div>';
-        }else{
-          imgsHtml='<div class="upd-img-grid '+_nc+'">'+_cells+'</div>';
+        if(realUrls.length){
+          imgsHtml=_buildUpdImgHtml(realUrls, isAlbum);
         }
       }
-    }
-    return'<div class="pm-update-entry"><div class="pm-update-entry-header">'+(updDate?'<span class="pm-update-entry-date">'+updDate+'</span>':'')+(entryIdx===0?'<span class="pm-update-entry-badge">Latest</span>':'')+'</div><div class="pm-update-entry-title">'+updTitle+'</div>'+(updBody?'<div class="pm-update-entry-body">'+parseMarkdown(updBody)+'</div>':'')+imgsHtml+'</div>';
-  }).join('');
-  document.getElementById('pm-updates-feed').innerHTML=feedHtml;
+      // Build DOM node for this entry
+      var _e=document.createElement('div');_e.className='pm-update-entry';
+      var _h=document.createElement('div');_h.className='pm-update-entry-header';
+      if(updDate){var _ds=document.createElement('span');_ds.className='pm-update-entry-date';_ds.textContent=updDate;_h.appendChild(_ds);}
+      if(entryIdx===0){var _bd=document.createElement('span');_bd.className='pm-update-entry-badge';_bd.textContent='Latest';_h.appendChild(_bd);}
+      _e.appendChild(_h);
+      var _tt=document.createElement('div');_tt.className='pm-update-entry-title';_tt.textContent=updTitle;_e.appendChild(_tt);
+      if(updBody){var _bo=document.createElement('div');_bo.className='pm-update-entry-body';_bo.innerHTML=parseMarkdown(updBody);_e.appendChild(_bo);}
+      if(imgsHtml){var _iw=document.createElement('div');_iw.innerHTML=imgsHtml;_e.appendChild(_iw);}
+      return _e;
+  });
+  var _feed=document.getElementById('pm-updates-feed');_feed.innerHTML='';
+  _entries.forEach(function(n){_feed.appendChild(n);});
   document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
   updatePanel.style.display='block';
 }
@@ -2099,12 +2102,13 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
 
   if(buildUpdates.length){
     var allUpdateImgs=[];_updGals={};
-    var feedHtml=buildUpdates.map(function(upd,entryIdx){
+    var feedEl=document.getElementById('pm-updates-feed');
+    feedEl.innerHTML='';
+    buildUpdates.forEach(function(upd,entryIdx){
       var updContent=(upd.content||'').trim();
       var updImgStr=(upd.images||'').trim();
       if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
       var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
-      // Derive title FIRST so we can use it for the gallery label below
       var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
       var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
       if(!updTitle)updTitle=updDate||'Update';
@@ -2114,35 +2118,35 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
       var _plainUrls=updUrls.filter(function(u){return!u.startsWith('__album__:');});
       allUpdateImgs=allUpdateImgs.concat(_plainUrls);
-      // Add to gallery tab: if already in the gallery column, mark as gallery, else update
       _plainUrls.forEach(function(u){
-        if(!_galPhotoSet[u]) {
+        if(!_galPhotoSet[u]){
           _labelledGalPhotos.push({url:u,label:updTitle,cls:'update'});
-          _galPhotoSet[u]=true; // prevent duplicates from multiple updates
+          _galPhotoSet[u]=true;
         }
       });
-      var imgsHtml='';
+      // Build entry DOM node
+      var entry=document.createElement('div');
+      entry.className='pm-update-entry';
+      var hdr=document.createElement('div');hdr.className='pm-update-entry-header';
+      if(updDate){var ds=document.createElement('span');ds.className='pm-update-entry-date';ds.textContent=updDate;hdr.appendChild(ds);}
+      if(entryIdx===0){var bd=document.createElement('span');bd.className='pm-update-entry-badge';bd.textContent='Latest';hdr.appendChild(bd);}
+      entry.appendChild(hdr);
+      var tt=document.createElement('div');tt.className='pm-update-entry-title';tt.textContent=updTitle;entry.appendChild(tt);
+      if(updBody){var bo=document.createElement('div');bo.className='pm-update-entry-body';bo.innerHTML=parseMarkdown(updBody);entry.appendChild(bo);}
       if(updUrls.length){
         var isAlbum=updUrls.length===1&&updUrls[0].startsWith('__album__:');
         var realUrls=isAlbum
           ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
           :updUrls.filter(function(u){return!u.startsWith('__album__:');});
         if(realUrls.length){
-          var allEscUpd=realUrls.map(function(u){return u.replace(/\\/g,'\\\\').replace(/'/g,"\'");});
-          var _nc2=realUrls.length===1?'one':realUrls.length===2?'two':'three';
-          var _cells2=realUrls.map(function(u,i){return'<div class="upd-img-grid-cell" onclick="openLightboxMulti([\''+allEscUpd.join("','")+'\'\'],'+i+')"><img src="'+u+'" alt="" onerror="this.parentNode.style.display=\'none\'"></div>';}).join('');
-          if(isAlbum){
-            imgsHtml='<div class="upd-album-label">Update photos \u2014 not in main gallery</div><div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
-          }else{
-            imgsHtml='<div class="upd-img-grid '+_nc2+'">'+_cells2+'</div>';
-          }
+          var imgNode=_buildUpdImgDom(realUrls, isAlbum);
+          entry.appendChild(imgNode);
         }
       }
-      return '<div class="pm-update-entry"><div class="pm-update-entry-header">'+(updDate?'<span class="pm-update-entry-date">'+updDate+'</span>':'')+(entryIdx===0?'<span class="pm-update-entry-badge">Latest</span>':'')+'</div><div class="pm-update-entry-title">'+updTitle+'</div>'+(updBody?'<div class="pm-update-entry-body">'+parseMarkdown(updBody)+'</div>':'')+imgsHtml+'</div>';
-    }).join('');
-    document.getElementById('pm-updates-feed').innerHTML=feedHtml;
+      feedEl.appendChild(entry);
+    });
     document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
-    var feed=document.getElementById('pm-updates-feed');if(feed)feed.scrollTop=0;
+    feedEl.scrollTop=0;
     _lbImages=_pmGalImages.concat(allUpdateImgs);
     updatePanel.style.display='block';
   }else{updatePanel.style.display='none';_lbImages=_pmGalImages.slice();}
@@ -2217,6 +2221,37 @@ function pmBuildGalleryTab(photos) {
     cell.addEventListener('click', (function(idx){ return function(){ openLightboxMulti(urls, idx); }; })(i));
     grid.appendChild(cell);
   });
+}
+
+
+function _buildUpdImgDom(realUrls, isAlbum) {
+  var nc = realUrls.length===1?'one':realUrls.length===2?'two':'three';
+  var wrap = document.createElement('div');
+  if(isAlbum){
+    var lbl=document.createElement('div');
+    lbl.className='upd-album-label';
+    lbl.textContent='Update photos — not in main gallery';
+    wrap.appendChild(lbl);
+  }
+  var grid=document.createElement('div');
+  grid.className='upd-img-grid '+nc;
+  realUrls.forEach(function(u,i){
+    var cell=document.createElement('div');
+    cell.className='upd-img-grid-cell';
+    cell.style.cursor='zoom-in';
+    var img=document.createElement('img');
+    img.src=u;img.alt='';
+    img.onerror=function(){cell.style.display='none';};
+    cell.appendChild(img);
+    cell.addEventListener('click',(function(idx){return function(){openLightboxMulti(realUrls,idx);};})(i));
+    grid.appendChild(cell);
+  });
+  wrap.appendChild(grid);
+  return wrap;
+}
+// Legacy string version used by _repopulateUpdates (innerHTML path)
+function _buildUpdImgHtml(realUrls, isAlbum) {
+  return _buildUpdImgDom(realUrls, isAlbum).outerHTML;
 }
 
 function closeProductModal(){
