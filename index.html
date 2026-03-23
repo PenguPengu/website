@@ -1587,10 +1587,9 @@ function _annReady(){
   if(PRODUCT_REGISTRY.length)renderProducts(PRODUCT_REGISTRY);
   // If a deep link was waiting on us, open it now
   if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);return;}
-  // If product modal is already open (products loaded faster), re-render updates panel
-  if(document.getElementById('product-modal').classList.contains('open')){
-    var name=document.getElementById('pm-name').textContent||'';
-    if(name&&name!=='Example')_repopulateUpdates(name);
+  // If product modal is already open, repopulate updates + gallery immediately
+  if(_currentModalName&&_currentModalName!=='Example'&&document.getElementById('product-modal').classList.contains('open')){
+    _repopulateUpdates(_currentModalName);
   }
 }
 
@@ -1996,6 +1995,7 @@ function openLightboxMulti(urls,idx){_lbImages=urls.slice();_lbCurrent=idx;pmOpe
 
 // ── Gallery state for current modal ──────────────────────────────────────────
 var _pmGalImages=[],_pmGalCurrent=0;
+var _currentModalName='';
 function pmGalShow(idx){
   if(!_pmGalImages.length)return;
   idx=((idx%_pmGalImages.length)+_pmGalImages.length)%_pmGalImages.length;
@@ -2198,6 +2198,9 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow='hidden';
   var scroll=document.querySelector('.product-modal-scroll');if(scroll)scroll.scrollTop=0;
+  // If announcements haven't loaded yet, fetch them now so gallery/updates populate immediately
+  _currentModalName = name;
+  if(!_announcementsReady) loadAnnouncements();
 }
 
 function pmOpenUpdateImg(lbIdx){pmOpenLightbox(lbIdx);}
@@ -2291,6 +2294,7 @@ function _buildUpdImgHtml(realUrls, isAlbum) {
 function closeProductModal(){
   document.getElementById('product-modal').classList.remove('open');
   document.body.style.overflow='';
+  _currentModalName='';
   history.replaceState(null,'','/');
 }
 
