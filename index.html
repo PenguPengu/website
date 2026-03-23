@@ -1583,51 +1583,49 @@ function fixDiscordUrl(u){
 
 function _annReady(){
   _announcementsReady=true;
-  // Re-render products now that we have update timestamps
-  if(PRODUCT_REGISTRY.length)renderProducts(PRODUCT_REGISTRY);
-  // If a deep link was waiting on us, open it now
   if(_pendingDeepLink){var s=_pendingDeepLink;_pendingDeepLink=null;openProductBySlug(s);return;}
-  // If product modal is already open, repopulate updates + gallery immediately
-  if(_currentModalName&&_currentModalName!=='Example'&&document.getElementById('product-modal').classList.contains('open')){
+  // Modal is open — just repopulate it, don't re-render the whole product grid
+  if(_currentModalName&&document.getElementById('product-modal').classList.contains('open')){
     _repopulateUpdates(_currentModalName);
+    return;
   }
+  // No modal open — safe to re-render products with updated timestamps
+  if(PRODUCT_REGISTRY.length)renderProducts(PRODUCT_REGISTRY);
 }
 
 function _repopulateUpdates(name){
+  if(!name||name==='Example')return;
   var buildUpdates=_announcements.filter(function(a){
     var t=(a.type||'').toLowerCase().trim();
     return(t==='build update'||t==='build_update')&&
       (a.build||'').toLowerCase().trim()===name.toLowerCase().trim();
   }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
-  if(!buildUpdates.length)return;
+
+  // ── Updates feed ──────────────────────────────────────────────────────────
   var updatePanel=document.getElementById('pm-update-panel');
   if(!updatePanel)return;
-  var allUpdateImgs=[];_updGals={};
-  var _entries=buildUpdates.map(function(upd,entryIdx){
-    var updContent=(upd.content||'').trim();
-    var updImgStr=(upd.images||'').trim();
-    if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
-    var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
-    var _isAlbumStr=updImgStr&&updImgStr.startsWith('__album__:');
+  if(buildUpdates.length){
+    _updGals={};
+    var _entries=buildUpdates.map(function(upd,entryIdx){
+      var updContent=(upd.content||'').trim();
+      var updImgStr=(upd.images||'').trim();
+      if(!updImgStr&&updContent.indexOf('http')===0){updImgStr=updContent;updContent='';}
+      var updDate='';try{var _ud=new Date(upd.timestamp);if(!isNaN(_ud.getTime()))updDate=_ud.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}
+      var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
+      if(!updTitle)updTitle=updDate||'Update';
+      var _isAlbumStr=updImgStr&&updImgStr.startsWith('__album__:');
       var _imgContent=_isAlbumStr?updImgStr.slice('__album__:'.length):updImgStr;
       var updUrls=_imgContent?_imgContent.split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;}):[];
       if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
-    // Filter out album-only images from the main gallery aggregation
-    allUpdateImgs=allUpdateImgs.concat(updUrls.filter(function(u){return!u.startsWith('__album__:');}));
-    var lines=updContent.split('\n').map(function(l){return l.trim();}).filter(Boolean);
-    var updTitle=lines.length>1?lines[0]:'';var updBody=lines.length>1?lines.slice(1).join('\n'):updContent;
-    if(!updTitle)updTitle=name+' — Update';
-    var imgNode=null;
-    if(updUrls.length){
-      var isAlbum=updUrls.length===1&&updUrls[0].startsWith('__album__:');
-      var realUrls=isAlbum
-        ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
-        :updUrls.filter(function(u){return!u.startsWith('__album__:');});
-        if(realUrls.length){
-          imgNode=_buildUpdImgDom(realUrls, isAlbum);
-        }
+      var imgNode=null;
+      if(updUrls.length){
+        var isAlbum=updUrls.length===1&&updUrls[0].startsWith('__album__:');
+        var realUrls=isAlbum
+          ?updUrls[0].slice('__album__:'.length).split(',').map(function(s){return s.trim();}).filter(Boolean)
+          :updUrls.filter(function(u){return!u.startsWith('__album__:');});
+        if(realUrls.length) imgNode=_buildUpdImgDom(realUrls,isAlbum);
       }
-      // Build DOM node for this entry
       var _e=document.createElement('div');_e.className='pm-update-entry';
       var _h=document.createElement('div');_h.className='pm-update-entry-header';
       if(updDate){var _ds=document.createElement('span');_ds.className='pm-update-entry-date';_ds.textContent=updDate;_h.appendChild(_ds);}
@@ -1635,26 +1633,36 @@ function _repopulateUpdates(name){
       _e.appendChild(_h);
       var _tt=document.createElement('div');_tt.className='pm-update-entry-title';_tt.textContent=updTitle;_e.appendChild(_tt);
       if(updBody){var _bo=document.createElement('div');_bo.className='pm-update-entry-body';_bo.innerHTML=parseMarkdown(updBody);_e.appendChild(_bo);}
-      if(imgNode){_e.appendChild(imgNode);}
+      if(imgNode)_e.appendChild(imgNode);
       return _e;
+    });
+    var _feed=document.getElementById('pm-updates-feed');_feed.innerHTML='';
+    _entries.forEach(function(n){_feed.appendChild(n);});
+    document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
+    updatePanel.style.display='block';
+    // Show Updates tab without switching to it
+    var _tu=document.getElementById('pm-tab-updates');
+    if(_tu)_tu.style.display='';
+  }
+
+  // ── Gallery tab — cover always first, then rest of gallery, then update photos ──
+  var _rSeen={};var _rGalPhotos=[];
+  // _pmGalImages already has cover deduplicated first (set at modal open)
+  _pmGalImages.forEach(function(u){
+    if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
   });
-  var _feed=document.getElementById('pm-updates-feed');_feed.innerHTML='';
-  _entries.forEach(function(n){_feed.appendChild(n);});
-  document.getElementById('pm-updates-count').textContent=buildUpdates.length+' update'+(buildUpdates.length===1?'':'s');
-  updatePanel.style.display='block';
-  // Also refresh gallery tab with new update photos
-  var _rGalSeen={};var _rGalPhotos=[];
-  _pmGalImages.forEach(function(u){if(!_rGalSeen[u]){_rGalSeen[u]=true;_rGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}});
   buildUpdates.forEach(function(upd){
-    var s=(upd.images||'').trim();var isA=s.startsWith('__album__:');
+    var s=(upd.images||'').trim();
+    var isA=s.startsWith('__album__:');
     var c=isA?s.slice('__album__:'.length):s;
+    if(!c&&(upd.content||'').indexOf('http')===0)c=(upd.content||'').trim();
     var lines=(upd.content||'').trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
     var lbl=lines.length>1?lines[0]:(lines[0]||'Update');
-    if(!c&&(upd.content||'').indexOf('http')===0)c=upd.content.trim();
     c.split(',').map(function(u){return fixDiscordUrl(u.trim());}).filter(function(u){return u.indexOf('http')===0;}).forEach(function(u){
-      if(!_rGalSeen[u]){_rGalSeen[u]=true;_rGalPhotos.push({url:u,label:lbl,cls:'update'});}
+      if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:lbl,cls:'update'});}
     });
   });
+  // Rebuild gallery grid, preserving current active tab
   pmBuildGalleryTab(_rGalPhotos);
   var _tg=document.getElementById('pm-tab-gallery');
   if(_tg)_tg.style.display=_rGalPhotos.length?'':'none';
@@ -2198,9 +2206,9 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   document.getElementById('product-modal').classList.add('open');
   document.body.style.overflow='hidden';
   var scroll=document.querySelector('.product-modal-scroll');if(scroll)scroll.scrollTop=0;
-  // If announcements haven't loaded yet, fetch them now so gallery/updates populate immediately
+  // Always fetch fresh announcements when a card opens so update photos are current
   _currentModalName = name;
-  if(!_announcementsReady) loadAnnouncements();
+  loadAnnouncements();
 }
 
 function pmOpenUpdateImg(lbIdx){pmOpenLightbox(lbIdx);}
