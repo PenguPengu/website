@@ -177,7 +177,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .comp-label{font-size:8px;letter-spacing:.3em;text-transform:uppercase;opacity:.6;display:block;margin-bottom:8px;}
 .comp-prompt-text{font-family:var(--serif);font-size:18px;font-style:italic;font-weight:700;line-height:1.3;}
 .comp-info-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px;flex-shrink:0;}
-.photos-grid{margin:0 80px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+/* Filmstrip replaces old grid */
+.photos-grid{margin:0 80px;overflow:hidden;position:relative;}
+.photos-filmstrip{display:flex;gap:1px;will-change:transform;transition:transform .05s linear;}
+.photos-filmstrip .photo-card{flex:0 0 calc(33.333% - 1px);min-width:240px;}
 .photo-card{background:var(--cream);display:flex;flex-direction:column;transition:background .2s;cursor:default;min-width:0;overflow:hidden;}
 .photo-card:hover{background:#f0e8de;}
 .photo-img{aspect-ratio:4/3;background:rgba(25,41,58,.07);border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--navy);font-size:9px;letter-spacing:.15em;text-transform:uppercase;overflow:hidden;position:relative;min-width:0;max-width:100%;}
@@ -998,8 +1001,12 @@ body{top:0!important;}
       <button class="btn-primary" onclick="openGallery()">View Full Gallery</button>
     </div>
   </div>
-  <div class="photos-grid" id="photos-teaser-grid">
-    <div class="gallery-loading" style="grid-column:1/-1;padding:48px 0">Loading submissions…</div>
+  <div class="photos-grid" id="photos-teaser-wrap">
+    <div class="photos-filmstrip" id="photos-teaser-grid">
+      <div class="photo-card" style="flex:0 0 33.333%;min-width:240px;"><div class="photo-img"><div class="photo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="photo-placeholder-text">Loading…</span></div></div></div>
+      <div class="photo-card" style="flex:0 0 33.333%;min-width:240px;"><div class="photo-img"><div class="photo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div></div>
+      <div class="photo-card" style="flex:0 0 33.333%;min-width:240px;"><div class="photo-img"><div class="photo-placeholder"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div></div>
+    </div>
   </div>
   <div class="photos-teaser-cta reveal">
     <button class="photos-see-all" onclick="openGallery()">
@@ -1486,7 +1493,7 @@ function renderGallery(rows){
   var groups=Object.values(map).sort(function(a,b){return(b.openedAt||'').localeCompare(a.openedAt||'');});
   var current=groups[0],past=groups.slice(1);
   var allByRecent=entries.slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
-  var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=allByRecent.slice(0,3).map(buildCard).join('')||'<div class="gallery-empty">No submissions yet</div>';
+  var tg=document.getElementById('photos-teaser-grid');if(tg){var tgHtml=allByRecent.slice(0,9).map(buildCard).join('');tg.innerHTML=tgHtml||'<div class="gallery-empty" style="padding:40px">No submissions yet</div>';_initFilmstripScroll();}
   var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent=current?'\u201c'+current.name+'\u201d':'No active contest';
   var byScore=current?current.entries.slice().sort(function(a,b){return b.score-a.score;}):[]; _currentEntries=byScore;
   var eyebrow=document.getElementById('gallery-current-eyebrow'),title=document.getElementById('gallery-current-title'),meta=document.getElementById('gallery-current-meta');
@@ -2626,16 +2633,79 @@ document.addEventListener('keydown',function(e){
   }
 });
 
+// ── Photo filmstrip scroll ────────────────────────────────────────────────────
+function _initFilmstripScroll(){
+  var strip=document.getElementById('photos-teaser-grid');
+  var wrap=document.getElementById('photos-teaser-wrap');
+  if(!strip||!wrap)return;
+  function _updateFilmstrip(){
+    var wrapRect=wrap.getBoundingClientRect();
+    var vpH=window.innerHeight;
+    // How far through the section the user has scrolled: 0 = top of section at bottom of screen, 1 = bottom of section at top
+    var progress=1-((wrapRect.bottom)/(vpH+wrapRect.height));
+    progress=Math.max(0,Math.min(1,progress));
+    var maxShift=strip.scrollWidth-strip.parentElement.clientWidth;
+    if(maxShift<=0)return;
+    strip.style.transform='translateX(-'+Math.round(progress*maxShift)+'px)';
+  }
+  window.addEventListener('scroll',_updateFilmstrip,{passive:true});
+  _updateFilmstrip();
+}
+
 // ── YouTube ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',function(){
   if(typeof UNDERWAY_CONFIG==='undefined')return;
   var YK=UNDERWAY_CONFIG.ytKey,YC=UNDERWAY_CONFIG.ytChannelId;if(!YK||!YC)return;
+  var YT_CACHE_KEY='_uw_yt_cache_v1';
+  var YT_CACHE_TTL=3*60*60*1000; // 3 hours — refresh if stale, but never go blank
+
   function timeAgo(d){var diff=(Date.now()-new Date(d))/1000;if(diff<3600)return Math.floor(diff/60)+' mins ago';if(diff<86400)return Math.floor(diff/3600)+' hours ago';if(diff<604800)return Math.floor(diff/86400)+' days ago';if(diff<2592000)return Math.floor(diff/604800)+' weeks ago';return Math.floor(diff/2592000)+' months ago';}
+
   var el=document.getElementById('yt-channel-link');if(el)el.href='https://www.youtube.com/channel/'+YC;
-  fetch('https://www.googleapis.com/youtube/v3/search?key='+YK+'&channelId='+YC+'&part=snippet&order=date&maxResults=3&type=video').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(data){
-    if(data.error)throw 0;var grid=document.getElementById('yt-videos-grid');if(!data.items||!data.items.length){grid.innerHTML='';return;}
-    grid.innerHTML='';data.items.slice(0,3).forEach(function(item){var vid=item.id.videoId,title=item.snippet.title,thumb='https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg',pub=timeAgo(item.snippet.publishedAt);var card=document.createElement('div');card.className='video-card';card.innerHTML='<div class="video-thumb" style="position:relative;"><img src="'+thumb+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" alt="'+title+'"><div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div><div class="video-info"><div class="video-title">'+title+'</div><div class="video-meta">'+pub+'</div></div>';card.addEventListener('click',(function(id){return function(){openVideoModal('https://www.youtube.com/embed/'+id);};})(vid));grid.appendChild(card);});
-  }).catch(function(){});
+
+  function renderYtItems(items){
+    var grid=document.getElementById('yt-videos-grid');if(!grid||!items||!items.length)return;
+    grid.innerHTML='';
+    items.slice(0,3).forEach(function(item){
+      var vid=item.id.videoId,title=item.snippet.title,
+          thumb='https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg',
+          pub=timeAgo(item.snippet.publishedAt);
+      var card=document.createElement('div');card.className='video-card';
+      card.innerHTML='<div class="video-thumb" style="position:relative;">'
+        +'<img src="'+thumb+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" alt="'+title+'">'
+        +'<div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>'
+        +'<div class="video-info"><div class="video-title">'+title+'</div>'
+        +'<div class="video-meta">'+pub+'</div></div>';
+      card.addEventListener('click',(function(id){return function(){openVideoModal('https://www.youtube.com/embed/'+id);};})(vid));
+      grid.appendChild(card);
+    });
+  }
+
+  // 1. Paint cached data immediately so the grid is never blank on load
+  var _cached=null;
+  try{
+    var _raw=localStorage.getItem(YT_CACHE_KEY);
+    if(_raw){_cached=JSON.parse(_raw);}
+  }catch(e){}
+  if(_cached&&_cached.items&&_cached.items.length){
+    renderYtItems(_cached.items);
+  }
+
+  // 2. Decide whether a fresh API call is needed
+  var _age=_cached?Date.now()-(_cached.ts||0):Infinity;
+  if(_age<YT_CACHE_TTL)return; // still fresh — skip the call, keep what we painted
+
+  // 3. Fetch fresh data; on failure keep whatever is currently painted
+  fetch('https://www.googleapis.com/youtube/v3/search?key='+YK+'&channelId='+YC+'&part=snippet&order=date&maxResults=3&type=video')
+    .then(function(r){if(!r.ok)throw 0;return r.json();})
+    .then(function(data){
+      if(data.error||!data.items||!data.items.length)throw 0;
+      renderYtItems(data.items);
+      try{localStorage.setItem(YT_CACHE_KEY,JSON.stringify({ts:Date.now(),items:data.items}));}catch(e){}
+    })
+    .catch(function(){
+      // API failed or quota hit — leave whatever is painted (cached or skeleton)
+    });
 });
 
 // ── Fetch user IP for like deduplication ──────────────────────────────────────
