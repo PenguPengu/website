@@ -1110,7 +1110,7 @@ body{top:0!important;}
       <!-- Tab bar -->
       <div class="pm-tabs" id="pm-tabs">
         <button class="pm-tab active" onclick="pmSwitchTab('info',this)">Info</button>
-        <button class="pm-tab" id="pm-tab-gallery" onclick="pmSwitchTab('gallery',this)" style="display:none">Gallery</button>
+        <button class="pm-tab" id="pm-tab-gallery" onclick="pmSwitchTab('gallery',this)" style="display:none">Photo Album</button>
         <button class="pm-tab" id="pm-tab-updates" onclick="pmSwitchTab('updates',this)" style="display:none">Updates</button>
       </div>
       <!-- Info panel -->
@@ -1663,7 +1663,7 @@ function _repopulateUpdates(name){
   _rUpdPhotos.sort(function(a,b){return(b.ts||'').localeCompare(a.ts||'');});
   var _rSeen={};var _rGalPhotos=[];
   _pmGalImages.forEach(function(u){
-    if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
+    if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:'Album',cls:'gallery'});}
   });
   _rUpdPhotos.forEach(function(o){
     if(!_rSeen[o.url]){_rSeen[o.url]=true;_rGalPhotos.push(o);}
@@ -2199,7 +2199,7 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   var _allGalPhotos=[];
   // Cover is productImgs[0] — always first
   productImgs.forEach(function(u){
-    if(!_seen[u]){_seen[u]=true;_allGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
+    if(!_seen[u]){_seen[u]=true;_allGalPhotos.push({url:u,label:'Album',cls:'gallery'});}
   });
   // Update photos in date order, skip any already shown as gallery
   _labelledGalPhotos.forEach(function(o){
@@ -2254,7 +2254,7 @@ function pmBuildGalleryTab(photos) {
     grid.innerHTML = '<div class="pm-gal-empty">No photos yet</div>';
     return;
   }
-  var items = photos.map(function(p){ return typeof p==='string'?{url:p,label:'Gallery',cls:'gallery'}:p; });
+  var items = photos.map(function(p){ return typeof p==='string'?{url:p,label:'Album',cls:'gallery'}:p; });
   var urls = items.map(function(p){return p.url;});
   grid.innerHTML = '';
   items.forEach(function(p, i) {
@@ -2269,7 +2269,7 @@ function pmBuildGalleryTab(photos) {
     img.addEventListener('error', function(){ cell.style.display='none'; }, {once:true});
     var tag = document.createElement('div');
     tag.className = 'pm-gal-tag ' + (p.cls||'gallery');
-    tag.textContent = p.label || 'Gallery';
+    tag.textContent = p.label || 'Album';
     cell.appendChild(img);
     cell.appendChild(tag);
     cell.addEventListener('click', (function(idx){ return function(){ openLightboxMulti(urls, idx); }; })(i));
@@ -2349,44 +2349,58 @@ var TOUR_STEPS=[
     target:'#products',
     icon:'',
     title:'The Catalogue',
-    desc:'Browse everything we build. Each card shows the current build status — Active, In Development, Coming Soon. Click any card to open the full product page.',
+    desc:'Browse everything we build. Each card shows the current build status — Active, In Development, or Coming Soon. Click any card to open the full product page.',
     cta:'Next'
   },
   {
     target:'#pm-gallery-main',
     icon:'',
-    title:'Photos & Gallery',
-    desc:'Every product has a full photo gallery. Click the main image to open it full-screen, or use the thumbnails below to jump between shots.',
+    title:'Hero Image',
+    desc:'The main photo at the top of each product page. Click it to open full-screen, or use the arrow keys to step through the shots. Swipe left and right on mobile.',
     cta:'Next',
     onEnter:function(){
       if(!document.getElementById('product-modal').classList.contains('open')){
         openProductModal('Example','In Development','Example','','','','','','');
-        // Ensure the modal scroll is at the top so the gallery is visible
-        setTimeout(function(){var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;},120);
       }
+      setTimeout(function(){
+        pmSwitchTab('info',document.querySelector('.pm-tab'));
+        var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;
+      },140);
     }
   },
   {
-    target:'#pm-content',
+    target:'#pm-panel-info',
     icon:'',
-    title:'Status, Specs & Details',
-    desc:'The info panel shows the build status badge, full description, and technical spec line. The status updates live from our team as a build progresses.',
+    title:'Info Tab',
+    desc:'The Info tab shows the build status badge, full description, and technical detail line. Use the Share button to copy a direct link to this product.',
     cta:'Next',
     onEnter:function(){
-      var s=document.querySelector('.product-modal-scroll');
-      if(s)s.scrollTo({top:0,behavior:'smooth'});
+      pmSwitchTab('info',document.querySelector('.pm-tab'));
+      var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;
     }
   },
   {
-    target:'#pm-update-panel',
+    target:'#pm-panel-gallery',
     icon:'',
-    title:'Live Build Updates',
-    desc:'This is the build log — every milestone, test result, and progress note from the team posted directly from Discord. Scroll down to see the full history.',
+    title:'Photo Album Tab',
+    desc:'Every photo ever posted for this build lives here — cover shot first, then the rest of the album, then photos from each build update in date order. Click any photo to open it full-screen.',
     cta:'Next',
     onEnter:function(){
-      var panel=document.getElementById('pm-update-panel');
-      var s=document.querySelector('.product-modal-scroll');
-      if(panel&&s){var pTop=panel.offsetTop-20;s.scrollTo({top:Math.max(0,pTop),behavior:'smooth'});}
+      var btn=document.getElementById('pm-tab-gallery');
+      if(btn&&btn.style.display!=='none')pmSwitchTab('gallery',btn);
+      var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;
+    }
+  },
+  {
+    target:'#pm-panel-updates',
+    icon:'',
+    title:'Updates Tab',
+    desc:'The build log — every milestone, test result, and progress note posted from Discord. Photos in each update are clickable too. Newest entry is always at the top.',
+    cta:'Next',
+    onEnter:function(){
+      var btn=document.getElementById('pm-tab-updates');
+      if(btn&&btn.style.display!=='none')pmSwitchTab('updates',btn);
+      var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;
     },
     onLeave:function(){closeProductModal();}
   },
@@ -2401,7 +2415,7 @@ var TOUR_STEPS=[
     target:'#discord',
     icon:'',
     title:'Announcements',
-    desc:'The latest news from the team lives here — new releases, updates, and anything worth knowing. Join the Discord to get pinged the moment something drops.',
+    desc:'The latest news from the team — new releases, updates, and anything worth knowing. Join the Discord to get pinged the moment something drops.',
     cta:'Next'
   },
   {
