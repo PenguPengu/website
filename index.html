@@ -1645,12 +1645,9 @@ function _repopulateUpdates(name){
     if(_tu)_tu.style.display='';
   }
 
-  // ── Gallery tab — cover always first, then rest of gallery, then update photos ──
-  var _rSeen={};var _rGalPhotos=[];
-  // _pmGalImages already has cover deduplicated first (set at modal open)
-  _pmGalImages.forEach(function(u){
-    if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
-  });
+  // ── Gallery tab — cover first, gallery in order, update photos sorted newest→oldest ──
+  // Collect update photos with timestamps first, then sort
+  var _rUpdPhotos=[];
   buildUpdates.forEach(function(upd){
     var s=(upd.images||'').trim();
     var isA=s.startsWith('__album__:');
@@ -1658,9 +1655,18 @@ function _repopulateUpdates(name){
     if(!c&&(upd.content||'').indexOf('http')===0)c=(upd.content||'').trim();
     var lines=(upd.content||'').trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);
     var lbl=lines.length>1?lines[0]:(lines[0]||'Update');
+    var ts=upd.timestamp||'';
     c.split(',').map(function(u){return fixDiscordUrl(u.trim());}).filter(function(u){return u.indexOf('http')===0;}).forEach(function(u){
-      if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:lbl,cls:'update'});}
+      _rUpdPhotos.push({url:u,label:lbl,cls:'update',ts:ts});
     });
+  });
+  _rUpdPhotos.sort(function(a,b){return(b.ts||'').localeCompare(a.ts||'');});
+  var _rSeen={};var _rGalPhotos=[];
+  _pmGalImages.forEach(function(u){
+    if(!_rSeen[u]){_rSeen[u]=true;_rGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
+  });
+  _rUpdPhotos.forEach(function(o){
+    if(!_rSeen[o.url]){_rSeen[o.url]=true;_rGalPhotos.push(o);}
   });
   // Rebuild gallery grid, preserving current active tab
   pmBuildGalleryTab(_rGalPhotos);
@@ -2152,9 +2158,9 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
       if(_isAlbumStr&&updUrls.length){updUrls=['__album__:'+updUrls.join(',')];}
       var _plainUrls=updUrls.filter(function(u){return!u.startsWith('__album__:');});
       allUpdateImgs=allUpdateImgs.concat(_plainUrls);
-      // Collect ALL update photo URLs — dedup happens later when building gallery tab
+      // Collect ALL update photo URLs with timestamp for sorting
       _plainUrls.forEach(function(u){
-        _labelledGalPhotos.push({url:u,label:updTitle,cls:'update'});
+        _labelledGalPhotos.push({url:u,label:updTitle,cls:'update',ts:upd.timestamp||''});
       });
       // Build entry DOM node
       var entry=document.createElement('div');
@@ -2186,12 +2192,16 @@ function openProductModal(num, status, name, type, desc, details, cta, imageStr,
   // ── Tab wiring ────────────────────────────────────────────────────────────
   pmSwitchTab('info', document.querySelector('.pm-tab'));
 
-  // Gallery tab: gallery photos first, then ALL update photos — dedupe by URL, gallery label wins
+  // Gallery tab: cover first, rest of gallery in order, then update photos sorted newest→oldest
+  // Sort update photos by timestamp descending (newest first)
+  _labelledGalPhotos.sort(function(a,b){return(b.ts||'').localeCompare(a.ts||'');});
   var _seen={};
   var _allGalPhotos=[];
+  // Cover is productImgs[0] — always first
   productImgs.forEach(function(u){
     if(!_seen[u]){_seen[u]=true;_allGalPhotos.push({url:u,label:'Gallery',cls:'gallery'});}
   });
+  // Update photos in date order, skip any already shown as gallery
   _labelledGalPhotos.forEach(function(o){
     if(!_seen[o.url]){_seen[o.url]=true;_allGalPhotos.push(o);}
   });
