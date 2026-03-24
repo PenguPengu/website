@@ -1548,6 +1548,8 @@ var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H1
 var SUBMISSIONS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=802177609&single=true&output=csv';
 var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
 var CONFIG_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1234676240&single=true&output=csv';
+// ── Videos tab — fill in your GID once you create the tab ────────────────────
+var VIDEOS_URL='';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 function loadConfig(){
@@ -2664,60 +2666,85 @@ function _initFilmstripScroll(){
   _update();
 }
 
-// ── YouTube ───────────────────────────────────────────────────────────────────
+// ── YouTube (sheet-driven, no API key needed) ─────────────────────────────────
+// Sheet tab: "Videos" — columns: Title | URL | Date
+// Paste any youtube.com/watch?v=... or youtu.be/... link. Shorts are ignored.
+// Thumbnails are pulled from YouTube's public CDN — zero API quota used.
 document.addEventListener('DOMContentLoaded',function(){
-  if(typeof UNDERWAY_CONFIG==='undefined')return;
-  var YK=UNDERWAY_CONFIG.ytKey,YC=UNDERWAY_CONFIG.ytChannelId;if(!YK||!YC)return;
-  var YT_CACHE_KEY='_uw_yt_cache_v1';
-  var YT_CACHE_TTL=3*60*60*1000; // 3 hours — refresh if stale, but never go blank
 
-  function timeAgo(d){var diff=(Date.now()-new Date(d))/1000;if(diff<3600)return Math.floor(diff/60)+' mins ago';if(diff<86400)return Math.floor(diff/3600)+' hours ago';if(diff<604800)return Math.floor(diff/86400)+' days ago';if(diff<2592000)return Math.floor(diff/604800)+' weeks ago';return Math.floor(diff/2592000)+' months ago';}
+  function extractVideoId(raw){
+    if(!raw)return null;
+    raw=raw.trim();
+    // Skip Shorts
+    if(raw.indexOf('/shorts/')!==-1)return null;
+    // youtu.be/ID
+    var m=raw.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+    if(m)return m[1];
+    // youtube.com/watch?v=ID
+    m=raw.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    if(m)return m[1];
+    // bare 11-char ID
+    if(/^[a-zA-Z0-9_-]{11}$/.test(raw))return raw;
+    return null;
+  }
 
-  var el=document.getElementById('yt-channel-link');if(el)el.href='https://www.youtube.com/channel/'+YC;
+  function timeAgoSimple(dateStr){
+    if(!dateStr)return'';
+    var d=new Date(dateStr);if(isNaN(d.getTime()))return dateStr;
+    var diff=(Date.now()-d)/1000;
+    if(diff<3600)return Math.floor(diff/60)+' mins ago';
+    if(diff<86400)return Math.floor(diff/3600)+' hours ago';
+    if(diff<604800)return Math.floor(diff/86400)+' days ago';
+    if(diff<2592000)return Math.floor(diff/604800)+' weeks ago';
+    return Math.floor(diff/2592000)+' months ago';
+  }
 
-  function renderYtItems(items){
-    var grid=document.getElementById('yt-videos-grid');if(!grid||!items||!items.length)return;
+  function renderVideos(rows){
+    var grid=document.getElementById('yt-videos-grid');
+    if(!grid)return;
+    // Normalise keys, extract IDs, filter Shorts, take latest 3
+    var videos=[];
+    rows.forEach(function(row){
+      var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});
+      var id=extractVideoId(r.url||r.link||r.videoid||r.video_id||'');
+      if(!id)return;
+      videos.push({id:id,title:r.title||'Untitled',date:r.date||r.published||r.publishedat||''});
+    });
+    if(!videos.length){grid.innerHTML='';return;}
     grid.innerHTML='';
-    items.slice(0,3).forEach(function(item){
-      var vid=item.id.videoId,title=item.snippet.title,
-          thumb='https://i.ytimg.com/vi/'+vid+'/hqdefault.jpg',
-          pub=timeAgo(item.snippet.publishedAt);
+    videos.slice(0,3).forEach(function(v){
+      // Try maxresdefault, fall back to hqdefault on error
+      var thumbHi='https://i.ytimg.com/vi/'+v.id+'/maxresdefault.jpg';
+      var thumbLo='https://i.ytimg.com/vi/'+v.id+'/hqdefault.jpg';
+      var meta=timeAgoSimple(v.date);
       var card=document.createElement('div');card.className='video-card';
-      card.innerHTML='<div class="video-thumb" style="position:relative;">'
-        +'<img src="'+thumb+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" alt="'+title+'">'
+      card.innerHTML=
+        '<div class="video-thumb" style="position:relative;">'
+        +'<img src="'+thumbHi+'" data-fallback="'+thumbLo+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;" alt="'+v.title.replace(/"/g,'&quot;')+'" onerror="if(!this._fb){this._fb=true;this.src=this.dataset.fallback;}">'
         +'<div class="video-thumb-bg"></div><div class="video-play-btn">&#9654;</div></div>'
-        +'<div class="video-info"><div class="video-title">'+title+'</div>'
-        +'<div class="video-meta">'+pub+'</div></div>';
-      card.addEventListener('click',(function(id){return function(){openVideoModal('https://www.youtube.com/embed/'+id);};})(vid));
+        +'<div class="video-info"><div class="video-title">'+v.title+'</div>'
+        +(meta?'<div class="video-meta">'+meta+'</div>':'')
+        +'</div>';
+      card.addEventListener('click',(function(id){return function(){openVideoModal('https://www.youtube.com/embed/'+id);};})(v.id));
       grid.appendChild(card);
     });
   }
 
-  // 1. Paint cached data immediately so the grid is never blank on load
-  var _cached=null;
-  try{
-    var _raw=localStorage.getItem(YT_CACHE_KEY);
-    if(_raw){_cached=JSON.parse(_raw);}
-  }catch(e){}
-  if(_cached&&_cached.items&&_cached.items.length){
-    renderYtItems(_cached.items);
+  // Set channel link if config still has it
+  if(typeof UNDERWAY_CONFIG!=='undefined'&&UNDERWAY_CONFIG.ytChannelId){
+    var el=document.getElementById('yt-channel-link');
+    if(el)el.href='https://www.youtube.com/channel/'+UNDERWAY_CONFIG.ytChannelId;
   }
 
-  // 2. Decide whether a fresh API call is needed
-  var _age=_cached?Date.now()-(_cached.ts||0):Infinity;
-  if(_age<YT_CACHE_TTL)return; // still fresh — skip the call, keep what we painted
+  if(!VIDEOS_URL){return;} // no sheet configured yet — leave skeleton
 
-  // 3. Fetch fresh data; on failure keep whatever is currently painted
-  fetch('https://www.googleapis.com/youtube/v3/search?key='+YK+'&channelId='+YC+'&part=snippet&order=date&maxResults=3&type=video')
-    .then(function(r){if(!r.ok)throw 0;return r.json();})
-    .then(function(data){
-      if(data.error||!data.items||!data.items.length)throw 0;
-      renderYtItems(data.items);
-      try{localStorage.setItem(YT_CACHE_KEY,JSON.stringify({ts:Date.now(),items:data.items}));}catch(e){}
+  fetch(VIDEOS_URL)
+    .then(function(r){if(!r.ok)throw 0;return r.text();})
+    .then(function(text){
+      var rows=parseCSV(text);
+      if(rows&&rows.length)renderVideos(rows);
     })
-    .catch(function(){
-      // API failed or quota hit — leave whatever is painted (cached or skeleton)
-    });
+    .catch(function(){});
 });
 
 // ── Fetch user IP for like deduplication ──────────────────────────────────────
