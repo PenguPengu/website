@@ -536,27 +536,10 @@ footer>*{position:relative;z-index:1;}
 .pm-tab-panel{display:none;}
 .pm-tab-panel.active{display:block;}
 
-/* Gallery tab — horizontal filmstrip (single row, scrolls sideways) */
+/* Gallery tab — normal scrollable grid */
 .pm-gal-panel{padding:16px;}
-.pm-gal-grid{
-  display:flex;flex-wrap:nowrap;gap:3px;
-  overflow-x:auto;overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  scroll-snap-type:x mandatory;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(25,41,58,.2) transparent;
-}
-.pm-gal-grid::-webkit-scrollbar{height:4px;}
-.pm-gal-grid::-webkit-scrollbar-thumb{background:rgba(25,41,58,.18);border-radius:2px;}
-.pm-gal-cell{
-  flex:0 0 auto;
-  width:clamp(100px, 30%, 180px);
-  aspect-ratio:1;
-  overflow:hidden;cursor:zoom-in;
-  background:rgba(25,41,58,.06);
-  position:relative;
-  scroll-snap-align:start;
-}
+.pm-gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;}
+.pm-gal-cell{aspect-ratio:1;overflow:hidden;cursor:zoom-in;background:rgba(25,41,58,.06);position:relative;}
 .pm-gal-cell img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .22s ease;}
 .pm-gal-cell img.loaded{opacity:1;}
 .pm-gal-cell:hover img.loaded{opacity:.8;}
@@ -2286,56 +2269,25 @@ function pmBuildGalleryTab(photos) {
   }
   var items = photos.map(function(p){ return typeof p==='string'?{url:p,label:'Album',cls:'gallery'}:p; });
   var urls = items.map(function(p){return p.url;});
-
   grid.innerHTML = '';
-
-  // Render first 8 immediately, then append more as the user scrolls right
-  var CHUNK = 8;
-  var rendered = 0;
-
-  function renderChunk(count) {
-    var end = Math.min(rendered + count, items.length);
-    for(var i = rendered; i < end; i++) {
-      var p = items[i];
-      var cell = document.createElement('div');
-      cell.className = 'pm-gal-cell';
-      var img = document.createElement('img');
-      img.alt = '';
-      img.loading = 'lazy';
-      img.decoding = 'async';
-      // Defer src until IntersectionObserver fires
-      img.dataset.src = p.url;
-      img.addEventListener('load', function(){ this.classList.add('loaded'); this.parentNode.classList.add('img-loaded'); }, {once:true});
-      img.addEventListener('error', function(){ this.parentNode.style.display='none'; }, {once:true});
-      var tag = document.createElement('div');
-      tag.className = 'pm-gal-tag ' + (p.cls||'gallery');
-      tag.textContent = p.label || 'Album';
-      cell.appendChild(img);
-      cell.appendChild(tag);
-      cell.addEventListener('click', (function(idx){ return function(){ openLightboxMulti(urls, idx); }; })(i));
-      grid.appendChild(cell);
-    }
-    rendered = end;
-
-    // Wire up IO for the last sentinel cell to trigger next chunk
-    if(rendered < items.length) {
-      var sentinel = grid.lastElementChild;
-      var io = new IntersectionObserver(function(entries, obs) {
-        if(entries[0].isIntersecting) { obs.disconnect(); renderChunk(CHUNK); }
-      }, {root: grid, threshold: 0.1});
-      io.observe(sentinel);
-    }
-
-    // Trigger visible images immediately via their own IO
-    grid.querySelectorAll('img[data-src]').forEach(function(img) {
-      var imgIo = new IntersectionObserver(function(entries, obs) {
-        if(entries[0].isIntersecting) { obs.disconnect(); img.src = img.dataset.src; delete img.dataset.src; }
-      }, {root: grid, rootMargin: '0px 200px 0px 200px', threshold: 0});
-      imgIo.observe(img);
-    });
-  }
-
-  renderChunk(CHUNK);
+  items.forEach(function(p, i) {
+    var cell = document.createElement('div');
+    cell.className = 'pm-gal-cell';
+    var img = document.createElement('img');
+    img.src = p.url;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.addEventListener('load', function(){ img.classList.add('loaded'); cell.classList.add('img-loaded'); }, {once:true});
+    img.addEventListener('error', function(){ cell.style.display='none'; }, {once:true});
+    var tag = document.createElement('div');
+    tag.className = 'pm-gal-tag ' + (p.cls||'gallery');
+    tag.textContent = p.label || 'Album';
+    cell.appendChild(img);
+    cell.appendChild(tag);
+    cell.addEventListener('click', (function(idx){ return function(){ openLightboxMulti(urls, idx); }; })(i));
+    grid.appendChild(cell);
+  });
 }
 
 
@@ -2968,7 +2920,17 @@ document.addEventListener('keydown',function(e){});
     _gMoved=false;
   },{passive:true});
 
-  // Lightbox swipe
+  // Thumbnail strip — scroll wheel pans horizontally
+  var thumbStrip=document.getElementById('pm-gallery-thumbs');
+  if(thumbStrip){
+    thumbStrip.addEventListener('wheel',function(e){
+      if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){
+        e.preventDefault();
+        thumbStrip.scrollLeft+=e.deltaY;
+      }
+    },{passive:false});
+  }
+
   var _lTx=0,_lMoved=false;
   var lb=document.getElementById('pm-lightbox');
   if(lb){
