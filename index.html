@@ -2336,6 +2336,18 @@ function openVideoModal(url){document.getElementById('video-iframe').src=url+'?a
 function closeVideoModal(){document.getElementById('video-iframe').src='';document.getElementById('video-modal').classList.remove('open');document.body.style.overflow='';}
 
 // ── TOUR ──────────────────────────────────────────────────────────────────────
+function _tourOpenFirstProduct(){
+  if(document.getElementById('product-modal').classList.contains('open'))return;
+  // Try clicking the first card in the products grid so it goes through _openProductFromCard
+  var firstCard=document.querySelector('#products-grid .product-card');
+  if(firstCard){firstCard.click();return;}
+  // Fallback: open directly from registry if grid isn't rendered yet
+  if(PRODUCT_REGISTRY.length){
+    var fakeCard=document.createElement('div');
+    fakeCard.setAttribute('data-idx','0');
+    _openProductFromCard(fakeCard);
+  }
+}
 var TOUR_STEPS=[
   {
     target:null,
@@ -2359,13 +2371,11 @@ var TOUR_STEPS=[
     desc:'The main photo at the top of each product page. Click it to open full-screen, or use the arrow keys to step through the shots. Swipe left and right on mobile.',
     cta:'Next',
     onEnter:function(){
-      if(!document.getElementById('product-modal').classList.contains('open')){
-        openProductModal('Example','In Development','Example','','','','','','');
-      }
+      _tourOpenFirstProduct();
       setTimeout(function(){
         pmSwitchTab('info',document.querySelector('.pm-tab'));
         var s=document.querySelector('.product-modal-scroll');if(s)s.scrollTop=0;
-      },140);
+      },200);
     }
   },
   {
