@@ -232,6 +232,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .photo-share-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid rgba(25,41,58,.2);color:var(--navy);font-family:var(--mono);font-size:9px;padding:6px 10px;cursor:pointer;transition:.15s;letter-spacing:.05em;margin-left:auto;opacity:.5;}
 .photo-share-btn:hover{border-color:var(--navy);opacity:1;}
 .photo-share-btn.copied{border-color:var(--navy);opacity:1;}
+
+/* SCORE / MEDAL display (replaces likes when voting is closed) */
+.photo-score-wrap{display:flex;align-items:center;gap:8px;flex:1;}
+.photo-score-val{display:flex;align-items:center;gap:6px;background:rgba(25,41,58,.05);border:1px solid rgba(25,41,58,.18);color:var(--navy);font-family:var(--mono);font-size:10px;padding:6px 13px;letter-spacing:.05em;}
+.photo-score-label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.45;line-height:1;}
+.photo-medal{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:6px 11px;border:1px solid;}
+.photo-medal.gold{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.45);color:#b8950e;}
+.photo-medal.silver{background:rgba(148,148,160,.1);border-color:rgba(148,148,160,.4);color:#6b6b7a;}
+.photo-medal.bronze{background:rgba(176,110,60,.1);border-color:rgba(176,110,60,.38);color:#9a5f2a;}
+.photo-medal svg{flex-shrink:0;}
 .photos-teaser-cta{margin:0 80px;border:1px solid var(--border);border-top:none;}
 .photos-see-all{width:100%;padding:18px 36px;background:none;border:none;color:var(--navy);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s;opacity:.8;}
 .photos-see-all:hover{background:rgba(25,41,58,.04);opacity:1;}
@@ -1000,7 +1010,7 @@ body{top:0!important;}
   </div>
   <div class="comp-info-bar reveal">
     <div class="comp-info-left">
-      <span class="comp-label">Current Theme</span>
+      <span class="comp-label" id="comp-label">Current Theme</span>
       <div class="comp-prompt-text" id="comp-prompt-text">Loading…</div>
     </div>
     <div class="comp-info-right">
@@ -1436,6 +1446,11 @@ function parseCSV(text){
 
 // ── Build a photo card ────────────────────────────────────────────────────────
 var ZOOM_SVG='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>';
+var MEDAL_GOLD_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><path d="M8.21 3.06 4 7l2 2 2-2 2 2 2-2 2 2 2-2-4.21-3.94a1 1 0 0 0-1.58 0z"/></svg>';
+var MEDAL_SILVER_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><path d="M8.21 3.06 4 7l2 2 2-2 2 2 2-2 2 2 2-2-4.21-3.94a1 1 0 0 0-1.58 0z"/></svg>';
+var MEDAL_BRONZE_SVG='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="7"/><path d="M8.21 3.06 4 7l2 2 2-2 2 2 2-2 2 2 2-2-4.21-3.94a1 1 0 0 0-1.58 0z"/></svg>';
+var MEDAL_LABELS={gold:'1st Place',silver:'2nd Place',bronze:'3rd Place'};
+var MEDAL_SVGS={gold:MEDAL_GOLD_SVG,silver:MEDAL_SILVER_SVG,bronze:MEDAL_BRONZE_SVG};
 function buildCard(entry){
   var url=entry.image||'';
   url=fixDiscordUrl(url);
@@ -1445,21 +1460,39 @@ function buildCard(entry){
     ?'<img src="'+url+'" alt="'+(entry.title||'').replace(/"/g,'&quot;')+'" loading="lazy" onerror="this.style.display=\'none\'">'+zoomOverlay
     :ph;
   var imgClick=url?' style="cursor:zoom-in;" onclick="openLightboxSingle(\''+url.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\')"':'';
-  // Restore vote state from localStorage (one vote per photo)
-  var currentVote=null;
-  try{currentVote=localStorage.getItem('vote_'+entry.id);}catch(e){}
-  var likedHeart=currentVote==='heart';
-  var likedFire=currentVote==='fire';
+  var actionsHtml;
+  if(entry.votingOpen){
+    // Voting is open — show like buttons
+    var currentVote=null;
+    try{currentVote=localStorage.getItem('vote_'+entry.id);}catch(e){}
+    var likedHeart=currentVote==='heart';
+    var likedFire=currentVote==='fire';
+    actionsHtml=
+      '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" data-rowid="'+(entry.rowId||entry.id)+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
+      '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" data-rowid="'+(entry.rowId||entry.id)+'" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
+      '<button class="photo-share-btn" onclick="sharePhoto(\''+entry.id+'\',this)" title="Share this photo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>';
+  }else{
+    // Voting closed — show final score and medal if placed
+    var medalHtml='';
+    if(entry.medal){
+      medalHtml='<div class="photo-medal '+entry.medal+'">'+MEDAL_SVGS[entry.medal]+MEDAL_LABELS[entry.medal]+'</div>';
+    }
+    actionsHtml=
+      '<div class="photo-score-wrap">'+
+        '<div class="photo-score-val">'+
+          '<div class="photo-score-label">Score</div>'+
+          entry.score+
+        '</div>'+
+        medalHtml+
+      '</div>'+
+      '<button class="photo-share-btn" onclick="sharePhoto(\''+entry.id+'\',this)" title="Share this photo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>';
+  }
   return '<div class="photo-card" data-photoid="'+entry.id+'">'+
     '<div class="photo-img"'+imgClick+'>'+imgHtml+'</div>'+
     '<div class="photo-info">'+
       '<div class="photo-title">'+(entry.title||'Untitled')+'</div>'+
       (entry.description?'<div class="photo-desc">'+entry.description+'</div>':'')+
-      '<div class="photo-actions">'+
-        '<button class="photo-like'+(likedHeart?' liked-heart':'')+'" data-type="heart" data-id="'+entry.id+'" data-rowid="'+(entry.rowId||entry.id)+'" onclick="toggleLike(this)">'+HEART_SVG+'<span class="like-count">'+entry.hearts+'</span></button>'+
-        '<button class="photo-like'+(likedFire?' liked-fire':'')+'" data-type="fire" data-id="'+entry.id+'" data-rowid="'+(entry.rowId||entry.id)+'" onclick="toggleLike(this)">'+FIRE_SVG+'<span class="like-count">'+entry.fire+'</span></button>'+
-        '<button class="photo-share-btn" onclick="sharePhoto(\''+entry.id+'\',this)" title="Share this photo"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>'+
-      '</div>'+
+      '<div class="photo-actions">'+actionsHtml+'</div>'+
     '</div>'+
   '</div>';
 }
@@ -1492,18 +1525,34 @@ function renderGallery(rows){
     var h=0;for(var ci=0;ci<raw.length;ci++){h=((h<<5)-h+raw.charCodeAt(ci))|0;}
     return'p'+(h>>>0).toString(36);
   }
-  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){var sid=stableId(r);return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||''};});
-  if(!entries.length){var empty='<div class="gallery-empty">No submissions yet</div>';var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=empty;var cg=document.getElementById('gallery-current-grid');if(cg)cg.innerHTML=empty;var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent='No active contest';return;}
+  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){var sid=stableId(r);return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||'',votingOpen:r.votingopen==='TRUE'};});
+  if(!entries.length){var empty='<div class="gallery-empty">No submissions yet</div>';var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=empty;var cg=document.getElementById('gallery-current-grid');if(cg)cg.innerHTML=empty;var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent='No active challenge right now';var cl=document.getElementById('comp-label');if(cl)cl.textContent='Challenge Status';return;}
   _allEntries=entries.slice();_showingAll=false;
   var map={};entries.forEach(function(e){var key=e.contestName;if(!map[key])map[key]={name:key,openedAt:'',entries:[]};if(e.contestOpenedAt&&e.contestOpenedAt>map[key].openedAt)map[key].openedAt=e.contestOpenedAt;map[key].entries.push(e);});
   var groups=Object.values(map).sort(function(a,b){return(b.openedAt||'').localeCompare(a.openedAt||'');});
+  // Assign medals (gold/silver/bronze) to top 3 entries per group where voting is closed
+  groups.forEach(function(g){
+    var allClosed=g.entries.every(function(e){return!e.votingOpen;});
+    if(!allClosed)return; // don't medal while voting is still open
+    var ranked=g.entries.slice().sort(function(a,b){return b.score-a.score;});
+    var medals=['gold','silver','bronze'];
+    ranked.forEach(function(e,i){if(i<3)e.medal=medals[i];});
+  });
   var current=groups[0],past=groups.slice(1);
+  var currentActive=current&&current.entries.some(function(e){return e.votingOpen;});
   var allByRecent=entries.slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   var tg=document.getElementById('photos-teaser-grid');if(tg){var tgHtml=allByRecent.slice(0,9).map(buildCard).join('');tg.innerHTML=tgHtml||'<div class="gallery-empty" style="padding:40px">No submissions yet</div>';_initFilmstripScroll();}
-  var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent=current?'\u201c'+current.name+'\u201d':'No active contest';
+  var ct=document.getElementById('comp-prompt-text');var cl=document.getElementById('comp-label');
+  if(currentActive){
+    if(ct)ct.textContent='\u201c'+current.name+'\u201d';
+    if(cl)cl.textContent='Current Theme';
+  }else{
+    if(ct)ct.textContent='No active challenge right now';
+    if(cl)cl.textContent='Challenge Status';
+  }
   var byScore=current?current.entries.slice().sort(function(a,b){return b.score-a.score;}):[]; _currentEntries=byScore;
   var eyebrow=document.getElementById('gallery-current-eyebrow'),title=document.getElementById('gallery-current-title'),meta=document.getElementById('gallery-current-meta');
-  if(eyebrow)eyebrow.textContent='Current Contest';if(title)title.textContent=current?current.name:'—';
+  if(eyebrow)eyebrow.textContent=currentActive?'Current Challenge':'Most Recent Challenge';if(title)title.textContent=current?current.name:'—';
   if(meta&&current&&current.openedAt){try{meta.textContent='Opened '+new Date(current.openedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(x){}}
   var cg=document.getElementById('gallery-current-grid');if(cg)cg.innerHTML=byScore.length?byScore.map(buildCard).join(''):'<div class="gallery-empty">No submissions yet</div>';
   var sn=document.getElementById('sidebar-comp-name');if(sn)sn.textContent=current?current.name:'—';
