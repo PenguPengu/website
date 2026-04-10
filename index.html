@@ -1525,7 +1525,7 @@ function renderGallery(rows){
     var h=0;for(var ci=0;ci<raw.length;ci++){h=((h<<5)-h+raw.charCodeAt(ci))|0;}
     return'p'+(h>>>0).toString(36);
   }
-  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){var sid=stableId(r);return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||'',votingOpen:r.votingopen==='TRUE'};});
+  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){var sid=stableId(r);return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||'',votingOpen:r.votingopen==='TRUE'||r.contestclosedat==='TRUE'};});
   if(!entries.length){var empty='<div class="gallery-empty">No submissions yet</div>';var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=empty;var cg=document.getElementById('gallery-current-grid');if(cg)cg.innerHTML=empty;var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent='No active challenge right now';var cl=document.getElementById('comp-label');if(cl)cl.textContent='Challenge Status';return;}
   _allEntries=entries.slice();_showingAll=false;
   var map={};entries.forEach(function(e){var key=e.contestName;if(!map[key])map[key]={name:key,openedAt:'',entries:[]};if(e.contestOpenedAt&&e.contestOpenedAt>map[key].openedAt)map[key].openedAt=e.contestOpenedAt;map[key].entries.push(e);});
@@ -1597,8 +1597,41 @@ var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H1
 var SUBMISSIONS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=802177609&single=true&output=csv';
 var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
 var CONFIG_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1234676240&single=true&output=csv';
+var CONTEST_STATUS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1583091509&single=true&output=csv';
 // ── Videos tab — fill in your GID once you create the tab ────────────────────
 var VIDEOS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=924138447&single=true&output=csv';
+
+// ── Contest Status (authoritative open/closed + theme from bot) ───────────────
+var _contestStatus={status:'',theme:'',openedAt:'',closedAt:''};
+function loadContestStatus(){
+  fetch(CONTEST_STATUS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+    var rows=parseCSV(text);if(!rows||!rows.length)return;
+    var row=rows[0];
+    var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().replace(/[^a-z0-9]/g,'')]=(row[k]||'').trim();});
+    _contestStatus.status=(r.status||'').toUpperCase();
+    _contestStatus.theme=r.theme||'';
+    _contestStatus.openedAt=r.openedat||r.opened||'';
+    _contestStatus.closedAt=r.closedat||r.closed||'';
+    _applyContestStatus();
+  }).catch(function(){});
+}
+function _applyContestStatus(){
+  var isOpen=_contestStatus.status==='OPEN';
+  var ct=document.getElementById('comp-prompt-text');
+  var cl=document.getElementById('comp-label');
+  if(isOpen&&_contestStatus.theme){
+    if(ct)ct.textContent='\u201c'+_contestStatus.theme+'\u201d';
+    if(cl)cl.textContent='Current Theme';
+  }else if(!isOpen&&_contestStatus.theme){
+    if(ct)ct.textContent='No active challenge right now';
+    if(cl)cl.textContent='Challenge Status';
+  }
+  // Also update gallery eyebrow if it's visible
+  var eyebrow=document.getElementById('gallery-current-eyebrow');
+  if(eyebrow&&eyebrow.textContent){
+    eyebrow.textContent=isOpen?'Current Challenge':'Most Recent Challenge';
+  }
+}
 
 // ── Config ────────────────────────────────────────────────────────────────────
 function loadConfig(){
@@ -2938,9 +2971,11 @@ loadFromSheets();
 loadPartners();
 loadAnnouncements();
 loadSubmissions();
+loadContestStatus();
 setTimeout(_initNotifBaseline,6000);
 setInterval(loadAnnouncements,60000);
 setInterval(loadSubmissions,60000);
+setInterval(loadContestStatus,60000);
 // Check for ?gallery=1 immediately on load (doesn't need products to be ready)
 (function(){
   var p=new URLSearchParams(window.location.search);
