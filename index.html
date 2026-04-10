@@ -1525,7 +1525,17 @@ function renderGallery(rows){
     var h=0;for(var ci=0;ci<raw.length;ci++){h=((h<<5)-h+raw.charCodeAt(ci))|0;}
     return'p'+(h>>>0).toString(36);
   }
-  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){var sid=stableId(r);return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:r.contestname||'(no theme)',contestOpenedAt:r.contestopenedat||r.openedat||'',votingOpen:r.votingopen==='TRUE'||r.contestclosedat==='TRUE'};});
+  var entries=norm.filter(function(r){return(r.id&&!isNaN(parseInt(r.id)))||(r.title&&r.contestname);}).map(function(r){
+    var sid=stableId(r);
+    var contestName=r.contestname||'(no theme)';
+    // votingOpen is driven by ContestStatus (authoritative), not the CSV column.
+    // If ContestStatus hasn't loaded yet we default to false; _applyContestStatus
+    // will correct it once it resolves.
+    var votingOpen=_contestStatus.status==='OPEN'&&
+      !!_contestStatus.theme&&
+      contestName.trim()===(_contestStatus.theme||'').trim();
+    return{id:sid,rowId:r.id,title:r.title||'Untitled',description:r.description||'',image:r.image||'',hearts:parseInt(r.hearts)||0,fire:parseInt(r.fire)||0,score:parseInt(r.score)||0,timestamp:r.timestamp||'',contestName:contestName,contestOpenedAt:r.contestopenedat||r.openedat||'',votingOpen:votingOpen};
+  });
   if(!entries.length){var empty='<div class="gallery-empty">No submissions yet</div>';var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=empty;var cg=document.getElementById('gallery-current-grid');if(cg)cg.innerHTML=empty;var ct=document.getElementById('comp-prompt-text');if(ct)ct.textContent='No active challenge right now';var cl=document.getElementById('comp-label');if(cl)cl.textContent='Challenge Status';return;}
   _allEntries=entries.slice();_showingAll=false;
   var map={};entries.forEach(function(e){var key=e.contestName;if(!map[key])map[key]={name:key,openedAt:'',entries:[]};if(e.contestOpenedAt&&e.contestOpenedAt>map[key].openedAt)map[key].openedAt=e.contestOpenedAt;map[key].entries.push(e);});
@@ -1602,9 +1612,14 @@ var CONTEST_STATUS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H
 var VIDEOS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=924138447&single=true&output=csv';
 
 // ── Contest Status (authoritative open/closed + theme from bot) ───────────────
+// This is the single source of truth for whether voting is open. We never rely
+// on the VotingOpen column from the submissions CSV — that column can flicker
+// due to Google's CDN serving alternating cached versions of the sheet.
 var _contestStatus={status:'',theme:'',openedAt:'',closedAt:''};
 function loadContestStatus(){
-  fetch(CONTEST_STATUS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+  // cache:'no-store' sends Cache-Control:no-cache to Google's CDN, reducing
+  // the chance of getting a stale alternating-cache response.
+  fetch(CONTEST_STATUS_URL+'&_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
     var rows=parseCSV(text);if(!rows||!rows.length)return;
     var row=rows[0];
     var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().replace(/[^a-z0-9]/g,'')]=(row[k]||'').trim();});
@@ -1617,20 +1632,52 @@ function loadContestStatus(){
 }
 function _applyContestStatus(){
   var isOpen=_contestStatus.status==='OPEN';
+  var activeTheme=(_contestStatus.theme||'').trim();
+  // ── Update labels ────────────────────────────────────────────────────────
   var ct=document.getElementById('comp-prompt-text');
   var cl=document.getElementById('comp-label');
-  if(isOpen&&_contestStatus.theme){
-    if(ct)ct.textContent='\u201c'+_contestStatus.theme+'\u201d';
+  if(isOpen&&activeTheme){
+    if(ct)ct.textContent='\u201c'+activeTheme+'\u201d';
     if(cl)cl.textContent='Current Theme';
-  }else if(!isOpen&&_contestStatus.theme){
+  }else{
     if(ct)ct.textContent='No active challenge right now';
     if(cl)cl.textContent='Challenge Status';
   }
-  // Also update gallery eyebrow if it's visible
   var eyebrow=document.getElementById('gallery-current-eyebrow');
-  if(eyebrow&&eyebrow.textContent){
-    eyebrow.textContent=isOpen?'Current Challenge':'Most Recent Challenge';
+  if(eyebrow)eyebrow.textContent=isOpen?'Current Challenge':'Most Recent Challenge';
+  // ── Re-apply voting state to all loaded entries and re-render ────────────
+  // This corrects whatever renderGallery set, regardless of which resolved first.
+  if(!_allEntries.length)return;
+  _allEntries.forEach(function(e){
+    delete e.medal;
+    e.votingOpen=isOpen&&!!activeTheme&&e.contestName.trim()===activeTheme;
+  });
+  // Re-assign medals: top 3 per fully-closed group
+  var _gmap={};
+  _allEntries.forEach(function(e){if(!_gmap[e.contestName])_gmap[e.contestName]=[];_gmap[e.contestName].push(e);});
+  Object.keys(_gmap).forEach(function(name){
+    var group=_gmap[name];
+    if(group.some(function(e){return e.votingOpen;}))return;
+    var ranked=group.slice().sort(function(a,b){return b.score-a.score;});
+    ['gold','silver','bronze'].forEach(function(m,i){if(ranked[i])ranked[i].medal=m;});
+  });
+  // Re-render teaser filmstrip
+  var tg=document.getElementById('photos-teaser-grid');
+  if(tg){
+    var allByRecent=_allEntries.slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
+    tg.innerHTML=allByRecent.slice(0,9).map(buildCard).join('');
   }
+  // Re-render full gallery current grid
+  var cg=document.getElementById('gallery-current-grid');
+  if(cg&&_currentEntries.length)cg.innerHTML=_currentEntries.map(buildCard).join('');
+  // Re-render any open past-challenge grids
+  document.querySelectorAll('.gallery-challenge-grid.open').forEach(function(grid){
+    var gname=grid.closest('[data-gname]');
+    if(!gname)return;
+    var name=gname.getAttribute('data-gname');
+    var entries=_allEntries.filter(function(e){return e.contestName===name;}).slice().sort(function(a,b){return b.score-a.score;});
+    grid.innerHTML=entries.map(buildCard).join('');
+  });
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -1840,10 +1887,13 @@ function loadAnnouncements(){
 
 // ── Submissions ───────────────────────────────────────────────────────────────
 function loadSubmissions(){
-  fetch(SUBMISSIONS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+  fetch(SUBMISSIONS_URL+'&_='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
     var rows=parseCSV(text);if(!rows||!rows.length){var e='<div class="gallery-empty">No submissions yet</div>';var tg=document.getElementById('photos-teaser-grid');if(tg)tg.innerHTML=e;return;}
     renderGallery(rows);
     _checkSubmissions(_allEntries.length);
+    // Re-apply contest status on top of whatever renderGallery set, so the
+    // authoritative OPEN/CLOSED from the bot always wins regardless of race order.
+    if(_contestStatus.status)_applyContestStatus();
   }).catch(function(){});
 }
 
