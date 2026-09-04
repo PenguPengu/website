@@ -123,11 +123,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .products-section .section-header{color:var(--cream);}
 .products-section .section-eyebrow,.products-section .section-title{color:var(--cream);}
 .products-section .section-rule{background:var(--cream);}
-.products-grid-wrap{margin:0 80px;overflow:hidden;position:relative;}
-.products-grid{display:flex;flex-wrap:nowrap;gap:1px;background:rgba(247,239,230,.1);will-change:transform;}
-.products-grid .product-card{flex:0 0 calc((100vw - 172px) / 3);width:calc((100vw - 172px) / 3);min-width:0;}
+.products-scroller-wrap{margin:0 80px;display:flex;align-items:stretch;gap:14px;}
+.products-grid{display:flex;flex-wrap:nowrap;gap:1px;background:rgba(247,239,230,.1);overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;flex:1;}
+.products-grid::-webkit-scrollbar{height:5px;}
+.products-grid::-webkit-scrollbar-thumb{background:rgba(247,239,230,.2);}
+.products-grid .product-card{flex:0 0 min(360px,78vw);width:min(360px,78vw);scroll-snap-align:start;}
+.products-nav-btn{flex-shrink:0;align-self:center;width:44px;height:44px;background:rgba(247,239,230,.06);border:1px solid rgba(247,239,230,.18);color:var(--cream);display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);font-size:16px;transition:.15s;}
+.products-nav-btn:hover{background:rgba(247,239,230,.14);}
 .product-card{background:var(--navy);padding:44px 36px;cursor:pointer;position:relative;overflow:hidden;transition:background .25s;border:1px solid rgba(247,239,230,.08);}
 .product-card:hover{background:#f0e9df;}
+.product-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
+.product-number{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--cream);opacity:.3;}
+.product-name{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--cream);margin-bottom:8px;letter-spacing:-.01em;}
+.product-type{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;margin-bottom:18px;}
+.product-desc{font-size:11px;line-height:1.75;color:var(--cream);opacity:.75;}
 .product-card:hover .product-name,.product-card:hover .product-number,.product-card:hover .product-type,.product-card:hover .product-desc{color:var(--navy);}
 .product-card:hover .product-status{border-color:rgba(25,41,58,.3);}
 .product-card:hover .status-active{color:#2d8a5a;}
@@ -587,8 +596,9 @@ body{top:0!important;}
   .intro-text h2{font-size:24px;}
   .intro-stats{padding:36px 20px;grid-template-columns:1fr 1fr!important;gap:24px;}
   .stat-num{font-size:28px;}
-  .products-grid-wrap{margin:0 16px;}
+  .products-scroller-wrap{margin:0 16px;gap:8px;}
   .products-grid .product-card{flex:0 0 82vw;width:82vw;}
+  .products-nav-btn{display:none;}
   .products-teaser-cta{margin:0 16px;}
   .catalogue-body{padding:20px 16px 60px;}
   .catalogue-nav{padding:0 16px;}
@@ -815,10 +825,12 @@ body{top:0!important;}
     <div class="section-rule"></div>
   </div>
   <div class="sheets-config-notice" id="sheets-notice"></div>
-  <div class="products-grid-wrap" id="products-teaser-wrap">
+  <div class="products-scroller-wrap" id="products-teaser-wrap">
+    <button class="products-nav-btn prev" onclick="productsScroll(-1)" aria-label="Previous">&#8592;</button>
     <div class="products-grid" id="products-grid">
       <div class="sheets-loading">Loading products…</div>
     </div>
+    <button class="products-nav-btn next" onclick="productsScroll(1)" aria-label="Next">&#8594;</button>
   </div>
   <div class="products-teaser-cta">
     <button class="products-see-all" id="products-see-all" onclick="openCatalogue()" style="display:none">
@@ -1476,27 +1488,15 @@ function _openProductFromCard(card){
   openProductModal(String(idx+1).padStart(2,'0'),r.status||'',r.name||'',r.type||'',r.desc||r.description||'',r.details||'',r.cta||'Request a Quote',imgParts.join(','),r.cta_url||'');
 }
 
-// ── Homepage teaser: drift sideways as the page scrolls ───────────────────────
-function _initProductsFilmstripScroll(){
-  var strip=document.getElementById('products-grid');
-  var wrap=document.getElementById('products-teaser-wrap');
-  if(!strip||!wrap)return;
-  if(wrap._filmstripBound)return;
-  wrap._filmstripBound=true;
-  function _update(){
-    var wrapRect=wrap.getBoundingClientRect();
-    var vpH=window.innerHeight;
-    var wrapH=wrapRect.height;
-    var progress=(vpH-wrapRect.top)/(vpH+wrapH);
-    progress=Math.max(0,Math.min(1,progress));
-    var maxShift=strip.scrollWidth-wrap.clientWidth;
-    if(maxShift<=0)return;
-    strip.style.transform='translateX(-'+Math.round(progress*maxShift)+'px)';
-    strip.style.transition='none';
-  }
-  window.addEventListener('scroll',_update,{passive:true});
-  window.addEventListener('resize',_update,{passive:true});
-  _update();
+// ── Homepage teaser: a plain horizontal scroller the user drives themselves ──
+// (native drag/swipe/trackpad scroll, plus these two arrow buttons — nothing
+// auto-moves it, unlike the old page-scroll-linked version.)
+function productsScroll(dir){
+  var grid=document.getElementById('products-grid');
+  if(!grid)return;
+  var card=grid.querySelector('.product-card');
+  var step=card?card.offsetWidth+1:360;
+  grid.scrollBy({left:dir*step,behavior:'smooth'});
 }
 
 // ── Full catalogue page: horizontal scroll-snap + arrow nav + counter ────────
@@ -1558,7 +1558,6 @@ function renderProducts(products){
     card.addEventListener('click',function(){_openProductFromCard(this);});
   });
   grid.querySelectorAll('.anim').forEach(function(el){el.style.animationPlayState='paused';observer.observe(el);});
-  _initProductsFilmstripScroll();
 
   // Show "view full catalogue" button only if there's more than fits on screen
   var seeAllBtn=document.getElementById('products-see-all');
@@ -1576,15 +1575,31 @@ function renderProducts(products){
   checkDeepLink();
 }
 
-// ── Catalogue overlay open/close ──────────────────────────────────────────────
-function openCatalogue(){
+// ── Full catalogue page — real navigation, not a dialog ───────────────────────
+// Opening it changes the URL and pushes a history entry, so the browser's own
+// back button (and a bookmark/refresh of ?page=catalogue) work like any other
+// page, instead of behaving like a modal that only your click can dismiss.
+function _catalogueShowUI(){
   document.getElementById('catalogue-page').style.display='flex';
   document.body.style.overflow='hidden';
   _updateCatalogueCounter();
 }
-function closeCatalogue(){
+function _catalogueHideUI(){
   document.getElementById('catalogue-page').style.display='none';
   document.body.style.overflow='';
+}
+function openCatalogue(){
+  _catalogueShowUI();
+  if(!(history.state&&history.state.catalogue)){
+    history.pushState({catalogue:true},'','/?page=catalogue');
+  }
+}
+function closeCatalogue(){
+  if(history.state&&history.state.catalogue){
+    history.back(); // triggers popstate, which calls _catalogueHideUI()
+  }else{
+    _catalogueHideUI();
+  }
 }
 function renderComingSoon(){document.getElementById('products-grid').innerHTML='<div style="padding:80px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;"><div style="font-family:var(--serif);font-size:28px;font-weight:700;color:var(--cream)">Catalogue Coming Soon</div><div style="font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;max-width:340px;line-height:1.9;">We\'re putting the finishing touches on our product range.</div></div>';}
 function loadFromSheets(){fetch(PRODUCTS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){var p=parseCSV(text);if(!p.length)throw 0;renderProducts(p);}).catch(function(){renderComingSoon();});}
@@ -1932,19 +1947,22 @@ function _buildUpdImgHtml(realUrls, isAlbum) {
 
 function closeProductModal(){
   document.getElementById('product-modal').classList.remove('open');
-  document.body.style.overflow='';
   _currentModalName='';
-  history.replaceState(null,'','/');
+  var onCatalogue=document.getElementById('catalogue-page').style.display!=='none';
+  document.body.style.overflow=onCatalogue?'hidden':'';
+  history.replaceState(onCatalogue?{catalogue:true}:null,'',onCatalogue?'/?page=catalogue':'/');
 }
 
-// Handle browser back/forward through product pages
+// Handle browser back/forward through product pages and the catalogue page
 window.addEventListener('popstate',function(e){
-  if(e.state&&e.state.product){
-    openProductBySlug(e.state.product);
+  var st=e.state;
+  if(st&&st.product){
+    openProductBySlug(st.product);
   }else{
     document.getElementById('product-modal').classList.remove('open');
     document.body.style.overflow='';
   }
+  if(st&&st.catalogue){_catalogueShowUI();}else{_catalogueHideUI();}
 });
 
 // ── Video modal ───────────────────────────────────────────────────────────────
@@ -2423,11 +2441,15 @@ loadPartners();
 loadAnnouncements();
 setTimeout(_initNotifBaseline,6000);
 setInterval(loadAnnouncements,60000);
-// Check for ?scroll= or a bare section pathname immediately on load
+// Check for ?scroll=, ?page=catalogue, or a bare section pathname immediately on load
 (function(){
   var p=new URLSearchParams(window.location.search);
   var _pn=window.location.pathname.replace(/^\/|\/$/g,'').toLowerCase();
   var _ss=['home','about','products','community','partners','discord'];
+  if(p.get('page')==='catalogue'){
+    history.replaceState({catalogue:true},'',window.location.href);
+    _catalogueShowUI();
+  }
   if(p.get('scroll')||(_pn&&_ss.indexOf(_pn)!==-1))checkDeepLink();
 })();
 
