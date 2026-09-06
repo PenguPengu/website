@@ -1217,23 +1217,19 @@ var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK7
 var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=664706385&single=true&output=csv';
 var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
 var VIDEOS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=924138447&single=true&output=csv';
-// New tab (yours is called "Config", key/value pairs — Key, Value columns).
-// Drives the hero's cycling photos (hero_image_1/hero_label_1 through
-// hero_image_5/hero_label_5, however many pairs you have) and the two
-// homepage stat overrides (stat_customers, stat_products). Publish this tab
-// the same way as the others and paste its CSV URL in below.
-var CONFIG_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_CONFIG_TAB_GID_HERE&single=true&output=csv';
-// New tab, not part of the original spreadsheet setup — add a "FAQ" tab to
-// your sheet (columns: Question, Answer), then File → Share → Publish to
-// web → that tab → CSV, and paste the resulting URL in below.
-var FAQ_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_FAQ_TAB_GID_HERE&single=true&output=csv';
-// Same idea — two more new tabs for the beta section. The access CODE itself
-// stays a plain constant below (BETA_CODE), not in a sheet — a "published to
-// web" sheet is publicly readable by anyone with the link even without your
-// access code, so putting the code itself in a sheet would defeat the point
-// of gating the section at all.
-var BETA_BUILDS_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_BETA_BUILDS_TAB_GID_HERE&single=true&output=csv';
-var BETA_ISSUES_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_BETA_ISSUES_TAB_GID_HERE&single=true&output=csv';
+// Config tab — key/value pairs (Key, Value columns). Drives the hero's
+// cycling photos (hero_image_1/hero_label_1 through however many pairs you
+// have) and the two homepage stat overrides (stat_customers, stat_products).
+var CONFIG_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=1234676240&single=true&output=csv';
+// FAQ tab — columns: Question, Answer.
+var FAQ_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=310892946&single=true&output=csv';
+// Beta Builds and Beta Issues tabs. The access CODE itself stays a plain
+// constant below (BETA_CODE), not in a sheet — a "published to web" sheet is
+// publicly readable by anyone with the link even without your access code,
+// so putting the code itself in a sheet would defeat the point of gating
+// the section at all.
+var BETA_BUILDS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=147835120&single=true&output=csv';
+var BETA_ISSUES_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=97136004&single=true&output=csv';
 
 function fixDiscordUrl(u){
   if(!u)return u;
