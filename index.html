@@ -53,12 +53,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 
 /* ── DEMO BANNER ─────────────────────────────────────────────────────────── */
 /* ── LOADING SCREEN ───────────────────────────────────────────────────────── */
-#loading-screen{position:fixed;inset:0;z-index:99999;background:var(--cream);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#loading-screen{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 42%,rgba(201,168,76,.08),transparent 55%),var(--cream);display:flex;align-items:center;justify-content:center;overflow:hidden;}
 #loading-screen.fading{transition:opacity .6s ease;opacity:0;}
 .loading-logo-wrap{width:150px;will-change:transform;}
 .loading-logo-wrap svg{width:100%;height:auto;display:block;}
 .loading-content{display:flex;flex-direction:column;align-items:center;gap:20px;}
 .loading-word{font-family:var(--serif);font-weight:900;font-size:32px;letter-spacing:.04em;color:var(--navy);opacity:.92;}
+.loading-tagline{font-family:var(--mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.3;margin-top:-10px;}
 .loading-status{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--navy);opacity:.45;min-height:14px;display:flex;align-items:center;justify-content:center;transition:opacity .28s ease,transform .28s ease;}
 .loading-status.swap{opacity:0;transform:translateY(5px);}
 @media(prefers-reduced-motion:reduce){.loading-status{transition:none;}}
@@ -169,6 +170,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .hero-scene-frame{aspect-ratio:1/1;background:var(--navy);border-radius:var(--r-lg);box-shadow:var(--shadow-dark);position:relative;overflow:hidden;}
 .hero-scene{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;display:flex;align-items:center;justify-content:center;color:var(--gold);}
 .hero-scene.active{opacity:1;}
+.hero-scene-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease;}
+.hero-scene-photo.loaded{opacity:1;}
+.hero-scene-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--navy);}
+.hero-scene-loading svg{animation:heroLoadPulse 1.6s ease-in-out infinite;}
+@keyframes heroLoadPulse{0%,100%{opacity:.2;}50%{opacity:.55;}}
 .hero-scene-cap{position:absolute;bottom:0;left:0;right:0;padding:16px 22px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.6;background:linear-gradient(to top,rgba(0,0,0,.35),transparent);}
 .hero-scene-dots{position:absolute;bottom:16px;right:18px;display:flex;gap:7px;z-index:5;}
 .hs-dot{width:7px;height:7px;border-radius:50%;background:var(--cream);opacity:.3;cursor:pointer;border:none;padding:0;transition:.2s var(--ease);}
@@ -512,6 +518,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
       </svg>
     </div>
     <div class="loading-word">UNDERWAY</div>
+    <div class="loading-tagline">Built for the Long Haul</div>
     <div class="loading-status" id="loading-status">Hoisting the anchor…</div>
   </div>
 </div>
@@ -580,7 +587,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         <h2 class="section-title">Marine equipment that goes <em>the distance.</em></h2>
       </div>
       <div class="stats-row">
-        <div class="stat-block"><div class="stat-num">160,000+</div><div class="stat-label">Happy Customers</div></div>
+        <div class="stat-block"><div class="stat-num" id="stat-customers">160,000+</div><div class="stat-label">Happy Customers</div></div>
         <div class="stat-block"><div class="stat-num" id="stat-partners">—</div><div class="stat-label">Active Partners</div></div>
         <div class="stat-block"><div class="stat-num" id="stat-products">—</div><div class="stat-label">Active Products</div></div>
         <div class="stat-block"><div class="stat-num">4yr</div><div class="stat-label">In Operation</div></div>
@@ -683,7 +690,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         <p class="pd-desc" id="pd-desc"></p>
         <div class="pd-details" id="pd-details"></div>
         <div class="pd-sidebar-actions">
-          <button class="pd-cta-btn" onclick="showToast('Quote requested (demo)','Not wired to a backend yet.')" data-i18n="pd_request_quote">Request a Quote →</button>
+          <a class="pd-cta-btn" id="pd-cta-btn" href="#">Request a Quote →</a>
           <button class="pd-share-btn" id="pd-share" onclick="shareProduct()" data-i18n="pd_share">Share</button>
         </div>
       </aside>
@@ -1210,6 +1217,12 @@ var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK7
 var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=664706385&single=true&output=csv';
 var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
 var VIDEOS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=924138447&single=true&output=csv';
+// New tab (yours is called "Config", key/value pairs — Key, Value columns).
+// Drives the hero's cycling photos (hero_image_1/hero_label_1 through
+// hero_image_5/hero_label_5, however many pairs you have) and the two
+// homepage stat overrides (stat_customers, stat_products). Publish this tab
+// the same way as the others and paste its CSV URL in below.
+var CONFIG_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_CONFIG_TAB_GID_HERE&single=true&output=csv';
 // New tab, not part of the original spreadsheet setup — add a "FAQ" tab to
 // your sheet (columns: Question, Answer), then File → Share → Publish to
 // web → that tab → CSV, and paste the resulting URL in below.
@@ -1310,7 +1323,7 @@ function loadProductsFromSheet(){
     var mapped=rows.map(function(row){
       var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase()]=(row[k]||'').trim();});
       return{name:r.name||'',type:r.type||'',status:r.status||'Active',desc:r.desc||r.description||'',
-        details:r.details||'',image:r.image||'',cover_image:r.cover_image||'',cta_url:r.cta_url||''};
+        details:r.details||'',image:r.image||'',cover_image:r.cover_image||'',cta:r.cta||'',cta_url:r.cta_url||'',dc_channel:r.dc_channel||''};
     }).filter(function(p){return p.name;});
     if(!mapped.length)throw 0;
     DEMO_PRODUCTS.splice.apply(DEMO_PRODUCTS,[0,DEMO_PRODUCTS.length].concat(mapped));
@@ -1370,7 +1383,12 @@ function _parseAnnouncementRow(r){
   var title=lines.length>1?lines[0]:'';
   var body=lines.length>1?lines.slice(1).join(' '):content;
   var date='';try{var d=new Date(r.timestamp);if(!isNaN(d.getTime()))date=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(e){}
-  var images=(r.images||'').split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;});
+  // Their Discord-bot export tags multi-photo entries with a literal
+  // "__album__:" prefix on the whole Images cell — strip it before splitting,
+  // otherwise the first photo in every album silently gets dropped (it fails
+  // the "starts with http" check while every photo after the first comma
+  // still passes).
+  var images=(r.images||'').replace(/^__album__:/,'').split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;});
   return{title:title,body:body,date:date||r.timestamp||'',images:images};
 }
 // Live build-update rows for one product, newest first. Returns null when
@@ -1433,6 +1451,34 @@ function loadVideosFromSheet(){
     DEMO_VIDEOS.splice.apply(DEMO_VIDEOS,[0,DEMO_VIDEOS.length].concat(mapped));
     var communityPage=document.querySelector('.page[data-page="community"]');
     if(communityPage&&communityPage.classList.contains('is-active'))renderVideos();
+  }).catch(function(){});
+}
+function loadConfigFromSheet(){
+  trackedFetch(CONFIG_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+    var rows=parseCSV(text);
+    if(!rows.length)throw 0;
+    var cfg={};
+    rows.forEach(function(row){
+      var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=row[k];});
+      if(r.key)cfg[r.key.trim().toLowerCase()]=(r.value||'').trim();
+    });
+    // Hero cycling photos — however many hero_image_N/hero_label_N pairs exist.
+    var scenes=[];
+    for(var n=1;n<=20;n++){
+      var img=cfg['hero_image_'+n];
+      if(!img)break;
+      scenes.push({image:fixDiscordUrl(img),label:cfg['hero_label_'+n]||''});
+    }
+    if(scenes.length){
+      HERO_SCENES=scenes;
+      _heroScenesRendered=false; // allow a re-render since the content is genuinely different now
+      heroSceneIdx=0;
+      var homePage=document.querySelector('.page[data-page="home"]');
+      if(homePage)renderHeroScenes();
+    }
+    // Homepage stat overrides — plain display strings, not recomputed counts.
+    if(cfg.stat_products){var sp=document.getElementById('stat-products');if(sp)sp.textContent=cfg.stat_products;}
+    if(cfg.stat_customers){var sc=document.getElementById('stat-customers');if(sc)sc.textContent=cfg.stat_customers;}
   }).catch(function(){});
 }
 function loadFAQFromSheet(){
@@ -2333,7 +2379,14 @@ function renderHeroScenes(){
   if(!frame||_heroScenesRendered)return; // only build the DOM once — repeated home visits shouldn't reset which scene you had selected
   _heroScenesRendered=true;
   frame.innerHTML=HERO_SCENES.map(function(s,i){
-    return '<div class="hero-scene'+(i===0?' active':'')+'" data-i="'+i+'">'+iconSVG(s.icon,120,1.6)+'<div class="hero-scene-cap">'+s.label+'</div></div>';
+    // Real photo (from Config) vs the icon-based fallback scenes above —
+    // the photo shows the small logo mark, pulsing, until it finishes
+    // loading, then fades in over it.
+    var media=s.image?
+      ('<div class="hero-scene-loading">'+logoSVG('#c9a84c',null,0,32)+'</div>'+
+       '<img class="hero-scene-photo" src="'+s.image+'" alt="" loading="'+(i===0?'eager':'lazy')+'" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">')
+      :iconSVG(s.icon,120,1.6);
+    return '<div class="hero-scene'+(i===0?' active':'')+'" data-i="'+i+'">'+media+(s.label?('<div class="hero-scene-cap">'+escapeHtml(s.label)+'</div>'):'')+'</div>';
   }).join('');
   dots.innerHTML=HERO_SCENES.map(function(_,i){return '<button class="hs-dot'+(i===0?' active':'')+'" onclick="goHeroScene('+i+')" aria-label="Scene '+(i+1)+' of '+HERO_SCENES.length+'"></button>';}).join('');
 }
@@ -2444,6 +2497,19 @@ function renderProductDetail(slug){
   document.getElementById('pd-breadcrumb-type').textContent=p.type||'';
   document.getElementById('pd-breadcrumb-current').textContent=p.name;
   var stEl=document.getElementById('pd-status');stEl.textContent=p.status;stEl.className='pd-status-badge '+statusClass(p.status);
+
+  var ctaBtn=document.getElementById('pd-cta-btn');
+  if(p.cta_url){
+    ctaBtn.textContent=(p.cta||'Learn More')+' →';
+    ctaBtn.href=p.cta_url;
+    ctaBtn.target=p.cta_url.indexOf(location.origin)===0?'_self':'_blank';
+    ctaBtn.rel='noopener';
+    ctaBtn.onclick=null;
+  }else{
+    ctaBtn.textContent='Request a Quote →';
+    ctaBtn.removeAttribute('href');
+    ctaBtn.onclick=function(){showToast('Quote requested (demo)','Not wired to a backend yet.');return false;};
+  }
 
   _pdImages=productImages(p);
   _pdCurrent=0;
@@ -2823,6 +2889,7 @@ loadPartnersFromSheet();
 loadAnnouncementsFromSheet();
 loadVideosFromSheet();
 loadFAQFromSheet();
+loadConfigFromSheet();
 loadBetaBuildsFromSheet();
 loadBetaIssuesFromSheet();
 </script>
