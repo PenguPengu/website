@@ -208,7 +208,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .product-status{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:5px 12px;border:1px solid;white-space:nowrap;border-radius:var(--r-full);}
 .status-active{color:#6fcf97;border-color:rgba(111,207,151,.35);}
 .status-dev{color:#f2c94c;border-color:rgba(242,201,76,.35);}
-.status-soon{color:rgba(247,239,230,.85);border-color:rgba(247,239,230,.4);}
+.status-soon{color:#e0b93d;border-color:rgba(224,185,61,.4);}
+.status-cancelled{color:#eb5757;border-color:rgba(235,87,87,.35);}
 .product-name{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--cream);margin-bottom:8px;letter-spacing:-.01em;}
 .product-type{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--cream);opacity:.35;margin-bottom:14px;}
 .product-desc{font-size:11px;line-height:1.75;color:var(--cream);opacity:.7;flex:1;}
@@ -304,13 +305,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .search-modal.open{display:flex;}
 .search-modal-inner{width:min(640px,100%);max-height:min(60vh,560px);background:var(--cream);color:var(--navy);border-radius:var(--r-lg);box-shadow:var(--shadow-dark);display:flex;flex-direction:column;overflow:hidden;}
 .search-modal-header{display:flex;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0;color:rgba(25,41,58,.45);}
-.search-modal-input{flex:1;border:none;background:none;outline:none;font-family:var(--mono);font-size:14px;color:var(--navy);}
+.search-modal-input{flex:1;min-width:0;border:none;background:none;outline:none;font-family:var(--mono);font-size:14px;line-height:1.4;padding:3px 0;color:var(--navy);}
 .search-modal-input::placeholder{color:rgba(25,41,58,.35);}
 .search-modal-esc{font-size:8px;letter-spacing:.15em;color:rgba(25,41,58,.4);border:1px solid rgba(25,41,58,.2);padding:4px 8px;border-radius:var(--r-xs);flex-shrink:0;}
 .search-modal-close{background:none;border:none;color:inherit;cursor:pointer;font-size:15px;opacity:.5;padding:6px;border-radius:var(--r-full);transition:opacity .2s var(--ease),background .2s var(--ease);}
 .search-modal-close:hover{opacity:1;background:rgba(25,41,58,.06);}
 .search-modal-results{overflow-y:auto;padding:10px;}
 .search-hint{padding:26px 16px;text-align:center;font-size:11px;line-height:1.7;opacity:.45;max-width:380px;margin:0 auto;}
+.search-suggest-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase;opacity:.4;padding:14px 14px 8px;}
+.search-suggest-grid{display:flex;gap:10px;padding:0 14px 14px;}
+.search-suggest-card{flex:1;display:flex;flex-direction:column;background:none;border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;cursor:pointer;text-align:left;padding:0;transition:border-color .15s var(--ease);}
+.search-suggest-card:hover{border-color:var(--navy);}
+.search-suggest-card img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;}
+.search-suggest-name{font-size:11px;font-weight:700;padding:8px 10px;color:var(--navy);}
 .search-result-group{margin-bottom:6px;}
 .search-result-group-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;opacity:.4;padding:10px 12px 4px;}
 .search-result-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;background:none;border:none;text-align:left;cursor:pointer;padding:11px 12px;border-radius:var(--r-sm);transition:background .15s var(--ease);font-family:var(--mono);color:var(--navy);}
@@ -351,6 +358,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .video-card{cursor:pointer;border:1px solid rgba(247,239,230,.1);border-radius:var(--r-md);overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease),background .25s var(--ease);background:rgba(247,239,230,.03);}
 .video-card:hover{border-color:rgba(247,239,230,.35);background:#f0e9df;transform:translateY(-6px);box-shadow:var(--shadow-md);}
 .video-thumb{aspect-ratio:16/9;background:rgba(247,239,230,.06);position:relative;display:flex;align-items:center;justify-content:center;color:rgba(247,239,230,.4);overflow:hidden;}
+.video-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .video-play-btn{position:absolute;width:44px;height:44px;background:var(--cream);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:13px;opacity:0;transition:.25s var(--ease);padding-left:3px;border-radius:var(--r-full);}
 .video-card:hover .video-play-btn{opacity:1;transform:scale(1.08);}
 .video-info{padding:14px 16px;}
@@ -363,12 +371,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .partner-card{background:var(--cream);border:1.5px solid var(--border);border-radius:var(--r-md);padding:36px 30px;display:flex;flex-direction:column;gap:10px;transition:transform .25s var(--ease),box-shadow .25s var(--ease),background .25s var(--ease),color .25s var(--ease),border-color .25s var(--ease);cursor:pointer;text-align:left;}
 .partner-card:hover{background:var(--navy);color:var(--cream);border-color:var(--navy);transform:translateY(-6px);box-shadow:var(--shadow-md);}
 .partner-initial{font-family:var(--serif);font-size:32px;font-weight:900;opacity:.12;letter-spacing:-.02em;}
+.partner-logo{width:56px;height:56px;border-radius:var(--r-md);object-fit:cover;display:block;}
 .partner-name{font-size:12px;font-weight:700;letter-spacing:.05em;}
 .partner-type{font-size:9px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;}
 .partner-hint{font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.3;margin-top:auto;padding-top:14px;transition:transform .25s var(--ease);}
 .partner-card:hover .partner-hint{transform:translateX(5px);}
 .partner-detail-head{display:flex;align-items:flex-start;gap:24px;margin-bottom:24px;}
 .partner-detail-initial{font-family:var(--serif);font-size:52px;font-weight:900;opacity:.1;line-height:1;}
+.partner-detail-logo{width:88px;height:88px;border-radius:var(--r-md);object-fit:cover;display:block;flex-shrink:0;}
 .partner-detail-name{font-family:var(--serif);font-size:32px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px;}
 .partner-detail-type{font-size:10px;letter-spacing:.25em;text-transform:uppercase;opacity:.4;}
 .partner-detail-desc{font-size:13px;line-height:1.9;opacity:.7;max-width:600px;margin-bottom:24px;}
@@ -632,6 +642,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         <button class="chip" data-status="Active" onclick="setStatusFilter('Active',this)">Active</button>
         <button class="chip" data-status="In Development" onclick="setStatusFilter('In Development',this)">In Development</button>
         <button class="chip" data-status="Coming Soon" onclick="setStatusFilter('Coming Soon',this)">Coming Soon</button>
+        <button class="chip" data-status="Canceled" onclick="setStatusFilter('Canceled',this)">Canceled</button>
       </div>
       <div class="catalogue-sort" id="catalogue-sort">
         <button type="button" class="catalogue-sort-btn" onclick="toggleSortDropdown(event)" aria-haspopup="true">
@@ -715,17 +726,17 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
       <h1 class="page-title" data-i18n-html="community_title">The <em>Community</em></h1>
     </div>
     <div class="channels-grid">
-      <a href="#" class="channel-card" onclick="return false;">
+      <a href="#" id="link-youtube" class="channel-card" target="_blank" rel="noopener">
         <div class="channel-name">YouTube</div>
         <div class="channel-desc">Walkthroughs, tutorials, behind the scenes &amp; more.</div>
         <div class="channel-cta">Watch Now →</div>
       </a>
-      <a href="#" class="channel-card" onclick="return false;">
+      <a href="#" id="link-discord" class="channel-card" target="_blank" rel="noopener">
         <div class="channel-name">Discord</div>
         <div class="channel-desc">Chat directly with the team, ask questions, get help.</div>
         <div class="channel-cta">Join Server →</div>
       </a>
-      <a href="#" class="channel-card" onclick="return false;">
+      <a href="#" id="link-steam" class="channel-card" target="_blank" rel="noopener">
         <div class="channel-name">Steam</div>
         <div class="channel-desc">See and use the latest products from our lineup and partners.</div>
         <div class="channel-cta">View Page →</div>
@@ -756,7 +767,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
       <span class="breadcrumb-current" id="pt-breadcrumb-current"></span>
     </nav>
     <div class="partner-detail-head">
-      <div class="partner-detail-initial" id="pt-initial"></div>
+      <div class="partner-detail-mark" id="pt-mark"><div class="partner-detail-initial" id="pt-initial"></div></div>
       <div>
         <div class="partner-detail-name" id="pt-name"></div>
         <div class="partner-detail-type" id="pt-type"></div>
@@ -1191,10 +1202,27 @@ var DEMO_VIDEOS=[
    CORS, whatever — the demo/placeholder content already on screen just stays
    put, so the site never goes blank.
 ═══════════════════════════════════════════════════════════════════════════ */
+// ── Social links — edit these three to your real profiles. Used by the
+// Community page's YouTube/Discord/Steam cards. ─────────────────────────────
+var YOUTUBE_URL='https://www.youtube.com/@underwayco';
+var DISCORD_URL='https://discord.gg/your-invite-code';
+var STEAM_URL='https://store.steampowered.com/your-page';
+
 var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=664706385&single=true&output=csv';
 var PARTNERS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=648553996&single=true&output=csv';
 var VIDEOS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=924138447&single=true&output=csv';
+// New tab, not part of the original spreadsheet setup — add a "FAQ" tab to
+// your sheet (columns: Question, Answer), then File → Share → Publish to
+// web → that tab → CSV, and paste the resulting URL in below.
+var FAQ_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_FAQ_TAB_GID_HERE&single=true&output=csv';
+// Same idea — two more new tabs for the beta section. The access CODE itself
+// stays a plain constant below (BETA_CODE), not in a sheet — a "published to
+// web" sheet is publicly readable by anyone with the link even without your
+// access code, so putting the code itself in a sheet would defeat the point
+// of gating the section at all.
+var BETA_BUILDS_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_BETA_BUILDS_TAB_GID_HERE&single=true&output=csv';
+var BETA_ISSUES_URL='https://docs.google.com/spreadsheets/d/e/YOUR_SHEET_ID_HERE/pub?gid=YOUR_BETA_ISSUES_TAB_GID_HERE&single=true&output=csv';
 
 function fixDiscordUrl(u){
   if(!u)return u;
@@ -1309,7 +1337,7 @@ function loadPartnersFromSheet(){
       var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});
       var links=[];
       for(var n=1;n<=3;n++){var lbl=r['link'+n+'_label'],url=r['link'+n+'_url'];if(lbl&&url)links.push({label:lbl,url:url.indexOf('http')===0?url:'https://'+url});}
-      return{name:r.name||'',type:r.type||'',desc:r.desc||r.description||'',links:links};
+      return{name:r.name||'',type:r.type||'',desc:r.desc||r.description||'',image:fixDiscordUrl((r.image||r.logo||'').trim()),links:links};
     }).filter(function(p){return p.name;});
     if(!mapped.length)throw 0;
     DEMO_PARTNERS.splice.apply(DEMO_PARTNERS,[0,DEMO_PARTNERS.length].concat(mapped));
@@ -1409,6 +1437,51 @@ function loadVideosFromSheet(){
     if(communityPage&&communityPage.classList.contains('is-active'))renderVideos();
   }).catch(function(){});
 }
+function loadFAQFromSheet(){
+  trackedFetch(FAQ_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+    var rows=parseCSV(text);
+    if(!rows.length)throw 0;
+    var mapped=rows.map(function(row){
+      var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});
+      return{q:r.question||r.q||'',a:r.answer||r.a||''};
+    }).filter(function(item){return item.q&&item.a;});
+    if(!mapped.length)throw 0;
+    DEMO_FAQ.splice.apply(DEMO_FAQ,[0,DEMO_FAQ.length].concat(mapped));
+    var faqPage=document.querySelector('.page[data-page="faq"]');
+    if(faqPage&&faqPage.classList.contains('is-active'))renderFAQ();
+  }).catch(function(){});
+}
+function _betaActiveAndUnlocked(){
+  var betaPage=document.querySelector('.page[data-page="beta"]');
+  return betaPage&&betaPage.classList.contains('is-active')&&safeSessionGet('underway_beta_unlocked')==='1'&&safeSessionGet('underway_beta_agreed')==='1';
+}
+function loadBetaBuildsFromSheet(){
+  trackedFetch(BETA_BUILDS_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+    var rows=parseCSV(text);
+    if(!rows.length)throw 0;
+    var mapped=rows.map(function(row){
+      var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});
+      var changelog=(r.changelog||'').split('\n').map(function(s){return s.trim();}).filter(Boolean);
+      return{version:r.version||'',date:r.date||'',notes:r.notes||'',changelog:changelog};
+    }).filter(function(b){return b.version;});
+    if(!mapped.length)throw 0;
+    DEMO_BETA_BUILDS.splice.apply(DEMO_BETA_BUILDS,[0,DEMO_BETA_BUILDS.length].concat(mapped));
+    if(_betaActiveAndUnlocked())renderBetaBuilds();
+  }).catch(function(){});
+}
+function loadBetaIssuesFromSheet(){
+  trackedFetch(BETA_ISSUES_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
+    var rows=parseCSV(text);
+    if(!rows.length)throw 0;
+    var mapped=rows.map(function(row){
+      var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase().trim()]=(row[k]||'').trim();});
+      return{title:r.title||'',severity:r.severity||'Minor',desc:r.desc||r.description||''};
+    }).filter(function(i){return i.title;});
+    if(!mapped.length)throw 0;
+    DEMO_BETA_ISSUES.splice.apply(DEMO_BETA_ISSUES,[0,DEMO_BETA_ISSUES.length].concat(mapped));
+    if(_betaActiveAndUnlocked())renderBetaIssues();
+  }).catch(function(){});
+}
 
 var DEMO_FAQ=[
   {q:'How long does shipping take?',a:'Most in-stock hardware ships within 3–5 business days. Custom orders vary — check the product page or ask us directly.'},
@@ -1442,9 +1515,37 @@ for(var _bi=0;_bi<6;_bi++)DEMO_BETA_ISSUES.push({title:_ISSUE_FILLER[_bi],severi
    with no server rewrites), driven by pushState + popstate.
 ═══════════════════════════════════════════════════════════════════════════ */
 var VALID_PAGES=['home','products','product','community','partners','partner','updates','faq','beta','notfound','gallery'];
+// ── Clean, shareable URLs ────────────────────────────────────────────────
+// Products get a bare root path (/ms-fridtjof-nansen) since that's the
+// content people actually share; partners get a small /partners/ prefix so
+// a product and partner can never collide on the same slug. Everything else
+// (gallery, notfound) stays on query params — not worth a clean path for
+// those. matchCleanPath() is shared by both the fresh-load parser below and
+// the 404.html hand-off resolver, so the two stay in sync automatically.
+var STATIC_PAGE_PATHS=['products','community','partners','updates','faq','beta'];
 function urlFor(page,slug){
   if(!page||page==='home')return '/';
+  if(page==='product'&&slug)return '/'+slug;
+  if(page==='partner'&&slug)return '/partners/'+slug;
+  if(STATIC_PAGE_PATHS.indexOf(page)!==-1)return '/'+page;
   return '?page='+page+(slug?('&slug='+encodeURIComponent(slug)):'');
+}
+function matchCleanPath(path){
+  if(!path)return{page:'home',slug:null};
+  var segments=path.split('/');
+  if(segments.length===1&&STATIC_PAGE_PATHS.indexOf(segments[0])!==-1)return{page:segments[0],slug:null};
+  if(segments[0]==='partners'&&segments.length===2){
+    var pslug=segments[1];
+    if(DEMO_PARTNERS.some(function(pt){return productSlug(pt.name)===pslug;}))return{page:'partner',slug:pslug};
+    return null;
+  }
+  if(segments.length===1){
+    var slug=segments[0];
+    if(DEMO_PRODUCTS.some(function(pr){return productSlug(pr.name)===slug;}))return{page:'product',slug:slug};
+    if(DEMO_PARTNERS.some(function(pt){return productSlug(pt.name)===slug;}))return{page:'partner',slug:slug};
+    return null;
+  }
+  return null;
 }
 // Some preview/embed contexts (e.g. a sandboxed srcdoc iframe) throw on
 // history.pushState/replaceState instead of failing quietly. Wrap both so a
@@ -1565,7 +1666,21 @@ function renderSearchResults(query){
   _searchActiveIdx=-1;
 
   if(!query){
-    box.innerHTML='<div class="search-hint">Start typing to search everything on the site — products, partners, FAQs, updates, and more.</div>';
+    if(!DEMO_PRODUCTS.length){
+      box.innerHTML='<div class="search-hint">Start typing to search everything on the site — products, partners, FAQs, updates, and more.</div>';
+      _searchFlat=[];
+      return;
+    }
+    var suggestions=DEMO_PRODUCTS.slice(0,2);
+    box.innerHTML='<div class="search-suggest-label">Try one of these</div><div class="search-suggest-grid">'+
+      suggestions.map(function(p){
+        var img=productImages(p)[0];
+        return '<button type="button" class="search-suggest-card" onclick="pickSearchSuggestion(\''+productSlug(p.name)+'\')">'+
+          '<img src="'+img+'" alt="" loading="lazy">'+
+          '<span class="search-suggest-name">'+escapeHtml(p.name)+'</span>'+
+        '</button>';
+      }).join('')+
+    '</div>';
     _searchFlat=[];
     return;
   }
@@ -1609,6 +1724,10 @@ function pickSearchResult(i){
   if(!item)return;
   closeSearchModal();
   item.action();
+}
+function pickSearchSuggestion(slug){
+  closeSearchModal();
+  navigate('product',slug,true);
 }
 function escapeHtml(s){return (s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});}
 document.addEventListener('keydown',function(e){
@@ -1673,8 +1792,15 @@ window.addEventListener('popstate',function(e){
   render(st.page,st.slug);
 });
 function readStateFromURL(){
+  var path=location.pathname.replace(/^\/+|\/+$/g,'');
+  if(path){
+    var matched=matchCleanPath(decodeURIComponent(path).toLowerCase());
+    if(matched)return matched;
+  }
+  // Legacy support: old ?page=X&slug=Y links (from before clean URLs) still work.
   var p=new URLSearchParams(location.search);
-  return {page:p.get('page')||'home',slug:p.get('slug')||null};
+  if(p.get('page'))return{page:p.get('page')||'home',slug:p.get('slug')||null};
+  return{page:'home',slug:null};
 }
 function renderNotFound(attemptedPath){
   var el=document.getElementById('notfound-detail');
@@ -1697,22 +1823,20 @@ function clearDemoModeIndicators(){
 // try to make sense of it: match it against a known page, a product, or a
 // partner (in that order), and fall back to the in-app "not found" page if
 // nothing matches. Either way the ugly ?redirect= param gets cleaned out of
-// the address bar once resolved.
+// the address bar once resolved (into a matching clean URL, via urlFor()).
 function resolveRedirectParam(){
   var p=new URLSearchParams(location.search);
   var redirect=p.get('redirect');
   if(redirect===null)return null;
   var path=redirect.replace(/^\/+|\/+$/g,'').split('?')[0].split('#')[0];
   if(!path)return{page:'home',slug:null};
-  var slug=decodeURIComponent(path).toLowerCase();
-  var knownPages=['products','community','partners','updates','faq','beta'];
-  if(knownPages.indexOf(slug)!==-1)return{page:slug,slug:null};
-  if(DEMO_PRODUCTS.some(function(pr){return productSlug(pr.name)===slug;}))return{page:'product',slug:slug};
-  if(DEMO_PARTNERS.some(function(pt){return productSlug(pt.name)===slug;}))return{page:'partner',slug:slug};
+  var decoded=decodeURIComponent(path).toLowerCase();
+  var matched=matchCleanPath(decoded);
+  if(matched)return matched;
   // Not found yet — but the live Sheets data hasn't loaded at this point in
   // startup, so it might still turn out to be a real product/partner once it
   // does. Remember the slug and recheck once Products/Partners load.
-  _pendingRedirectSlug=slug;
+  _pendingRedirectSlug=decoded.split('/').pop();
   return{page:'notfound',slug:path};
 }
 var _pendingRedirectSlug=null;
@@ -2138,7 +2262,7 @@ function closeMobileNav(){document.getElementById('mobile-nav-drawer').classList
   update();
 })();
 
-function statusClass(s){return({'Active':'status-active','In Development':'status-dev','Coming Soon':'status-soon'})[s]||'status-active';}
+function statusClass(s){return({'Active':'status-active','In Development':'status-dev','Coming Soon':'status-soon','Canceled':'status-cancelled','Cancelled':'status-cancelled'})[s]||'status-active';}
 function statusIcon(s){return s==='Active'?'&#9679;':(s==='In Development'?'&#9680;':'&#9676;');}
 function productSlug(name){return(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 function iconForName(name){
@@ -2451,8 +2575,9 @@ function renderUpdateGallery(comboSlug){
 function renderVideos(){
   var grid=document.getElementById('yt-videos-grid');
   grid.innerHTML=DEMO_VIDEOS.map(function(v){
+    var thumb=v.videoId?('<img src="https://img.youtube.com/vi/'+v.videoId+'/hqdefault.jpg" alt="" loading="lazy">'):'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
     return '<div class="video-card" tabindex="0" role="button" aria-label="Play '+v.title+'">'+
-      '<div class="video-thumb"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><polygon points="5 3 19 12 5 21 5 3"/></svg><div class="video-play-btn">&#9654;</div></div>'+
+      '<div class="video-thumb">'+thumb+'<div class="video-play-btn">&#9654;</div></div>'+
       '<div class="video-info"><div class="video-title">'+v.title+'</div><div class="video-meta">'+v.meta+'</div></div>'+
     '</div>';
   }).join('');
@@ -2484,7 +2609,8 @@ function closeVideoModal(){
 function renderPartnersGrid(){
   var grid=document.getElementById('partners-grid');
   grid.innerHTML=DEMO_PARTNERS.map(function(p,i){
-    return '<button class="partner-card" data-idx="'+i+'"><div class="partner-initial">'+p.name.charAt(0)+'</div><div class="partner-name">'+p.name+'</div><div class="partner-type">'+p.type+'</div><div class="partner-hint">Click to view →</div></button>';
+    var mark=p.image?('<img class="partner-logo" src="'+p.image+'" alt="" loading="lazy">'):('<div class="partner-initial">'+p.name.charAt(0)+'</div>');
+    return '<button class="partner-card" data-idx="'+i+'">'+mark+'<div class="partner-name">'+p.name+'</div><div class="partner-type">'+p.type+'</div><div class="partner-hint">Click to view →</div></button>';
   }).join('');
   grid.querySelectorAll('.partner-card').forEach(function(c){
     c.addEventListener('click',function(){
@@ -2498,6 +2624,8 @@ function renderPartnerDetail(slug){
   if(idx===-1)idx=0;
   var p=DEMO_PARTNERS[idx];
   document.getElementById('pt-initial').textContent=p.name.charAt(0);
+  var markEl=document.getElementById('pt-mark');
+  markEl.innerHTML=p.image?('<img class="partner-detail-logo" src="'+p.image+'" alt="">'):('<div class="partner-detail-initial" id="pt-initial">'+p.name.charAt(0)+'</div>');
   document.getElementById('pt-name').textContent=p.name;
   document.getElementById('pt-type').textContent=p.type;
   document.getElementById('pt-desc').textContent=p.desc;
@@ -2674,7 +2802,14 @@ document.addEventListener('keydown',function(e){
 /* ═══════════════════════════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════════════════════════ */
+function wireCommunityLinks(){
+  var yt=document.getElementById('link-youtube'),dc=document.getElementById('link-discord'),st=document.getElementById('link-steam');
+  if(yt)yt.href=YOUTUBE_URL;
+  if(dc)dc.href=DISCORD_URL;
+  if(st)st.href=STEAM_URL;
+}
 renderLogos();
+wireCommunityLinks();
 renderLangSelectors();
 applyLanguage(safeLocalGet('underway_lang')||'en');
 renderHome();
@@ -2690,6 +2825,9 @@ loadProductsFromSheet();
 loadPartnersFromSheet();
 loadAnnouncementsFromSheet();
 loadVideosFromSheet();
+loadFAQFromSheet();
+loadBetaBuildsFromSheet();
+loadBetaIssuesFromSheet();
 </script>
 </body>
 </html>
