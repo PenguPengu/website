@@ -55,7 +55,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 /* ── LOADING SCREEN ───────────────────────────────────────────────────────── */
 #loading-screen{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 42%,rgba(201,168,76,.08),transparent 55%),var(--cream);display:flex;align-items:center;justify-content:center;overflow:hidden;}
 #loading-screen.fading{transition:opacity .6s ease;opacity:0;}
-.loading-logo-wrap{width:150px;will-change:transform;}
+.loading-logo-wrap{width:150px;will-change:transform;position:relative;}
+.loading-ping{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:1px solid var(--gold);opacity:0;pointer-events:none;}
+.loading-ping.active{animation:loadingPing 2.6s ease-out infinite;}
+.loading-ping.active.delay{animation-delay:1.3s;}
+@keyframes loadingPing{0%{transform:scale(.6);opacity:.35;}100%{transform:scale(2.2);opacity:0;}}
 .loading-logo-wrap svg{width:100%;height:auto;display:block;}
 .loading-content{display:flex;flex-direction:column;align-items:center;gap:20px;}
 .loading-word{font-family:var(--serif);font-weight:900;font-size:32px;letter-spacing:.04em;color:var(--navy);opacity:.92;}
@@ -511,6 +515,8 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
   <div class="loading-gloss" id="loading-gloss"></div>
   <div class="loading-content">
     <div class="loading-logo-wrap" id="loading-logo-wrap">
+      <div class="loading-ping" id="loading-ping-1"></div>
+      <div class="loading-ping delay" id="loading-ping-2"></div>
       <svg id="loading-logo-svg" viewBox="193 327 640 299" xmlns="http://www.w3.org/2000/svg" overflow="visible">
         <path fill="#c9a84c" opacity=".22" id="loading-logo-glow"></path>
         <path id="loading-logo-outline" fill="none" stroke="#1b2b3a" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -1047,8 +1053,13 @@ function playLoadingAnimation(){
     rafId=requestAnimationFrame(spinTick);
   }
   rafId=requestAnimationFrame(spinTick);
+  var ping1=document.getElementById('loading-ping-1'),ping2=document.getElementById('loading-ping-2');
+  if(ping1)ping1.classList.add('active');
+  if(ping2)ping2.classList.add('active');
 
   function proceedToSettle(){
+    if(ping1)ping1.classList.remove('active');
+    if(ping2)ping2.classList.remove('active');
     // The spin loop already stopped in the fully-drawn state — this brief
     // wait is just a held beat before filling in.
     setTimeout(function(){
@@ -1062,7 +1073,14 @@ function playLoadingAnimation(){
       outline.style.opacity='0';
 
       setTimeout(function(){
+        // The swoosh runs FIRST, on its own, at full opacity — the whole
+        // point is watching it actually travel across the screen and land
+        // in the nav. Only once it's fully arrived does the backdrop start
+        // fading away; doing both at once (as before) meant the screen was
+        // already vanishing before the movement even registered, so it just
+        // read as a fade-out/fade-in swap instead of a move.
         var navMark=document.getElementById('nav-logo-mark');
+        var swooshMs=800;
         if(navMark&&wrap&&navMark.firstChild){
           var navRect=navMark.getBoundingClientRect();
           var wrapRect=wrap.getBoundingClientRect();
@@ -1070,22 +1088,23 @@ function playLoadingAnimation(){
             var scale=navRect.height/wrapRect.height;
             var dx=(navRect.left+navRect.width/2)-(wrapRect.left+wrapRect.width/2);
             var dy=(navRect.top+navRect.height/2)-(wrapRect.top+wrapRect.height/2);
-            wrap.style.transition='transform .8s cubic-bezier(.6,0,.25,1)';
+            wrap.style.transition='transform '+(swooshMs/1000)+'s cubic-bezier(.5,-0.2,.2,1.35)';
             wrap.style.transform='translate('+dx+'px,'+dy+'px) scale('+scale+')';
           }
         }
         if(gloss)gloss.classList.add('sweep');
-        screen.classList.add('fading');
-        stopLoadingMessages();
-        // Reveal the real (static) nav logo at the exact moment the loading
-        // screen starts fading — same position, same colors, so this reads
-        // as a crossfade rather than a swap.
-        if(realNavFill){
-          realNavFill.style.transition='opacity .6s ease';
-          realNavFill.style.opacity='1';
-        }
 
-        setTimeout(function(){screen.style.display='none';},850);
+        setTimeout(function(){
+          // Logo has landed — now reveal the real nav logo underneath (same
+          // spot, same colors) and fade the backdrop away together.
+          screen.classList.add('fading');
+          stopLoadingMessages();
+          if(realNavFill){
+            realNavFill.style.transition='opacity .5s ease';
+            realNavFill.style.opacity='1';
+          }
+          setTimeout(function(){screen.style.display='none';},550);
+        },swooshMs+120);
       },600);
     },450);
   }
