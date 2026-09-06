@@ -165,7 +165,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .btn-ghost:hover{border-color:var(--navy);background:rgba(25,41,58,.05);transform:translateY(-3px);}
 .dark-page .btn-ghost{color:var(--cream);border-color:rgba(247,239,230,.4);}
 .dark-page .btn-ghost:hover{border-color:var(--cream);background:rgba(247,239,230,.08);}
-.hero-art{aspect-ratio:1/1;max-width:420px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:var(--gold);margin-left:auto;border-radius:var(--r-lg);box-shadow:var(--shadow-dark);}
+.hero-scene-wrap{width:100%;max-width:420px;margin-left:auto;position:relative;}
+.hero-scene-frame{aspect-ratio:1/1;background:var(--navy);border-radius:var(--r-lg);box-shadow:var(--shadow-dark);position:relative;overflow:hidden;}
+.hero-scene{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;display:flex;align-items:center;justify-content:center;color:var(--gold);}
+.hero-scene.active{opacity:1;}
+.hero-scene-cap{position:absolute;bottom:0;left:0;right:0;padding:16px 22px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.6;background:linear-gradient(to top,rgba(0,0,0,.35),transparent);}
+.hero-scene-dots{position:absolute;bottom:16px;right:18px;display:flex;gap:7px;z-index:5;}
+.hs-dot{width:7px;height:7px;border-radius:50%;background:var(--cream);opacity:.3;cursor:pointer;border:none;padding:0;transition:.2s var(--ease);}
+.hs-dot.active{opacity:.95;transform:scale(1.3);}
 
 .section-block{padding:80px 0;border-top:1px solid var(--border);}
 .section-block-inner{max-width:1280px;margin:0 auto;padding:0 var(--gutter);}
@@ -273,6 +280,24 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .pd-update-entry-badge{font-size:7px;letter-spacing:.18em;text-transform:uppercase;padding:3px 9px;border:1px solid rgba(111,207,151,.35);color:#6fcf97;background:rgba(111,207,151,.08);border-radius:var(--r-full);}
 .pd-update-entry-title{font-family:var(--serif);font-size:17px;font-weight:700;margin-bottom:7px;}
 .pd-update-entry-body{font-size:12px;line-height:1.85;opacity:.65;}
+.pd-update-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px;max-width:360px;}
+.pd-update-gallery-cell{aspect-ratio:1;border-radius:var(--r-md);overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.06);position:relative;}
+.pd-update-gallery-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s;}
+.pd-update-gallery-cell:hover img{opacity:.85;}
+.pd-update-gallery-more{position:absolute;inset:0;background:rgba(25,41,58,.6);color:var(--cream);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.pd-update-see-more{background:none;border:none;color:inherit;opacity:.6;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;padding:0;margin-top:10px;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;}
+.pd-update-see-more:hover{opacity:1;}
+
+/* ── Full gallery page — a specific update's photos, mixed-size mosaic ───── */
+.update-gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:150px;gap:10px;}
+.update-gallery-cell{border-radius:var(--r-lg);overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.05);position:relative;}
+.update-gallery-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s;}
+.update-gallery-cell:hover img{opacity:.85;}
+.update-gallery-cell.big{grid-column:span 2;grid-row:span 2;}
+@media(max-width:700px){
+  .update-gallery-grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:130px;}
+  .update-gallery-cell.big{grid-column:span 2;grid-row:span 2;}
+}
 
 /* ── GLOBAL SEARCH ────────────────────────────────────────────────────────── */
 .search-modal{display:none;position:fixed;inset:0;z-index:9300;background:rgba(15,23,32,.55);backdrop-filter:blur(3px);align-items:flex-start;justify-content:center;padding:min(14vh,110px) 20px 20px;}
@@ -447,7 +472,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
   .page-inner{padding:0 var(--gutter) 60px;}
   .section-block-inner{padding:0 var(--gutter);}
   .hero{grid-template-columns:1fr;min-height:auto;padding:40px var(--gutter);gap:32px;}
-  .hero-art{max-width:260px;margin:0 auto;}
+  .hero-scene-wrap{max-width:260px;margin:0 auto;}
   .hero-btns{flex-direction:column;}
   .btn-primary,.btn-ghost{width:100%;text-align:center;}
   .stats-row{grid-template-columns:1fr 1fr;}
@@ -533,7 +558,10 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         <a href="?page=partners" onclick="goTo(event,'partners')" class="btn-ghost" data-i18n="hero_view_partners">View Partners</a>
       </div>
     </div>
-    <div class="hero-art" id="hero-art"></div>
+    <div class="hero-scene-wrap">
+      <div class="hero-scene-frame" id="hero-scene-frame"></div>
+      <div class="hero-scene-dots" id="hero-scene-dots"></div>
+    </div>
   </section>
 
   <section class="section-block">
@@ -663,6 +691,19 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         </div>
       </div>
     </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════ UPDATE GALLERY (a specific update's photos, ══
+     full page — reached via "See N more photos" on a Build Update) ══════════ -->
+<main class="page dark-page" data-page="gallery">
+  <div class="page-inner">
+    <button class="back-link" id="gallery-back-link" onclick="goBackToProductFromGallery(event)">&#8592; Back to Product</button>
+    <div class="page-header">
+      <p class="page-eyebrow" id="gallery-eyebrow"></p>
+      <h1 class="page-title" id="gallery-title"></h1>
+    </div>
+    <div class="update-gallery-grid" id="update-gallery-grid"></div>
   </div>
 </main>
 
@@ -1042,7 +1083,9 @@ var ICON_PATHS={
   cleat:'<path d="M12 42c0-11 9-20 20-20s20 9 20 20"/><line x1="8" y1="42" x2="56" y2="42"/><line x1="8" y1="50" x2="56" y2="50"/>',
   ladder:'<line x1="20" y1="6" x2="20" y2="58"/><line x1="44" y1="6" x2="44" y2="58"/><line x1="20" y1="16" x2="44" y2="16"/><line x1="20" y1="28" x2="44" y2="28"/><line x1="20" y1="40" x2="44" y2="40"/><line x1="20" y1="52" x2="44" y2="52"/>',
   anchor:'<circle cx="32" cy="14" r="6"/><line x1="32" y1="20" x2="32" y2="52"/><path d="M14 34a18 18 0 0 0 18 24 18 18 0 0 0 18-24"/><line x1="18" y1="30" x2="46" y2="30"/>',
-  chain:'<circle cx="22" cy="20" r="8"/><circle cx="42" cy="34" r="8"/><circle cx="22" cy="48" r="8"/>'
+  chain:'<circle cx="22" cy="20" r="8"/><circle cx="42" cy="34" r="8"/><circle cx="22" cy="48" r="8"/>',
+  aurora:'<path d="M6 40q8-18 16 0t16 0 16 0"/><path d="M6 48q8-14 16 0t16 0 16 0"/><circle cx="46" cy="14" r="4"/>',
+  glass:'<path d="M8 36h48"/><path d="M14 36V22l6-6h24l6 6v14"/><path d="M8 44h48"/><path d="M8 52h48"/>'
 };
 function iconSVG(key,size,strokeW){size=size||44;strokeW=strokeW||2.2;return '<svg viewBox="0 0 64 64" width="'+size+'" height="'+size+'" fill="none" stroke="currentColor" stroke-width="'+strokeW+'" stroke-linecap="round" stroke-linejoin="round">'+(ICON_PATHS[key]||ICON_PATHS.bollard)+'</svg>';}
 function demoImg(key,bg,fg,w,h){
@@ -1057,7 +1100,7 @@ var DEMO_PRODUCTS=[
    details:'Material: Marine-grade stainless 316L · Load rating: 25t SWL · Finish: Brushed',
    gallery:['bollard','cleat','chain'],
    updates:[
-     {date:'2 Aug 2026',title:'Load testing passed',badge:true,body:'Ran the MK-4 to 30t before we saw any deformation — 20% over rated capacity. Moving to finish work next.'},
+     {date:'2 Aug 2026',title:'Load testing passed',badge:true,body:'Ran the MK-4 to 30t before we saw any deformation — 20% over rated capacity. Moving to finish work next.',images:['bollard','cleat','chain','bollard','cleat','chain','bollard']},
      {date:'18 Jul 2026',title:'Casting complete',body:'First production casting came back clean. Machining tolerances locked in.'},
      {date:'30 Jun 2026',title:'Project kicked off',body:'Scoped as a drop-in upgrade for our MK-3 footprint, rated for the next class of vessel up.'}
    ]},
@@ -1074,7 +1117,7 @@ var DEMO_PRODUCTS=[
    details:'Line pull: 4t · Drum capacity: 120m · Power: Hydraulic, 12V electric option',
    gallery:['winch','chain','bollard'],
    updates:[
-     {date:'20 Aug 2026',title:'Now shipping',badge:true,body:'First production batch is out the door. Lead time back down to 2 weeks.'},
+     {date:'20 Aug 2026',title:'Now shipping',badge:true,body:'First production batch is out the door. Lead time back down to 2 weeks.',images:['winch','chain']},
      {date:'1 Aug 2026',title:'Certification complete',body:'Passed third-party load certification with margin to spare.'}
    ]},
   {name:'Tidewatch Buoy Array',type:'Navigation Aids',status:'Coming Soon',icon:'buoy',
@@ -1301,7 +1344,8 @@ function _parseAnnouncementRow(r){
   var title=lines.length>1?lines[0]:'';
   var body=lines.length>1?lines.slice(1).join(' '):content;
   var date='';try{var d=new Date(r.timestamp);if(!isNaN(d.getTime()))date=d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}catch(e){}
-  return{title:title,body:body,date:date||r.timestamp||''};
+  var images=(r.images||'').split(',').map(function(s){return fixDiscordUrl(s.trim());}).filter(function(s){return s.indexOf('http')===0;});
+  return{title:title,body:body,date:date||r.timestamp||'',images:images};
 }
 // Live build-update rows for one product, newest first. Returns null when
 // the sheet hasn't loaded yet (so callers know to fall back to demo data)
@@ -1315,7 +1359,7 @@ function getBuildUpdatesFor(productName){
   }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   return rows.map(function(r,i){
     var parsed=_parseAnnouncementRow(r);
-    return{date:parsed.date,title:parsed.title||'Update',body:parsed.body,badge:i===0};
+    return{date:parsed.date,title:parsed.title||'Update',body:parsed.body,badge:i===0,images:parsed.images};
   });
 }
 // Live general announcements, newest first. Same null-until-loaded contract.
@@ -1397,7 +1441,7 @@ for(var _bi=0;_bi<6;_bi++)DEMO_BETA_ISSUES.push({title:_ISSUE_FILLER[_bi],severi
    ROUTER — real "pages" (query-string based so it works on static hosting
    with no server rewrites), driven by pushState + popstate.
 ═══════════════════════════════════════════════════════════════════════════ */
-var VALID_PAGES=['home','products','product','community','partners','partner','updates','faq','beta','notfound'];
+var VALID_PAGES=['home','products','product','community','partners','partner','updates','faq','beta','notfound','gallery'];
 function urlFor(page,slug){
   if(!page||page==='home')return '/';
   return '?page='+page+(slug?('&slug='+encodeURIComponent(slug)):'');
@@ -1604,6 +1648,7 @@ function render(page,slug){
   if(page==='faq')renderFAQ();
   if(page==='beta')renderBeta();
   if(page==='notfound')renderNotFound(slug);
+  if(page==='gallery')renderUpdateGallery(slug);
 
   function activate(){
     document.querySelectorAll('.page').forEach(function(p){if(p!==target)p.classList.remove('is-active','page-leave');});
@@ -2149,11 +2194,33 @@ function wireProductCards(container,list){
 function renderHome(){
   document.getElementById('stat-products').textContent=DEMO_PRODUCTS.length;
   document.getElementById('stat-partners').textContent=DEMO_PARTNERS.length;
-  document.getElementById('hero-art').innerHTML=iconSVG('anchor',110,1.6);
+  renderHeroScenes();
   var grid=document.getElementById('home-builds-grid');
   var featured=DEMO_PRODUCTS.slice(0,3);
   grid.innerHTML=featured.map(buildProductCard).join('');
   wireProductCards(grid,featured);
+}
+var HERO_SCENES=[
+  {icon:'glass',label:'Antarctic glass water, dawn'},
+  {icon:'aurora',label:'Northern lights over open water'},
+  {icon:'anchor',label:'Built for the long haul'}
+];
+var heroSceneIdx=0,_heroScenesRendered=false;
+function renderHeroScenes(){
+  var frame=document.getElementById('hero-scene-frame'),dots=document.getElementById('hero-scene-dots');
+  if(!frame||_heroScenesRendered)return; // only build the DOM once — repeated home visits shouldn't reset which scene you had selected
+  _heroScenesRendered=true;
+  frame.innerHTML=HERO_SCENES.map(function(s,i){
+    return '<div class="hero-scene'+(i===0?' active':'')+'" data-i="'+i+'">'+iconSVG(s.icon,120,1.6)+'<div class="hero-scene-cap">'+s.label+'</div></div>';
+  }).join('');
+  dots.innerHTML=HERO_SCENES.map(function(_,i){return '<button class="hs-dot'+(i===0?' active':'')+'" onclick="goHeroScene('+i+')" aria-label="Scene '+(i+1)+' of '+HERO_SCENES.length+'"></button>';}).join('');
+}
+function goHeroScene(i){
+  var scenes=document.querySelectorAll('.hero-scene'),dots=document.querySelectorAll('.hs-dot');
+  if(!scenes.length)return;
+  scenes[heroSceneIdx].classList.remove('active');dots[heroSceneIdx].classList.remove('active');
+  heroSceneIdx=i;
+  scenes[i].classList.add('active');dots[i].classList.add('active');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2212,7 +2279,7 @@ document.addEventListener('click',function(e){
 /* ═══════════════════════════════════════════════════════════════════════════
    PRODUCT DETAIL PAGE
 ═══════════════════════════════════════════════════════════════════════════ */
-var _pdImages=[],_pdCurrent=0,_currentProductSlug=null;
+var _pdImages=[],_pdCurrent=0,_currentProductSlug=null,_pdUpdateResolvedImages=[];
 var _pdGalleryLM=null,_pdUpdatesLM=null;
 
 // Generic "load more" list — renders the first `pageSize` items into a
@@ -2269,8 +2336,23 @@ function renderProductDetail(slug){
   // for this product; otherwise fall back to the demo data's own updates.
   var liveUpdates=getBuildUpdatesFor(p.name);
   var updates=(liveUpdates&&liveUpdates.length)?liveUpdates:(p.updates||[]);
+  _pdUpdateResolvedImages=[];
   _pdUpdatesLM=makeLoadMoreList('pd-updates-feed','pd-updates-more-wrap',updates,4,function(u,i){
-    return '<div class="pd-update-entry"><div class="pd-update-entry-header"><span class="pd-update-entry-date">'+u.date+'</span>'+(i===0?'<span class="pd-update-entry-badge">Latest</span>':'')+'</div><div class="pd-update-entry-title">'+u.title+'</div><div class="pd-update-entry-body">'+u.body+'</div></div>';
+    var galleryHtml='';
+    if(u.images&&u.images.length){
+      var imgs=resolveUpdateImages(u.images);
+      _pdUpdateResolvedImages[i]=imgs;
+      var maxInline=3;
+      var shown=imgs.slice(0,maxInline);
+      var overflow=imgs.length-maxInline;
+      galleryHtml='<div class="pd-update-gallery" style="grid-template-columns:repeat('+Math.min(shown.length,3)+',1fr)">'+shown.map(function(img,idx){
+        var showMoreOverlay=(idx===maxInline-1)&&overflow>0;
+        var clickAttr=showMoreOverlay?('onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')"'):('onclick="openLightbox(_pdUpdateResolvedImages['+i+'],'+idx+')"');
+        return '<div class="pd-update-gallery-cell" '+clickAttr+'><img src="'+img+'" loading="lazy">'+(showMoreOverlay?'<div class="pd-update-gallery-more">+'+overflow+'</div>':'')+'</div>';
+      }).join('')+'</div>'+
+      (overflow>0?'<button class="pd-update-see-more" onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')">See all '+imgs.length+' photos →</button>':'');
+    }
+    return '<div class="pd-update-entry"><div class="pd-update-entry-header"><span class="pd-update-entry-date">'+u.date+'</span>'+(i===0?'<span class="pd-update-entry-badge">Latest</span>':'')+'</div><div class="pd-update-entry-title">'+u.title+'</div><div class="pd-update-entry-body">'+u.body+'</div>'+galleryHtml+'</div>';
   },'Show older updates','No updates yet');
 }
 function renderPdGalleryMain(){
@@ -2311,6 +2393,57 @@ function openLightbox(urls,idx){
 }
 function lightboxNav(dir){_lbCurrent=((_lbCurrent+dir)%_lbImages.length+_lbImages.length)%_lbImages.length;document.getElementById('lb-img').src=_lbImages[_lbCurrent];document.getElementById('lb-counter').textContent=(_lbCurrent+1)+' / '+_lbImages.length;}
 function lightboxClose(){document.getElementById('lightbox').classList.remove('open');}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UPDATE GALLERY — photos tied to one specific build update. A few show
+   inline on the update card itself; "See all N photos" opens the full page
+   below, laid out as a mixed 1x1/2x2 mosaic rather than a plain uniform grid.
+═══════════════════════════════════════════════════════════════════════════ */
+// Turns an update's `images` array into real <img> sources — a real URL
+// (from a live sheet) passes straight through; anything else is treated as
+// a demo icon key and rendered as a generated placeholder tile, same as the
+// product photo album fallback.
+function resolveUpdateImages(keys){
+  if(!keys||!keys.length)return[];
+  var tints=['#1b2b3a','#24384b','#2c4155','#16232f'];
+  return keys.map(function(k,i){
+    if(typeof k==='string'&&k.indexOf('http')===0)return k;
+    return demoImg(k,tints[i%tints.length],'#c9a84c',700,700);
+  });
+}
+var _galleryImages=[],_galleryProductSlug=null;
+function goToUpdateGallery(e,prodSlugStr,updateIndex){
+  if(e){e.preventDefault();e.stopPropagation();}
+  navigate('gallery',prodSlugStr+'::'+updateIndex,true);
+}
+function goBackToProductFromGallery(e){
+  if(e)e.preventDefault();
+  navigate('product',_galleryProductSlug,true);
+}
+function renderUpdateGallery(comboSlug){
+  var parts=(comboSlug||'').split('::');
+  var prodSlugStr=parts[0];
+  var updateIndex=parseInt(parts[1],10)||0;
+  _galleryProductSlug=prodSlugStr;
+
+  var idx=DEMO_PRODUCTS.findIndex(function(p){return productSlug(p.name)===prodSlugStr;});
+  if(idx===-1)idx=0;
+  var p=DEMO_PRODUCTS[idx]||{name:'',updates:[]};
+
+  var liveUpdates=getBuildUpdatesFor(p.name);
+  var updates=(liveUpdates&&liveUpdates.length)?liveUpdates:(p.updates||[]);
+  var u=updates[updateIndex]||updates[0]||{title:'Update',date:'',images:[]};
+
+  document.getElementById('gallery-eyebrow').textContent=p.name+(u.date?(' · '+u.date):'');
+  document.getElementById('gallery-title').textContent=u.title||'Update Photos';
+
+  _galleryImages=resolveUpdateImages(u.images||[]);
+  var grid=document.getElementById('update-gallery-grid');
+  grid.innerHTML=_galleryImages.map(function(img,i){
+    var big=(i%5===0); // simple repeating pattern so the mosaic isn't just a flat uniform grid
+    return '<div class="update-gallery-cell'+(big?' big':'')+'" onclick="openLightbox(_galleryImages,'+i+')"><img src="'+img+'" loading="lazy"></div>';
+  }).join('');
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMMUNITY / VIDEOS
