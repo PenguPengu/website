@@ -74,7 +74,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 /* ── NAV ──────────────────────────────────────────────────────────────────── */
 #top-loading-bar{position:fixed;top:0;left:0;height:2.5px;width:0%;background:var(--gold);z-index:9999;opacity:0;transition:width .4s ease,opacity .25s ease;pointer-events:none;box-shadow:0 0 8px rgba(201,168,76,.6);}
 #top-loading-bar.active{opacity:1;}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 var(--gutter);height:72px;background:rgba(247,239,230,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+#main-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 var(--gutter);height:72px;background:rgba(247,239,230,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
 .nav-logo{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--navy);cursor:pointer;background:none;border:none;border-radius:var(--r-sm);transition:opacity .2s var(--ease);}
 .nav-logo:hover{opacity:.75;}
 .nav-logo-mark{display:flex;align-items:center;flex-shrink:0;}
@@ -207,7 +207,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .product-number{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--cream);opacity:.3;}
 .product-status{font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:5px 12px;border:1px solid;white-space:nowrap;border-radius:var(--r-full);}
 .status-active{color:#6fcf97;border-color:rgba(111,207,151,.35);}
-.status-dev{color:#f2c94c;border-color:rgba(242,201,76,.35);}
 .status-soon{color:#e0b93d;border-color:rgba(224,185,61,.4);}
 .status-cancelled{color:#eb5757;border-color:rgba(235,87,87,.35);}
 .product-name{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--cream);margin-bottom:8px;letter-spacing:-.01em;}
@@ -473,7 +472,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
 
 /* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
 @media(max-width:900px){
-  nav{padding:0 var(--gutter);height:60px;}
+  #main-nav{padding:0 var(--gutter);height:60px;}
   .nav-links{display:none;}
   .lang-selector{display:none;}
   .nav-hamburger{display:flex;}
@@ -640,7 +639,6 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
       <div class="chip-row" id="catalogue-chips">
         <button class="chip active" data-status="all" onclick="setStatusFilter('all',this)">All</button>
         <button class="chip" data-status="Active" onclick="setStatusFilter('Active',this)">Active</button>
-        <button class="chip" data-status="In Development" onclick="setStatusFilter('In Development',this)">In Development</button>
         <button class="chip" data-status="Coming Soon" onclick="setStatusFilter('Coming Soon',this)">Coming Soon</button>
         <button class="chip" data-status="Canceled" onclick="setStatusFilter('Canceled',this)">Canceled</button>
       </div>
@@ -1115,7 +1113,7 @@ var DEMO_PRODUCTS=[
      {date:'18 Jul 2026',title:'Casting complete',body:'First production casting came back clean. Machining tolerances locked in.'},
      {date:'30 Jun 2026',title:'Project kicked off',body:'Scoped as a drop-in upgrade for our MK-3 footprint, rated for the next class of vessel up.'}
    ]},
-  {name:'Fenway Fender System',type:'Hull Protection',status:'In Development',icon:'fender',
+  {name:'Fenway Fender System',type:'Hull Protection',status:'Coming Soon',icon:'fender',
    desc:'A modular foam-filled fender line that scales from workboats to superyachts without a full re-order.',
    details:'Material: Closed-cell foam core, PVC skin · Sizes: 6 modular lengths',
    gallery:['fender','buoy'],
@@ -1141,7 +1139,7 @@ var DEMO_PRODUCTS=[
    details:'Sizes: 4", 6", 8", 10" · Material: 316L stainless, cast',
    gallery:['cleat','bollard'],
    updates:[{date:'9 Aug 2026',title:'New 10" size added',body:'Added a fourth size to the line after repeated requests from commercial customers.'}]},
-  {name:'Sentinel Dock Ladder',type:'Dock Infrastructure',status:'In Development',icon:'ladder',
+  {name:'Sentinel Dock Ladder',type:'Dock Infrastructure',status:'Coming Soon',icon:'ladder',
    desc:'A telescoping boarding ladder rated for repeated use in tidal environments.',
    details:'Material: Anodized aluminum · Rungs: 4–8 (telescoping) · Rating: 150kg',
    gallery:['ladder'],
@@ -2211,7 +2209,7 @@ function renderLangSelectors(){
 
 function closeMobileNav(){document.getElementById('mobile-nav-drawer').classList.remove('open');document.getElementById('nav-hamburger').classList.remove('open');}
 (function(){var btn=document.getElementById('nav-hamburger'),drawer=document.getElementById('mobile-nav-drawer');btn.addEventListener('click',function(e){e.stopPropagation();drawer.classList.toggle('open');btn.classList.toggle('open');});document.addEventListener('click',function(e){if(drawer.classList.contains('open')&&!drawer.contains(e.target)&&!btn.contains(e.target))closeMobileNav();});})();
-(function(){var nav=document.querySelector('nav');window.addEventListener('scroll',function(){nav.style.boxShadow=window.scrollY>40?'0 2px 24px rgba(25,41,58,.08)':'none';},{passive:true});})();
+(function(){var nav=document.querySelector('#main-nav');window.addEventListener('scroll',function(){nav.style.boxShadow=window.scrollY>40?'0 2px 24px rgba(25,41,58,.08)':'none';},{passive:true});})();
 (function(){var btn=document.getElementById('back-to-top');if(!btn)return;window.addEventListener('scroll',function(){btn.classList.toggle('visible',window.scrollY>600);},{passive:true});})();
 
 // ── Custom scrollbar (native one is hidden via CSS) ───────────────────────────
@@ -2262,8 +2260,8 @@ function closeMobileNav(){document.getElementById('mobile-nav-drawer').classList
   update();
 })();
 
-function statusClass(s){return({'Active':'status-active','In Development':'status-dev','Coming Soon':'status-soon','Canceled':'status-cancelled','Cancelled':'status-cancelled'})[s]||'status-active';}
-function statusIcon(s){return s==='Active'?'&#9679;':(s==='In Development'?'&#9680;':'&#9676;');}
+function statusClass(s){return({'Active':'status-active','Coming Soon':'status-soon','Canceled':'status-cancelled','Cancelled':'status-cancelled'})[s]||'status-active';}
+function statusIcon(s){return s==='Active'?'&#9679;':'&#9676;';}
 function productSlug(name){return(name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 function iconForName(name){
   var keys=Object.keys(ICON_PATHS);
@@ -2376,7 +2374,7 @@ function renderCatalogue(){
 // ── Catalogue sort ───────────────────────────────────────────────────────
 var _sortMode='featured';
 var SORT_LABELS={featured:'Featured',name:'Name (A–Z)',status:'Status'};
-var STATUS_ORDER={'Active':0,'In Development':1,'Coming Soon':2};
+var STATUS_ORDER={'Active':0,'Coming Soon':1,'Canceled':2};
 function sortProducts(list){
   var copy=list.slice();
   if(_sortMode==='name')copy.sort(function(a,b){return a.name.localeCompare(b.name);});
@@ -2623,9 +2621,8 @@ function renderPartnerDetail(slug){
   var idx=DEMO_PARTNERS.findIndex(function(p){return productSlug(p.name)===slug;});
   if(idx===-1)idx=0;
   var p=DEMO_PARTNERS[idx];
-  document.getElementById('pt-initial').textContent=p.name.charAt(0);
   var markEl=document.getElementById('pt-mark');
-  markEl.innerHTML=p.image?('<img class="partner-detail-logo" src="'+p.image+'" alt="">'):('<div class="partner-detail-initial" id="pt-initial">'+p.name.charAt(0)+'</div>');
+  markEl.innerHTML=p.image?('<img class="partner-detail-logo" src="'+p.image+'" alt="">'):('<div class="partner-detail-initial">'+p.name.charAt(0)+'</div>');
   document.getElementById('pt-name').textContent=p.name;
   document.getElementById('pt-type').textContent=p.type;
   document.getElementById('pt-desc').textContent=p.desc;
