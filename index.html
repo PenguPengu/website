@@ -1293,7 +1293,16 @@ var BETA_ISSUES_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15E
 
 function fixDiscordUrl(u){
   if(!u)return u;
-  if(u.indexOf('lh3.googleusercontent.com')!==-1)return u;
+  if(u.indexOf('lh3.googleusercontent.com')!==-1){
+    // Bare "/d/<fileId>" links with no size suffix are a known-unreliable
+    // hotlinking pattern — this was never an officially supported way to
+    // embed a Drive file, and Google's serving infrastructure routes the
+    // bare/no-size request less consistently than a sized one. Appending
+    // "=s0" (0 = original size, no actual resizing) routes through the
+    // more stable path — documented fix for exactly this symptom.
+    if(!/=(s|w|h)\d/.test(u))return u+'=s0';
+    return u;
+  }
   if(u.indexOf('drive.google.com')!==-1)return u;
   // Previously rewrote cdn.discordapp.com → media.discordapp.net here. Discord
   // signs these URLs (the ?ex=&is=&hm= params) against the exact host+path
