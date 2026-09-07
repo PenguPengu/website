@@ -1295,9 +1295,27 @@ function fixDiscordUrl(u){
   if(!u)return u;
   if(u.indexOf('lh3.googleusercontent.com')!==-1)return u;
   if(u.indexOf('drive.google.com')!==-1)return u;
-  if(u.indexOf('cdn.discordapp.com')!==-1)return u.replace('cdn.discordapp.com','media.discordapp.net');
+  // Previously rewrote cdn.discordapp.com → media.discordapp.net here. Discord
+  // signs these URLs (the ?ex=&is=&hm= params) against the exact host+path
+  // they were issued for, so swapping the domain risked invalidating an
+  // otherwise-still-valid link immediately rather than just leaving it to
+  // expire naturally. Left as-is now — these are meant to be temporary
+  // anyway (the bot's /push command re-uploads to Drive for a permanent
+  // link; a raw Discord URL showing up here means that upload silently
+  // failed and fell back to the original attachment link).
   return u;
 }
+// Broken images — an expired Discord link, a deleted Drive file, any bad URL
+// from the sheet — fail gracefully (just hides the element; every image
+// container already has its own subtle background, so this leaves a plain
+// empty tile instead of the browser's default broken-image icon) instead of
+// needing an onerror handler hand-added to every single <img> we generate.
+// The 'error' event doesn't bubble, but it does fire during the capture
+// phase, so this one listener catches every image on the site, including
+// ones rendered after this line runs.
+document.addEventListener('error',function(e){
+  if(e.target.tagName==='IMG')e.target.style.display='none';
+},true);
 
 function parseCSV(text){
   text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
