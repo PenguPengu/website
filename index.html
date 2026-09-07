@@ -182,6 +182,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 @keyframes heroLoadPulse{0%,100%{opacity:.2;}50%{opacity:.55;}}
 .hero-scene-cap{position:absolute;bottom:0;left:0;right:0;padding:16px 22px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);opacity:.6;background:linear-gradient(to top,rgba(0,0,0,.35),transparent);}
 .hero-scene-dots{position:absolute;bottom:16px;right:18px;display:flex;gap:7px;z-index:5;}
+.hero-scene-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(247,239,230,.9);color:var(--navy);border:1px solid rgba(25,41,58,.15);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;font-size:15px;transition:.2s var(--ease);opacity:0;border-radius:var(--r-full);}
+.hero-scene-wrap:hover .hero-scene-nav{opacity:1;}
+.hero-scene-nav:hover{background:var(--navy);color:var(--cream);transform:translateY(-50%) scale(1.08);}
+.hero-scene-nav.prev{left:14px;}.hero-scene-nav.next{right:14px;}
 .hs-dot{width:7px;height:7px;border-radius:50%;background:var(--cream);opacity:.3;cursor:pointer;border:none;padding:0;transition:.2s var(--ease);}
 .hs-dot.active{opacity:.95;transform:scale(1.3);}
 
@@ -294,7 +298,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-gal-cell{aspect-ratio:1;overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.06);border-radius:var(--r-sm);}
 .pd-gal-cell img{width:100%;height:100%;object-fit:cover;transition:opacity .2s var(--ease),transform .3s var(--ease);}
 .pd-gal-cell:hover img{opacity:.85;transform:scale(1.06);}
-.pd-update-entry{padding:22px 0;border-bottom:1px solid rgba(247,239,230,.1);}
+.pd-update-entry{padding:22px 0;border-bottom:1px solid rgba(247,239,230,.1);scroll-margin-top:150px;}
 .pd-update-entry:last-child{border-bottom:none;}
 .pd-update-entry-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
 .pd-update-entry-date{font-size:8px;letter-spacing:.2em;text-transform:uppercase;opacity:.4;}
@@ -312,6 +316,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-timeline-rail{width:14px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0;position:sticky;top:130px;padding-top:6px;}
 .pd-timeline-rail::before{content:'';position:absolute;top:6px;bottom:6px;width:1px;background:rgba(247,239,230,.15);}
 .pd-timeline-dot{width:9px;height:9px;border-radius:50%;background:rgba(247,239,230,.18);border:none;cursor:pointer;flex-shrink:0;position:relative;z-index:1;margin:11px 0;padding:0;transition:background .2s var(--ease),transform .2s var(--ease);}
+.pd-timeline-date{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:8px;letter-spacing:.1em;text-transform:uppercase;opacity:.4;white-space:nowrap;pointer-events:none;}
 .pd-timeline-dot:hover{transform:scale(1.3);}
 .pd-timeline-dot.active{background:var(--gold);transform:scale(1.4);}
 .pd-updates-list{flex:1;min-width:0;}
@@ -601,8 +606,10 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         <a href="?page=partners" onclick="goTo(event,'partners')" class="btn-ghost" data-i18n="hero_view_partners">View Partners</a>
       </div>
     </div>
-    <div class="hero-scene-wrap">
+    <div class="hero-scene-wrap" id="hero-scene-wrap">
       <div class="hero-scene-frame" id="hero-scene-frame"></div>
+      <button class="hero-scene-nav prev" onclick="goHeroScene(heroSceneIdx-1,true)" aria-label="Previous scene">&#8592;</button>
+      <button class="hero-scene-nav next" onclick="goHeroScene(heroSceneIdx+1,true)" aria-label="Next scene">&#8594;</button>
       <div class="hero-scene-dots" id="hero-scene-dots"></div>
     </div>
   </section>
@@ -752,7 +759,12 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
       <p class="page-eyebrow" id="all-updates-eyebrow"></p>
       <h1 class="page-title" id="all-updates-title">All Updates</h1>
     </div>
-    <div id="all-updates-feed"></div>
+    <div class="pd-updates-layout">
+      <div class="pd-timeline-rail" id="all-updates-timeline-rail"></div>
+      <div class="pd-updates-list">
+        <div id="all-updates-feed"></div>
+      </div>
+    </div>
   </div>
 </main>
 
@@ -2509,9 +2521,10 @@ var HERO_SCENES=[
   {icon:'aurora',label:'Northern lights over open water'},
   {icon:'anchor',label:'Built for the long haul'}
 ];
-var heroSceneIdx=0,_heroScenesRendered=false;
+var heroSceneIdx=0,_heroScenesRendered=false,_heroAutoTimer=null;
+var HERO_AUTOPLAY_MS=5500;
 function renderHeroScenes(){
-  var frame=document.getElementById('hero-scene-frame'),dots=document.getElementById('hero-scene-dots');
+  var frame=document.getElementById('hero-scene-frame'),dots=document.getElementById('hero-scene-dots'),wrap=document.getElementById('hero-scene-wrap');
   if(!frame||_heroScenesRendered)return; // only build the DOM once — repeated home visits shouldn't reset which scene you had selected
   _heroScenesRendered=true;
   frame.innerHTML=HERO_SCENES.map(function(s,i){
@@ -2524,14 +2537,32 @@ function renderHeroScenes(){
       :iconSVG(s.icon,120,1.6);
     return '<div class="hero-scene'+(i===0?' active':'')+'" data-i="'+i+'">'+media+(s.label?('<div class="hero-scene-cap">'+escapeHtml(s.label)+'</div>'):'')+'</div>';
   }).join('');
-  dots.innerHTML=HERO_SCENES.map(function(_,i){return '<button class="hs-dot'+(i===0?' active':'')+'" onclick="goHeroScene('+i+')" aria-label="Scene '+(i+1)+' of '+HERO_SCENES.length+'"></button>';}).join('');
+  dots.innerHTML=HERO_SCENES.map(function(_,i){return '<button class="hs-dot'+(i===0?' active':'')+'" onclick="goHeroScene('+i+',true)" aria-label="Scene '+(i+1)+' of '+HERO_SCENES.length+'"></button>';}).join('');
+
+  if(wrap){
+    wrap.addEventListener('mouseenter',stopHeroAutoRotate);
+    wrap.addEventListener('mouseleave',startHeroAutoRotate);
+  }
+  startHeroAutoRotate();
 }
-function goHeroScene(i){
+function startHeroAutoRotate(){
+  stopHeroAutoRotate();
+  if(HERO_SCENES.length<2)return;
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  _heroAutoTimer=setInterval(function(){goHeroScene(heroSceneIdx+1,false);},HERO_AUTOPLAY_MS);
+}
+function stopHeroAutoRotate(){
+  if(_heroAutoTimer){clearInterval(_heroAutoTimer);_heroAutoTimer=null;}
+}
+function goHeroScene(i,manual){
   var scenes=document.querySelectorAll('.hero-scene'),dots=document.querySelectorAll('.hs-dot');
   if(!scenes.length)return;
+  var n=scenes.length;
+  i=((i%n)+n)%n;
   scenes[heroSceneIdx].classList.remove('active');dots[heroSceneIdx].classList.remove('active');
   heroSceneIdx=i;
   scenes[i].classList.add('active');dots[i].classList.add('active');
+  if(manual)startHeroAutoRotate(); // manual pick resets the clock instead of jumping again right away
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2686,11 +2717,11 @@ function renderProductDetail(slug){
   var previewUpdates=updates.slice(0,previewCount);
   _pdUpdateResolvedImages=[];
   document.getElementById('pd-updates-feed').innerHTML=previewUpdates.length?
-    previewUpdates.map(function(u,i){return buildUpdateEntryHtml(u,i,_pdUpdateResolvedImages,'_pdUpdateResolvedImages');}).join(''):
+    previewUpdates.map(function(u,i){return buildUpdateEntryHtml(u,i,_pdUpdateResolvedImages,'_pdUpdateResolvedImages','pd-update');}).join(''):
     '<p style="opacity:.4;font-size:11px;letter-spacing:.1em;text-transform:uppercase">No updates yet</p>';
   var seeMoreUpdatesBtn=document.getElementById('pd-updates-see-more');
   seeMoreUpdatesBtn.style.display=updates.length>previewCount?'inline-flex':'none';
-  setupTimelineRail(previewUpdates);
+  setupTimelineRail(previewUpdates,'pd-timeline-rail','pd-updates-feed','pd-update');
   if(window._updateCustomScrollbar)window._updateCustomScrollbar();
   retranslateActivePage();
 }
@@ -2705,8 +2736,10 @@ function getAllUpdatePhotos(updates){
 // product page's short preview list and the full "all updates" page, so
 // they stay visually identical. registryVarName is the actual global
 // variable name (as a string) to reference in the click handlers, since the
-// two call sites store resolved images in different arrays.
-function buildUpdateEntryHtml(u,i,imagesRegistry,registryVarName){
+// two call sites store resolved images in different arrays. idPrefix keeps
+// each list's entry ids distinct so the two never collide when both exist
+// in the DOM at once (one just hidden on the inactive page).
+function buildUpdateEntryHtml(u,i,imagesRegistry,registryVarName,idPrefix){
   var galleryHtml='';
   if(u.images&&u.images.length){
     var imgs=resolveUpdateImages(u.images);
@@ -2721,31 +2754,82 @@ function buildUpdateEntryHtml(u,i,imagesRegistry,registryVarName){
     }).join('')+'</div>'+
     (overflow>0?'<button class="pd-update-see-more" onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')">See all '+imgs.length+' photos →</button>':'');
   }
-  return '<div class="pd-update-entry" id="pd-update-'+i+'"><div class="pd-update-entry-header"><span class="pd-update-entry-date">'+u.date+'</span>'+(i===0?'<span class="pd-update-entry-badge">Latest</span>':'')+'</div><div class="pd-update-entry-title">'+u.title+'</div><div class="pd-update-entry-body">'+u.body+'</div>'+galleryHtml+'</div>';
+  return '<div class="pd-update-entry" id="'+idPrefix+'-'+i+'"><div class="pd-update-entry-header"><span class="pd-update-entry-date">'+u.date+'</span>'+(i===0?'<span class="pd-update-entry-badge">Latest</span>':'')+'</div><div class="pd-update-entry-title">'+u.title+'</div><div class="pd-update-entry-body">'+u.body+'</div>'+galleryHtml+'</div>';
 }
 // Scroll-spy timeline rail — one dot per update currently shown on the page,
-// highlighting whichever is in view as you scroll, click a dot to jump.
-var _timelineObserver=null;
-function setupTimelineRail(updates){
-  var rail=document.getElementById('pd-timeline-rail');
+// highlighting whichever is closest to a reference line near the top of the
+// viewport as you scroll (recalculated continuously on scroll rather than
+// relying on IntersectionObserver's enter/exit thresholds, which could skip
+// highlighting a short entry entirely if it never crossed the threshold at
+// a normal scroll speed — this "closest wins" approach always lands on
+// exactly one dot, so nothing ever gets missed). Click a dot to jump.
+// Dates are labeled on the newest (top) and oldest (bottom) dot at minimum.
+var _timelineScrollHandler=null;
+function setupTimelineRail(updates,railId,feedId,idPrefix){
+  var rail=document.getElementById(railId);
   if(!rail)return;
-  if(_timelineObserver){_timelineObserver.disconnect();_timelineObserver=null;}
+  if(_timelineScrollHandler){window.removeEventListener('scroll',_timelineScrollHandler);_timelineScrollHandler=null;}
   if(updates.length<2){rail.innerHTML='';rail.style.display='none';return;}
   rail.style.display='flex';
-  rail.innerHTML=updates.map(function(u,i){return '<button class="pd-timeline-dot'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="scrollToUpdate('+i+')" aria-label="Jump to update '+(i+1)+'"></button>';}).join('');
-  if(!('IntersectionObserver' in window))return;
-  _timelineObserver=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(!entry.isIntersecting)return;
-      var idx=entry.target.id.replace('pd-update-','');
-      document.querySelectorAll('.pd-timeline-dot').forEach(function(d){d.classList.toggle('active',d.getAttribute('data-idx')===idx);});
-    });
-  },{threshold:.4,rootMargin:'-110px 0px -35% 0px'});
-  document.querySelectorAll('.pd-update-entry').forEach(function(el){_timelineObserver.observe(el);});
+  rail.innerHTML=updates.map(function(u,i){
+    var isEnd=(i===0||i===updates.length-1);
+    var label=isEnd&&u.date?('<span class="pd-timeline-date">'+u.date+'</span>'):'';
+    return '<button class="pd-timeline-dot'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="scrollToUpdate('+i+',\''+feedId+'\',\''+idPrefix+'\',\''+railId+'\')" aria-label="Jump to update '+(i+1)+' of '+updates.length+'">'+label+'</button>';
+  }).join('');
+
+  var feedEl=document.getElementById(feedId);
+  function updateActiveDot(){
+    if(Date.now()<_timelineSuppressUntil)return; // a manual click just set this — don't fight it mid-animation
+    if(!feedEl)return;
+    var entries=feedEl.querySelectorAll('.pd-update-entry');
+    if(!entries.length)return;
+    // Map however much of the ACHIEVABLE scroll range has been used onto
+    // the entries block's own cumulative height — not a fixed formula on
+    // window.scrollY directly. That was the actual bug in the first
+    // rewrite: shifting scrollY by a constant offset is still fundamentally
+    // capped by the same physical scroll ceiling as the original approach,
+    // so it didn't really decouple anything — an entry whose natural
+    // position needed a scrollY beyond what the page can physically reach
+    // was still unreachable no matter how the formula was rearranged.
+    // Rescaling the achievable range [scrollStart, maxScroll] onto [0,
+    // total] instead means every entry gets a real, reachable share
+    // regardless of whether the page has more or less room to scroll than
+    // the entries block is tall.
+    var firstTop=entries[0].getBoundingClientRect().top+window.scrollY;
+    var cumulative=[0],total=0;
+    entries.forEach(function(el){total+=el.getBoundingClientRect().height;cumulative.push(total);});
+    var scrollStart=firstTop-150;
+    var maxScroll=document.documentElement.scrollHeight-window.innerHeight;
+    var progress=maxScroll>scrollStart?(window.scrollY-scrollStart)/(maxScroll-scrollStart):1;
+    progress=Math.max(0,Math.min(1,progress));
+    var traveled=progress*total;
+    var activeIdx=0;
+    for(var i=0;i<entries.length;i++){if(traveled>=cumulative[i])activeIdx=i;}
+    rail.querySelectorAll('.pd-timeline-dot').forEach(function(d,i){d.classList.toggle('active',i===activeIdx);});
+  }
+  var ticking=false;
+  _timelineScrollHandler=function(){
+    if(!ticking){ticking=true;requestAnimationFrame(function(){ticking=false;updateActiveDot();});}
+  };
+  window.addEventListener('scroll',_timelineScrollHandler,{passive:true});
+  updateActiveDot();
 }
-function scrollToUpdate(i){
-  var el=document.getElementById('pd-update-'+i);
-  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+var _timelineSuppressUntil=0;
+function scrollToUpdate(i,feedId,idPrefix,railId){
+  var feedEl=document.getElementById(feedId);
+  var el=feedEl?feedEl.querySelector('#'+idPrefix+'-'+i):null;
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  // Set instantly on click rather than waiting for the scroll-spy to settle
+  // — a clicked dot should feel like it responded immediately, and this
+  // stays correct even in edge cases (e.g. clicking an entry so close to
+  // the bottom of the page that it can't scroll all the way to the
+  // reference line). Also briefly suppress the scroll-spy recalculation —
+  // a scroll event already queued from just before the click (or the smooth
+  // scroll animation this click itself starts) would otherwise land its
+  // recalculation right after this and silently overwrite it back.
+  var rail=document.getElementById(railId);
+  if(rail)rail.querySelectorAll('.pd-timeline-dot').forEach(function(d,idx){d.classList.toggle('active',idx===i);});
+  _timelineSuppressUntil=Date.now()+700;
 }
 function goToAllUpdates(e,prodSlugStr){
   if(e)e.preventDefault();
@@ -2766,8 +2850,9 @@ function renderAllUpdates(prodSlugStr){
   document.getElementById('all-updates-eyebrow').textContent=p.name;
   _allUpdatesResolvedImages=[];
   document.getElementById('all-updates-feed').innerHTML=updates.length?
-    updates.map(function(u,i){return buildUpdateEntryHtml(u,i,_allUpdatesResolvedImages,'_allUpdatesResolvedImages');}).join(''):
+    updates.map(function(u,i){return buildUpdateEntryHtml(u,i,_allUpdatesResolvedImages,'_allUpdatesResolvedImages','all-update');}).join(''):
     '<p style="opacity:.4;font-size:11px;letter-spacing:.1em;text-transform:uppercase">No updates yet</p>';
+  setupTimelineRail(updates,'all-updates-timeline-rail','all-updates-feed','all-update');
 }
 function renderPdGalleryMain(){
   var main=document.getElementById('pd-gallery-main');
