@@ -92,6 +92,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .nav-search-btn{background:none;border:1.5px solid rgba(25,41,58,.25);color:var(--navy);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s var(--ease),transform .2s var(--ease),background .2s var(--ease);border-radius:var(--r-full);}
 .lang-selector{position:relative;}
 .lang-btn{display:flex;align-items:center;gap:7px;background:none;border:1.5px solid rgba(25,41,58,.25);color:var(--navy);font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:8px 14px;cursor:pointer;transition:border-color .2s var(--ease),background .2s var(--ease);border-radius:var(--r-full);}
+.flag-icon{width:16px;height:12px;flex-shrink:0;border-radius:2px;box-shadow:0 0 0 1px rgba(25,41,58,.15);display:inline-block;vertical-align:middle;}
 .lang-btn:hover{border-color:var(--navy);background:rgba(25,41,58,.05);}
 .lang-btn svg{flex-shrink:0;transition:transform .2s var(--ease);}
 .lang-selector.open .lang-btn svg{transform:rotate(180deg);}
@@ -171,7 +172,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .dark-page .btn-ghost{color:var(--cream);border-color:rgba(247,239,230,.4);}
 .dark-page .btn-ghost:hover{border-color:var(--cream);background:rgba(247,239,230,.08);}
 .hero-scene-wrap{width:100%;max-width:420px;margin-left:auto;position:relative;}
-.hero-scene-frame{aspect-ratio:1/1;background:var(--navy);border-radius:var(--r-lg);box-shadow:var(--shadow-dark);position:relative;overflow:hidden;}
+.hero-scene-frame{aspect-ratio:4/3;background:var(--navy);border-radius:var(--r-lg);box-shadow:var(--shadow-dark);position:relative;overflow:hidden;}
 .hero-scene{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;display:flex;align-items:center;justify-content:center;color:var(--gold);}
 .hero-scene.active{opacity:1;}
 .hero-scene-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease;}
@@ -192,6 +193,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .section-title em{font-style:italic;font-weight:400;opacity:.5;}
 
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;}
+.reveal-pending{opacity:0;transform:translateY(18px);}
+.reveal-pending.reveal-in{opacity:1;transform:translateY(0);transition:opacity .55s var(--ease),transform .55s var(--ease);}
+@media(prefers-reduced-motion:reduce){.reveal-pending{opacity:1;transform:none;transition:none;}}
 .stat-block{border-left:2px solid rgba(25,41,58,.15);padding-left:18px;border-radius:var(--r-xs);}
 .stat-num{font-family:var(--serif);font-size:36px;font-weight:900;letter-spacing:-.02em;line-height:1;}
 .stat-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;opacity:.45;margin-top:6px;}
@@ -250,15 +254,22 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 
 /* ── PRODUCT DETAIL PAGE ──────────────────────────────────────────────────── */
 .pd-gallery{position:relative;background:rgba(247,239,230,.04);border:1px solid rgba(247,239,230,.1);margin-bottom:0;border-radius:var(--r-lg);overflow:hidden;}
+.pd-gallery.entering{animation:pdGalleryEnter .7s var(--ease);}
+@keyframes pdGalleryEnter{0%{opacity:0;transform:scale(1.04);}100%{opacity:1;transform:scale(1);}}
+@media(prefers-reduced-motion:reduce){.pd-gallery.entering{animation:none;}}
 .pd-gallery-main{width:100%;aspect-ratio:21/9;position:relative;overflow:hidden;cursor:zoom-in;display:flex;align-items:center;justify-content:center;}
 .pd-gallery-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease);}
 .pd-gallery-main:hover img{transform:scale(1.03);}
+.pd-gallery-name{position:absolute;left:0;bottom:0;right:0;padding:34px 24px 16px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);color:var(--cream);font-family:var(--serif);font-weight:900;font-size:22px;letter-spacing:-.01em;pointer-events:none;z-index:4;}
 .pd-gallery-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(247,239,230,.9);color:var(--navy);border:1px solid rgba(25,41,58,.15);width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;font-size:16px;transition:.2s var(--ease);opacity:0;border-radius:var(--r-full);}
 .pd-gallery:hover .pd-gallery-nav{opacity:1;}
 .pd-gallery-nav:hover{background:var(--navy);color:var(--cream);transform:translateY(-50%) scale(1.08);}
 .pd-gallery-nav.prev{left:14px;}.pd-gallery-nav.next{right:14px;}
 .pd-gallery-counter{position:absolute;bottom:14px;right:16px;background:rgba(25,41,58,.6);color:var(--cream);font-size:9px;letter-spacing:.15em;padding:5px 12px;z-index:5;pointer-events:none;border-radius:var(--r-full);}
-.pd-gallery-thumbs{display:flex;gap:8px;padding:10px;background:rgba(247,239,230,.03);border-top:1px solid rgba(247,239,230,.08);overflow-x:auto;}
+.pd-gallery-thumbs{display:flex;gap:8px;padding:10px;background:rgba(247,239,230,.03);border-top:1px solid rgba(247,239,230,.08);overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--gold) transparent;}
+.pd-gallery-thumbs::-webkit-scrollbar{height:6px;}
+.pd-gallery-thumbs::-webkit-scrollbar-track{background:transparent;}
+.pd-gallery-thumbs::-webkit-scrollbar-thumb{background:var(--gold);border-radius:var(--r-full);}
 .pd-gallery-thumb{width:56px;height:56px;flex:0 0 56px;object-fit:cover;cursor:pointer;border:2px solid transparent;opacity:.55;transition:.2s var(--ease);border-radius:var(--r-sm);}
 .pd-gallery-thumb:hover{opacity:.85;transform:translateY(-2px);}
 .pd-gallery-thumb.active{border-color:var(--cream);opacity:1;}
@@ -271,7 +282,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-details{font-size:11px;line-height:1.85;opacity:.45;border-top:1px solid rgba(247,239,230,.12);padding-top:14px;}
 .pd-status-badge{align-self:flex-start;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:0 16px;border:1px solid;height:36px;display:flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:var(--r-full);}
 .pd-sidebar-actions{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
-.pd-cta-btn{width:100%;background:var(--cream);color:var(--navy);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:0 14px;border:none;cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-full);transition:transform .2s var(--ease),box-shadow .2s var(--ease),opacity .2s var(--ease);}
+.pd-cta-btn{width:100%;background:var(--cream);color:var(--navy);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:0 14px;border:none;cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-full);transition:transform .2s var(--ease),box-shadow .2s var(--ease),opacity .2s var(--ease);text-decoration:none;}
 .pd-cta-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);opacity:.92;}
 .pd-share-btn{width:100%;background:transparent;color:var(--cream);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:0 14px;border:1px solid rgba(247,239,230,.3);cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center;transition:.2s var(--ease);border-radius:var(--r-full);}
 .pd-share-btn:hover{border-color:rgba(247,239,230,.6);background:rgba(247,239,230,.06);}
@@ -290,12 +301,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-update-entry-badge{font-size:7px;letter-spacing:.18em;text-transform:uppercase;padding:3px 9px;border:1px solid rgba(111,207,151,.35);color:#6fcf97;background:rgba(111,207,151,.08);border-radius:var(--r-full);}
 .pd-update-entry-title{font-family:var(--serif);font-size:17px;font-weight:700;margin-bottom:7px;}
 .pd-update-entry-body{font-size:12px;line-height:1.85;opacity:.65;}
-.pd-update-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px;max-width:360px;}
-.pd-update-gallery-cell{aspect-ratio:1;border-radius:var(--r-md);overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.06);position:relative;}
+.pd-update-gallery{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.pd-update-gallery-cell{width:44px;height:44px;flex:0 0 44px;border-radius:var(--r-md);overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.06);position:relative;}
 .pd-update-gallery-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .15s;}
 .pd-update-gallery-cell:hover img{opacity:.85;}
 .pd-update-gallery-more{position:absolute;inset:0;background:rgba(25,41,58,.6);color:var(--cream);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
-.pd-update-see-more{background:none;border:none;color:inherit;opacity:.6;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;padding:0;margin-top:10px;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;}
+.pd-update-see-more{background:none;border:none;color:inherit;opacity:.6;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;padding:0;margin-top:10px;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;font-family:inherit;text-decoration:none;}
+.pd-section-sub{font-size:11px;opacity:.45;margin-top:6px;margin-bottom:18px;}
+.pd-updates-layout{display:flex;gap:20px;align-items:flex-start;}
+.pd-timeline-rail{width:14px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0;position:sticky;top:130px;padding-top:6px;}
+.pd-timeline-rail::before{content:'';position:absolute;top:6px;bottom:6px;width:1px;background:rgba(247,239,230,.15);}
+.pd-timeline-dot{width:9px;height:9px;border-radius:50%;background:rgba(247,239,230,.18);border:none;cursor:pointer;flex-shrink:0;position:relative;z-index:1;margin:11px 0;padding:0;transition:background .2s var(--ease),transform .2s var(--ease);}
+.pd-timeline-dot:hover{transform:scale(1.3);}
+.pd-timeline-dot.active{background:var(--gold);transform:scale(1.4);}
+.pd-updates-list{flex:1;min-width:0;}
 .pd-update-see-more:hover{opacity:1;}
 
 /* ── Full gallery page — a specific update's photos, mixed-size mosaic ───── */
@@ -354,6 +373,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .lightbox-nav:hover{background:rgba(255,255,255,.24);transform:translateY(-50%) scale(1.08);}
 .lightbox-nav.prev{left:20px;}.lightbox-nav.next{right:20px;}
 .lightbox-counter{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:10px;letter-spacing:.2em;}
+.lightbox-caption{position:absolute;top:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.75);font-size:10px;letter-spacing:.2em;text-transform:uppercase;background:rgba(255,255,255,.08);padding:8px 18px;border-radius:var(--r-full);display:none;}
+.lightbox-caption.show{display:block;}
 
 /* ── COMMUNITY PAGE ───────────────────────────────────────────────────────── */
 .channels-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:60px;}
@@ -685,6 +706,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
     </nav>
     <div class="pd-gallery" id="pd-gallery">
       <div class="pd-gallery-main" id="pd-gallery-main"></div>
+      <div class="pd-gallery-name" id="pd-gallery-name"></div>
       <div class="pd-gallery-thumbs" id="pd-gallery-thumbs" style="display:none"></div>
     </div>
     <div class="pd-layout">
@@ -701,18 +723,36 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         </div>
       </aside>
       <div class="pd-main">
-        <div class="pd-section">
-          <p class="section-eyebrow" data-i18n="pd_photo_album">Photo Album</p>
+        <div class="pd-section" id="pd-photos-section" style="display:none">
+          <p class="section-eyebrow">Update Photos</p>
+          <p class="pd-section-sub">Photos from the build updates below, all in one place.</p>
           <div class="pd-gal-grid" id="pd-gal-grid"></div>
-          <div class="load-more-wrap" id="pd-gal-more-wrap" style="display:none"><button class="load-more-btn" onclick="_pdGalleryLM.more()"></button></div>
+          <button class="pd-update-see-more" id="pd-photos-see-more" onclick="goToUpdateGallery(event,_currentProductSlug,'all')">See all photos →</button>
         </div>
         <div class="pd-section">
           <p class="section-eyebrow" data-i18n="pd_build_updates">Build Updates</p>
-          <div id="pd-updates-feed"></div>
-          <div class="load-more-wrap" id="pd-updates-more-wrap" style="display:none"><button class="load-more-btn" onclick="_pdUpdatesLM.more()"></button></div>
+          <div class="pd-updates-layout">
+            <div class="pd-timeline-rail" id="pd-timeline-rail"></div>
+            <div class="pd-updates-list">
+              <div id="pd-updates-feed"></div>
+              <button class="pd-update-see-more" id="pd-updates-see-more" onclick="goToAllUpdates(event,_currentProductSlug)">See all updates →</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+  </div>
+</main>
+
+<!-- ══════════════════════════════ ALL UPDATES (full list for one product) ══ -->
+<main class="page dark-page" data-page="product-updates">
+  <div class="page-inner">
+    <button class="back-link" id="all-updates-back-link" onclick="goBackToProductFromUpdates(event)">&#8592; Back to Product</button>
+    <div class="page-header">
+      <p class="page-eyebrow" id="all-updates-eyebrow"></p>
+      <h1 class="page-title" id="all-updates-title">All Updates</h1>
+    </div>
+    <div id="all-updates-feed"></div>
   </div>
 </main>
 
@@ -881,6 +921,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
   <button class="lightbox-nav prev" id="lb-prev" onclick="event.stopPropagation();lightboxNav(-1)">&#8592;</button>
   <img class="lightbox-img" id="lb-img" src="" alt="" onclick="event.stopPropagation()">
   <button class="lightbox-nav next" id="lb-next" onclick="event.stopPropagation();lightboxNav(1)">&#8594;</button>
+  <div class="lightbox-caption" id="lb-caption"></div>
   <div class="lightbox-counter" id="lb-counter"></div>
 </div>
 
@@ -1228,9 +1269,9 @@ var DEMO_VIDEOS=[
 ═══════════════════════════════════════════════════════════════════════════ */
 // ── Social links — edit these three to your real profiles. Used by the
 // Community page's YouTube/Discord/Steam cards. ─────────────────────────────
-var YOUTUBE_URL='https://www.youtube.com/@underwayco';
-var DISCORD_URL='https://discord.gg/your-invite-code';
-var STEAM_URL='https://store.steampowered.com/your-page';
+var YOUTUBE_URL='https://www.youtube.com/@Pengu672';
+var DISCORD_URL='https://discord.gg/vhBx3wm8WT';
+var STEAM_URL='https://steamcommunity.com/profiles/76561198811951629/';
 
 var PRODUCTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=0&single=true&output=csv';
 var ANNOUNCEMENTS_URL='https://docs.google.com/spreadsheets/d/e/2PACX-1vR-eKX1H15EFK77Si2hyU_PaGJr48Yzo9blhJ83I3BXJZ255FbRu6tNcqDHWzGAERxMZLdKMWuAPz7h/pub?gid=664706385&single=true&output=csv';
@@ -1573,7 +1614,7 @@ for(var _bi=0;_bi<6;_bi++)DEMO_BETA_ISSUES.push({title:_ISSUE_FILLER[_bi],severi
    ROUTER — real "pages" (query-string based so it works on static hosting
    with no server rewrites), driven by pushState + popstate.
 ═══════════════════════════════════════════════════════════════════════════ */
-var VALID_PAGES=['home','products','product','community','partners','partner','updates','faq','beta','notfound','gallery'];
+var VALID_PAGES=['home','products','product','community','partners','partner','updates','faq','beta','notfound','gallery','product-updates'];
 // ── Clean, shareable URLs ────────────────────────────────────────────────
 // Products get a bare root path (/ms-fridtjof-nansen) since that's the
 // content people actually share; partners get a small /partners/ prefix so
@@ -1827,6 +1868,7 @@ function render(page,slug){
   if(page==='beta')renderBeta();
   if(page==='notfound')renderNotFound(slug);
   if(page==='gallery')renderUpdateGallery(slug);
+  if(page==='product-updates')renderAllUpdates(slug);
 
   function activate(){
     document.querySelectorAll('.page').forEach(function(p){if(p!==target)p.classList.remove('is-active','page-leave');});
@@ -1923,17 +1965,22 @@ function retryPendingRedirect(){
    Sheets rather than hardcoded here, rather than something to hand-translate
    in this file.
 ═══════════════════════════════════════════════════════════════════════════ */
+// Flag emoji don't render as flags on Windows (or most non-Apple platforms)
+// — no flag glyphs in the system emoji font, so they just show as plain
+// two-letter text ("NO", "GB", etc). Small inline SVGs render identically
+// everywhere, same approach as every other icon in this file.
+function flagSVG(inner){return '<svg class="flag-icon" viewBox="0 0 22 16" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>';}
 var LANGUAGES=[
-  {code:'nb',label:'Norsk',flag:'🇳🇴'},
-  {code:'sv',label:'Svenska',flag:'🇸🇪'},
-  {code:'da',label:'Dansk',flag:'🇩🇰'},
-  {code:'fi',label:'Suomi',flag:'🇫🇮'},
-  {code:'en',label:'English',flag:'🇬🇧'},
-  {code:'de',label:'Deutsch',flag:'🇩🇪'},
-  {code:'nl',label:'Nederlands',flag:'🇳🇱'},
-  {code:'fr',label:'Français',flag:'🇫🇷'},
-  {code:'es',label:'Español',flag:'🇪🇸'},
-  {code:'it',label:'Italiano',flag:'🇮🇹'}
+  {code:'nb',label:'Norsk',flag:flagSVG('<rect width="22" height="16" fill="#BA0C2F"/><rect x="6" width="4" height="16" fill="#fff"/><rect y="6" width="22" height="4" fill="#fff"/><rect x="7" width="2" height="16" fill="#00205B"/><rect y="7" width="22" height="2" fill="#00205B"/>')},
+  {code:'sv',label:'Svenska',flag:flagSVG('<rect width="22" height="16" fill="#006AA7"/><rect x="6" width="4" height="16" fill="#FECC00"/><rect y="6" width="22" height="4" fill="#FECC00"/>')},
+  {code:'da',label:'Dansk',flag:flagSVG('<rect width="22" height="16" fill="#C60C30"/><rect x="6" width="3" height="16" fill="#fff"/><rect y="6" width="22" height="3" fill="#fff"/>')},
+  {code:'fi',label:'Suomi',flag:flagSVG('<rect width="22" height="16" fill="#fff"/><rect x="6" width="4" height="16" fill="#002F6C"/><rect y="6" width="22" height="4" fill="#002F6C"/>')},
+  {code:'en',label:'English',flag:flagSVG('<rect width="22" height="16" fill="#00247d"/><path d="M0 0L22 16M22 0L0 16" stroke="#fff" stroke-width="3"/><path d="M0 0L22 16M22 0L0 16" stroke="#cf142b" stroke-width="1.4"/><path d="M11 0V16M0 8H22" stroke="#fff" stroke-width="4.4"/><path d="M11 0V16M0 8H22" stroke="#cf142b" stroke-width="2.6"/>')},
+  {code:'de',label:'Deutsch',flag:flagSVG('<rect width="22" height="5.33" fill="#000"/><rect width="22" height="5.33" y="5.33" fill="#DD0000"/><rect width="22" height="5.34" y="10.66" fill="#FFCE00"/>')},
+  {code:'nl',label:'Nederlands',flag:flagSVG('<rect width="22" height="5.33" fill="#AE1C28"/><rect width="22" height="5.33" y="5.33" fill="#fff"/><rect width="22" height="5.34" y="10.66" fill="#21468B"/>')},
+  {code:'fr',label:'Français',flag:flagSVG('<rect width="7.33" height="16" fill="#002395"/><rect x="7.33" width="7.33" height="16" fill="#fff"/><rect x="14.66" width="7.34" height="16" fill="#ED2939"/>')},
+  {code:'es',label:'Español',flag:flagSVG('<rect width="22" height="16" fill="#AA151B"/><rect y="4" width="22" height="8" fill="#F1BF00"/>')},
+  {code:'it',label:'Italiano',flag:flagSVG('<rect width="7.33" height="16" fill="#009246"/><rect x="7.33" width="7.33" height="16" fill="#fff"/><rect x="14.66" width="7.34" height="16" fill="#CE2B37"/>')}
 ];
 var I18N={
   en:{nav_products:'Products',nav_community:'Community',nav_partners:'Partners',nav_updates:'Updates',footer_home:'Home',
@@ -2211,7 +2258,7 @@ function applyLanguage(code){
   safeLocalSet('underway_lang',CURRENT_LANG);
   var meta=LANGUAGES.filter(function(l){return l.code===CURRENT_LANG;})[0]||LANGUAGES.filter(function(l){return l.code==='en';})[0];
   var flagEl=document.getElementById('lang-current-flag'),codeEl=document.getElementById('lang-current-code');
-  if(flagEl&&meta)flagEl.textContent=meta.flag;
+  if(flagEl&&meta)flagEl.innerHTML=meta.flag;
   if(codeEl&&meta)codeEl.textContent=meta.code.toUpperCase();
   document.querySelectorAll('.lang-option').forEach(function(o){o.classList.toggle('active',o.getAttribute('data-lang')===CURRENT_LANG);});
   document.querySelectorAll('.mobile-lang-chip').forEach(function(o){o.classList.toggle('active',o.getAttribute('data-lang')===CURRENT_LANG);});
@@ -2383,6 +2430,53 @@ function renderHome(){
   grid.innerHTML=featured.map(buildProductCard).join('');
   wireProductCards(grid,featured);
 }
+// ── Scroll-triggered animations: stat numbers count up, and the featured
+// builds cards reveal one at a time — both fire once, the first time they
+// scroll into view (not replayed on every visit/scroll).
+function animateCountUp(el){
+  var raw=el.textContent.trim();
+  var m=raw.match(/^([\d,]+)(.*)$/);
+  if(!m)return;
+  var target=parseInt(m[1].replace(/,/g,''),10);
+  if(isNaN(target))return;
+  var hasCommas=m[1].indexOf(',')!==-1,suffix=m[2],durationMs=1200,startTs=null;
+  function tick(ts){
+    if(!startTs)startTs=ts;
+    var p=Math.min(1,(ts-startTs)/durationMs);
+    var eased=1-Math.pow(1-p,3);
+    var current=Math.round(target*eased);
+    el.textContent=(hasCommas?current.toLocaleString('en-US'):current)+suffix;
+    if(p<1)requestAnimationFrame(tick);else el.textContent=raw;
+  }
+  requestAnimationFrame(tick);
+}
+function initScrollAnimations(){
+  if(!('IntersectionObserver' in window))return;
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+
+  var statObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting)return;
+      statObserver.unobserve(entry.target);
+      animateCountUp(entry.target);
+    });
+  },{threshold:.6});
+  document.querySelectorAll('.stat-num').forEach(function(el){statObserver.observe(el);});
+
+  var gridObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting)return;
+      gridObserver.unobserve(entry.target);
+      var items=entry.target.children;
+      Array.prototype.forEach.call(items,function(item,i){
+        item.classList.add('reveal-pending');
+        setTimeout(function(){item.classList.add('reveal-in');},i*90);
+      });
+    });
+  },{threshold:.15});
+  var buildsGrid=document.getElementById('home-builds-grid');
+  if(buildsGrid&&buildsGrid.children.length)gridObserver.observe(buildsGrid);
+}
 var HERO_SCENES=[
   {icon:'glass',label:'Antarctic glass water, dawn'},
   {icon:'aurora',label:'Northern lights over open water'},
@@ -2470,7 +2564,7 @@ document.addEventListener('click',function(e){
    PRODUCT DETAIL PAGE
 ═══════════════════════════════════════════════════════════════════════════ */
 var _pdImages=[],_pdCurrent=0,_currentProductSlug=null,_pdUpdateResolvedImages=[];
-var _pdGalleryLM=null,_pdUpdatesLM=null;
+var _pdAllUpdates=[],_pdAllUpdatePhotosPreview=[];
 
 // Generic "load more" list — renders the first `pageSize` items into a
 // container, shows a button for the rest, and reveals more each click. Used
@@ -2529,34 +2623,124 @@ function renderProductDetail(slug){
   _pdImages=productImages(p);
   _pdCurrent=0;
   renderPdGalleryMain();
+  document.getElementById('pd-gallery-name').textContent=p.name;
+  var galleryEl=document.getElementById('pd-gallery');
+  galleryEl.classList.remove('entering');
+  void galleryEl.offsetWidth; // restart the animation on every product visit, not just the first
+  galleryEl.classList.add('entering');
   var thumbStrip=document.getElementById('pd-gallery-thumbs');
   if(_pdImages.length>1){thumbStrip.style.display='flex';thumbStrip.innerHTML=_pdImages.map(function(u,i){return '<img class="pd-gallery-thumb'+(i===0?' active':'')+'" src="'+u+'" onclick="pdGalShow('+i+')">';}).join('');}
   else{thumbStrip.style.display='none';}
-
-  _pdGalleryLM=makeLoadMoreList('pd-gal-grid','pd-gal-more-wrap',_pdImages,9,function(u,i){return '<div class="pd-gal-cell" onclick="openLightbox(_pdImages,'+i+')"><img src="'+u+'" loading="lazy"></div>';},'Show more photos','No photos yet');
 
   // Prefer live build-update rows from the Announcements sheet if any exist
   // for this product; otherwise fall back to the demo data's own updates.
   var liveUpdates=getBuildUpdatesFor(p.name);
   var updates=(liveUpdates&&liveUpdates.length)?liveUpdates:(p.updates||[]);
+  _pdAllUpdates=updates;
+
+  // "Update Photos" — every photo from every update, aggregated, distinct
+  // from the gallery above (which is the product's own official photos, not
+  // build-progress shots) so the two no longer show the same set twice.
+  var photosSection=document.getElementById('pd-photos-section');
+  var allUpdatePhotos=getAllUpdatePhotos(updates);
+  if(allUpdatePhotos.length){
+    photosSection.style.display='block';
+    var maxPreview=9;
+    document.getElementById('pd-gal-grid').innerHTML=allUpdatePhotos.slice(0,maxPreview).map(function(img,i){
+      return '<div class="pd-gal-cell" onclick="openLightbox(_pdAllUpdatePhotosPreview,'+i+')"><img src="'+img+'" loading="lazy"></div>';
+    }).join('');
+    _pdAllUpdatePhotosPreview=allUpdatePhotos.slice(0,maxPreview);
+    document.getElementById('pd-photos-see-more').style.display=allUpdatePhotos.length>0?'inline-flex':'none';
+  }else{
+    photosSection.style.display='none';
+  }
+
+  var previewCount=4;
+  var previewUpdates=updates.slice(0,previewCount);
   _pdUpdateResolvedImages=[];
-  _pdUpdatesLM=makeLoadMoreList('pd-updates-feed','pd-updates-more-wrap',updates,4,function(u,i){
-    var galleryHtml='';
-    if(u.images&&u.images.length){
-      var imgs=resolveUpdateImages(u.images);
-      _pdUpdateResolvedImages[i]=imgs;
-      var maxInline=3;
-      var shown=imgs.slice(0,maxInline);
-      var overflow=imgs.length-maxInline;
-      galleryHtml='<div class="pd-update-gallery" style="grid-template-columns:repeat('+Math.min(shown.length,3)+',1fr)">'+shown.map(function(img,idx){
-        var showMoreOverlay=(idx===maxInline-1)&&overflow>0;
-        var clickAttr=showMoreOverlay?('onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')"'):('onclick="openLightbox(_pdUpdateResolvedImages['+i+'],'+idx+')"');
-        return '<div class="pd-update-gallery-cell" '+clickAttr+'><img src="'+img+'" loading="lazy">'+(showMoreOverlay?'<div class="pd-update-gallery-more">+'+overflow+'</div>':'')+'</div>';
-      }).join('')+'</div>'+
-      (overflow>0?'<button class="pd-update-see-more" onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')">See all '+imgs.length+' photos →</button>':'');
-    }
-    return '<div class="pd-update-entry"><div class="pd-update-entry-header"><span class="pd-update-entry-date">'+u.date+'</span>'+(i===0?'<span class="pd-update-entry-badge">Latest</span>':'')+'</div><div class="pd-update-entry-title">'+u.title+'</div><div class="pd-update-entry-body">'+u.body+'</div>'+galleryHtml+'</div>';
-  },'Show older updates','No updates yet');
+  document.getElementById('pd-updates-feed').innerHTML=previewUpdates.length?
+    previewUpdates.map(function(u,i){return buildUpdateEntryHtml(u,i,_pdUpdateResolvedImages,'_pdUpdateResolvedImages');}).join(''):
+    '<p style="opacity:.4;font-size:11px;letter-spacing:.1em;text-transform:uppercase">No updates yet</p>';
+  var seeMoreUpdatesBtn=document.getElementById('pd-updates-see-more');
+  seeMoreUpdatesBtn.style.display=updates.length>previewCount?'inline-flex':'none';
+  setupTimelineRail(previewUpdates);
+  if(window._updateCustomScrollbar)window._updateCustomScrollbar();
+  retranslateActivePage();
+}
+function getAllUpdatePhotos(updates){
+  var all=[];
+  updates.forEach(function(u){
+    if(u.images&&u.images.length)resolveUpdateImages(u.images).forEach(function(img){all.push(img);});
+  });
+  return all;
+}
+// Shared renderer for one update entry + its mini-gallery — used both on the
+// product page's short preview list and the full "all updates" page, so
+// they stay visually identical. registryVarName is the actual global
+// variable name (as a string) to reference in the click handlers, since the
+// two call sites store resolved images in different arrays.
+function buildUpdateEntryHtml(u,i,imagesRegistry,registryVarName){
+  var galleryHtml='';
+  if(u.images&&u.images.length){
+    var imgs=resolveUpdateImages(u.images);
+    imagesRegistry[i]=imgs;
+    var maxInline=3;
+    var shown=imgs.slice(0,maxInline);
+    var overflow=imgs.length-maxInline;
+    galleryHtml='<div class="pd-update-gallery">'+shown.map(function(img,idx){
+      var showMoreOverlay=(idx===maxInline-1)&&overflow>0;
+      var clickAttr=showMoreOverlay?('onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')"'):('onclick="openLightbox('+registryVarName+'['+i+'],'+idx+')"');
+      return '<div class="pd-update-gallery-cell" '+clickAttr+'><img src="'+img+'" loading="lazy">'+(showMoreOverlay?'<div class="pd-update-gallery-more">+'+overflow+'</div>':'')+'</div>';
+    }).join('')+'</div>'+
+    (overflow>0?'<button class="pd-update-see-more" onclick="goToUpdateGallery(event,\''+_currentProductSlug+'\','+i+')">See all '+imgs.length+' photos →</button>':'');
+  }
+  return '<div class="pd-update-entry" id="pd-update-'+i+'"><div class="pd-update-entry-header"><span class="pd-update-entry-date">'+u.date+'</span>'+(i===0?'<span class="pd-update-entry-badge">Latest</span>':'')+'</div><div class="pd-update-entry-title">'+u.title+'</div><div class="pd-update-entry-body">'+u.body+'</div>'+galleryHtml+'</div>';
+}
+// Scroll-spy timeline rail — one dot per update currently shown on the page,
+// highlighting whichever is in view as you scroll, click a dot to jump.
+var _timelineObserver=null;
+function setupTimelineRail(updates){
+  var rail=document.getElementById('pd-timeline-rail');
+  if(!rail)return;
+  if(_timelineObserver){_timelineObserver.disconnect();_timelineObserver=null;}
+  if(updates.length<2){rail.innerHTML='';rail.style.display='none';return;}
+  rail.style.display='flex';
+  rail.innerHTML=updates.map(function(u,i){return '<button class="pd-timeline-dot'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="scrollToUpdate('+i+')" aria-label="Jump to update '+(i+1)+'"></button>';}).join('');
+  if(!('IntersectionObserver' in window))return;
+  _timelineObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting)return;
+      var idx=entry.target.id.replace('pd-update-','');
+      document.querySelectorAll('.pd-timeline-dot').forEach(function(d){d.classList.toggle('active',d.getAttribute('data-idx')===idx);});
+    });
+  },{threshold:.4,rootMargin:'-110px 0px -35% 0px'});
+  document.querySelectorAll('.pd-update-entry').forEach(function(el){_timelineObserver.observe(el);});
+}
+function scrollToUpdate(i){
+  var el=document.getElementById('pd-update-'+i);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function goToAllUpdates(e,prodSlugStr){
+  if(e)e.preventDefault();
+  navigate('product-updates',prodSlugStr,true);
+}
+function goBackToProductFromUpdates(e){
+  if(e)e.preventDefault();
+  navigate('product',_allUpdatesProductSlug,true);
+}
+var _allUpdatesProductSlug=null,_allUpdatesResolvedImages=[];
+function renderAllUpdates(prodSlugStr){
+  _allUpdatesProductSlug=prodSlugStr;
+  var idx=DEMO_PRODUCTS.findIndex(function(pr){return productSlug(pr.name)===prodSlugStr;});
+  if(idx===-1)idx=0;
+  var p=DEMO_PRODUCTS[idx]||{name:''};
+  var liveUpdates=getBuildUpdatesFor(p.name);
+  var updates=(liveUpdates&&liveUpdates.length)?liveUpdates:(p.updates||[]);
+  document.getElementById('all-updates-eyebrow').textContent=p.name;
+  _allUpdatesResolvedImages=[];
+  document.getElementById('all-updates-feed').innerHTML=updates.length?
+    updates.map(function(u,i){return buildUpdateEntryHtml(u,i,_allUpdatesResolvedImages,'_allUpdatesResolvedImages');}).join(''):
+    '<p style="opacity:.4;font-size:11px;letter-spacing:.1em;text-transform:uppercase">No updates yet</p>';
 }
 function renderPdGalleryMain(){
   var main=document.getElementById('pd-gallery-main');
@@ -2585,16 +2769,23 @@ function shareProduct(){
 /* ═══════════════════════════════════════════════════════════════════════════
    LIGHTBOX
 ═══════════════════════════════════════════════════════════════════════════ */
-var _lbImages=[],_lbCurrent=0;
-function openLightbox(urls,idx){
-  _lbImages=urls.slice();_lbCurrent=idx;
+var _lbImages=[],_lbCaptions=[],_lbCurrent=0;
+function openLightbox(urls,idx,captions){
+  _lbImages=urls.slice();_lbCaptions=captions?captions.slice():[];_lbCurrent=idx;
   document.getElementById('lb-img').src=_lbImages[idx];
   document.getElementById('lb-counter').textContent=(idx+1)+' / '+_lbImages.length;
   document.getElementById('lb-prev').style.display=_lbImages.length>1?'flex':'none';
   document.getElementById('lb-next').style.display=_lbImages.length>1?'flex':'none';
+  _updateLightboxCaption();
   document.getElementById('lightbox').classList.add('open');
 }
-function lightboxNav(dir){_lbCurrent=((_lbCurrent+dir)%_lbImages.length+_lbImages.length)%_lbImages.length;document.getElementById('lb-img').src=_lbImages[_lbCurrent];document.getElementById('lb-counter').textContent=(_lbCurrent+1)+' / '+_lbImages.length;}
+function _updateLightboxCaption(){
+  var el=document.getElementById('lb-caption');
+  var cap=_lbCaptions[_lbCurrent];
+  el.textContent=cap||'';
+  el.classList.toggle('show',!!cap);
+}
+function lightboxNav(dir){_lbCurrent=((_lbCurrent+dir)%_lbImages.length+_lbImages.length)%_lbImages.length;document.getElementById('lb-img').src=_lbImages[_lbCurrent];document.getElementById('lb-counter').textContent=(_lbCurrent+1)+' / '+_lbImages.length;_updateLightboxCaption();}
 function lightboxClose(){document.getElementById('lightbox').classList.remove('open');}
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2614,7 +2805,7 @@ function resolveUpdateImages(keys){
     return demoImg(k,tints[i%tints.length],'#c9a84c',700,700);
   });
 }
-var _galleryImages=[],_galleryProductSlug=null;
+var _galleryImages=[],_galleryCaptions=[],_galleryProductSlug=null;
 function goToUpdateGallery(e,prodSlugStr,updateIndex){
   if(e){e.preventDefault();e.stopPropagation();}
   navigate('gallery',prodSlugStr+'::'+updateIndex,true);
@@ -2626,7 +2817,7 @@ function goBackToProductFromGallery(e){
 function renderUpdateGallery(comboSlug){
   var parts=(comboSlug||'').split('::');
   var prodSlugStr=parts[0];
-  var updateIndex=parseInt(parts[1],10)||0;
+  var mode=parts[1];
   _galleryProductSlug=prodSlugStr;
 
   var idx=DEMO_PRODUCTS.findIndex(function(p){return productSlug(p.name)===prodSlugStr;});
@@ -2635,16 +2826,34 @@ function renderUpdateGallery(comboSlug){
 
   var liveUpdates=getBuildUpdatesFor(p.name);
   var updates=(liveUpdates&&liveUpdates.length)?liveUpdates:(p.updates||[]);
-  var u=updates[updateIndex]||updates[0]||{title:'Update',date:'',images:[]};
-
-  document.getElementById('gallery-eyebrow').textContent=p.name+(u.date?(' · '+u.date):'');
-  document.getElementById('gallery-title').textContent=u.title||'Update Photos';
-
-  _galleryImages=resolveUpdateImages(u.images||[]);
   var grid=document.getElementById('update-gallery-grid');
+
+  if(mode==='all'){
+    // Every photo from every update, combined — each one still shows which
+    // update it came from (in the eyebrow when zoomed into the lightbox).
+    document.getElementById('gallery-eyebrow').textContent=p.name;
+    document.getElementById('gallery-title').textContent='Update Photos';
+    _galleryImages=[];_galleryCaptions=[];
+    updates.forEach(function(u){
+      if(u.images&&u.images.length){
+        resolveUpdateImages(u.images).forEach(function(img){
+          _galleryImages.push(img);
+          _galleryCaptions.push(u.title||u.date||'');
+        });
+      }
+    });
+  }else{
+    var updateIndex=parseInt(mode,10)||0;
+    var u=updates[updateIndex]||updates[0]||{title:'Update',date:'',images:[]};
+    document.getElementById('gallery-eyebrow').textContent=p.name+(u.date?(' · '+u.date):'');
+    document.getElementById('gallery-title').textContent=u.title||'Update Photos';
+    _galleryImages=resolveUpdateImages(u.images||[]);
+    _galleryCaptions=[];
+  }
+
   grid.innerHTML=_galleryImages.map(function(img,i){
     var big=(i%5===0); // simple repeating pattern so the mosaic isn't just a flat uniform grid
-    return '<div class="update-gallery-cell'+(big?' big':'')+'" onclick="openLightbox(_galleryImages,'+i+')"><img src="'+img+'" loading="lazy"></div>';
+    return '<div class="update-gallery-cell'+(big?' big':'')+'" onclick="openLightbox(_galleryImages,'+i+',_galleryCaptions)"><img src="'+img+'" loading="lazy"></div>';
   }).join('');
 }
 
@@ -2688,8 +2897,7 @@ function closeVideoModal(){
 function renderPartnersGrid(){
   var grid=document.getElementById('partners-grid');
   grid.innerHTML=DEMO_PARTNERS.map(function(p,i){
-    var mark=p.image?('<img class="partner-logo" src="'+p.image+'" alt="" loading="lazy">'):('<div class="partner-initial">'+p.name.charAt(0)+'</div>');
-    return '<button class="partner-card" data-idx="'+i+'">'+mark+'<div class="partner-name">'+p.name+'</div><div class="partner-type">'+p.type+'</div><div class="partner-hint">Click to view →</div></button>';
+    return '<button class="partner-card" data-idx="'+i+'"><div class="partner-initial">'+p.name.charAt(0)+'</div><div class="partner-name">'+p.name+'</div><div class="partner-type">'+p.type+'</div><div class="partner-hint">Click to view →</div></button>';
   }).join('');
   grid.querySelectorAll('.partner-card').forEach(function(c){
     c.addEventListener('click',function(){
@@ -2708,7 +2916,7 @@ function renderPartnerDetail(slug){
   document.getElementById('pt-type').textContent=p.type;
   document.getElementById('pt-desc').textContent=p.desc;
   document.getElementById('pt-breadcrumb-current').textContent=p.name;
-  document.getElementById('pt-links').innerHTML=(p.links||[]).map(function(l){return '<a class="partner-detail-link" href="'+l.url+'" onclick="return false;">'+l.label+' →</a>';}).join('');
+  document.getElementById('pt-links').innerHTML=(p.links||[]).map(function(l){return '<a class="partner-detail-link" href="'+l.url+'" target="_blank" rel="noopener">'+l.label+' →</a>';}).join('');
 }
 // Breadcrumb's middle "type" segment jumps to the catalogue pre-searched
 // for that type, since there's no dedicated type-filter UI yet.
@@ -2891,6 +3099,7 @@ wireCommunityLinks();
 renderLangSelectors();
 applyLanguage(safeLocalGet('underway_lang')||'en');
 renderHome();
+initScrollAnimations();
 renderVideos();
 var initial=resolveRedirectParam()||readStateFromURL();
 safeReplaceState(initial,urlFor(initial.page,initial.slug));
