@@ -313,12 +313,10 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-update-see-more{background:none;border:none;color:inherit;opacity:.6;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;padding:0;margin-top:10px;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s;font-family:inherit;text-decoration:none;}
 .pd-section-sub{font-size:11px;opacity:.45;margin-top:6px;margin-bottom:18px;}
 .pd-updates-layout{display:flex;gap:20px;align-items:flex-start;}
-.pd-timeline-rail{width:14px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:0;position:sticky;top:130px;padding-top:6px;}
-.pd-timeline-rail::before{content:'';position:absolute;top:6px;bottom:6px;width:1px;background:rgba(247,239,230,.15);}
-.pd-timeline-dot{width:9px;height:9px;border-radius:50%;background:rgba(247,239,230,.18);border:none;cursor:pointer;flex-shrink:0;position:relative;z-index:1;margin:11px 0;padding:0;transition:background .2s var(--ease),transform .2s var(--ease);}
-.pd-timeline-date{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:8px;letter-spacing:.1em;text-transform:uppercase;opacity:.4;white-space:nowrap;pointer-events:none;}
-.pd-timeline-dot:hover{transform:scale(1.3);}
-.pd-timeline-dot.active{background:var(--gold);transform:scale(1.4);}
+.pd-timeline-rail{width:76px;flex-shrink:0;display:flex;flex-direction:column;gap:2px;position:sticky;top:130px;max-height:70vh;overflow-y:auto;}
+.pd-month-btn{background:none;border:none;color:inherit;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;opacity:.4;cursor:pointer;padding:6px 8px;border-radius:var(--r-sm);transition:opacity .15s var(--ease),background .15s var(--ease);}
+.pd-month-btn:hover{opacity:1;background:rgba(247,239,230,.06);}
+@media(max-width:900px){.pd-timeline-rail{display:none !important;}}
 .pd-updates-list{flex:1;min-width:0;}
 .pd-update-see-more:hover{opacity:1;}
 
@@ -1498,7 +1496,7 @@ function getBuildUpdatesFor(productName){
   }).slice().sort(function(a,b){return(b.timestamp||'').localeCompare(a.timestamp||'');});
   return rows.map(function(r,i){
     var parsed=_parseAnnouncementRow(r);
-    return{date:parsed.date,title:parsed.title||'Update',body:parsed.body,badge:i===0,images:parsed.images};
+    return{date:parsed.date,rawDate:r.timestamp,title:parsed.title||'Update',body:parsed.body,badge:i===0,images:parsed.images};
   });
 }
 // Live general announcements, newest first. Same null-until-loaded contract.
@@ -2703,7 +2701,11 @@ function renderProductDetail(slug){
   var allUpdatePhotos=getAllUpdatePhotos(updates);
   if(allUpdatePhotos.length){
     photosSection.style.display='block';
-    var maxPreview=9;
+    // Fewer photos on mobile before the "see all" button — each one takes
+    // the full screen width there, so 9 of them is a lot of scrolling to
+    // get through before ever reaching the actual updates below.
+    var isNarrow=window.matchMedia&&window.matchMedia('(max-width:700px)').matches;
+    var maxPreview=isNarrow?4:9;
     document.getElementById('pd-gal-grid').innerHTML=allUpdatePhotos.slice(0,maxPreview).map(function(img,i){
       return '<div class="pd-gal-cell" onclick="openLightbox(_pdAllUpdatePhotosPreview,'+i+')"><img src="'+img+'" loading="lazy"></div>';
     }).join('');
@@ -2721,7 +2723,7 @@ function renderProductDetail(slug){
     '<p style="opacity:.4;font-size:11px;letter-spacing:.1em;text-transform:uppercase">No updates yet</p>';
   var seeMoreUpdatesBtn=document.getElementById('pd-updates-see-more');
   seeMoreUpdatesBtn.style.display=updates.length>previewCount?'inline-flex':'none';
-  setupTimelineRail(previewUpdates,'pd-timeline-rail','pd-updates-feed','pd-update');
+  setupMonthJump(previewUpdates,'pd-timeline-rail','pd-updates-feed','pd-update');
   if(window._updateCustomScrollbar)window._updateCustomScrollbar();
   retranslateActivePage();
 }
@@ -2764,72 +2766,43 @@ function buildUpdateEntryHtml(u,i,imagesRegistry,registryVarName,idPrefix){
 // a normal scroll speed — this "closest wins" approach always lands on
 // exactly one dot, so nothing ever gets missed). Click a dot to jump.
 // Dates are labeled on the newest (top) and oldest (bottom) dot at minimum.
-var _timelineScrollHandler=null;
-function setupTimelineRail(updates,railId,feedId,idPrefix){
+// Month-jump navigator — replaces the old per-update dot timeline, which
+// didn't scale (some builds have 40+ updates; that's 40+ tiny dots crammed
+// into a rail, not usable). This scales with however many distinct months
+// of activity exist instead of however many updates exist, and skips the
+// scroll-spy "highlight where you currently are" complexity entirely —
+// click-to-jump is what was actually asked for here, not live tracking.
+function monthKeyFor(u){
+  var d=u.rawDate?new Date(u.rawDate):new Date(u.date);
+  if(isNaN(d.getTime()))return null;
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function monthLabelFor(key){
+  var parts=key.split('-');
+  var d=new Date(parseInt(parts[0],10),parseInt(parts[1],10)-1,1);
+  return d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+}
+function setupMonthJump(updates,railId,feedId,idPrefix){
   var rail=document.getElementById(railId);
   if(!rail)return;
-  if(_timelineScrollHandler){window.removeEventListener('scroll',_timelineScrollHandler);_timelineScrollHandler=null;}
-  if(updates.length<2){rail.innerHTML='';rail.style.display='none';return;}
+  var months=[],firstIdxForMonth={};
+  updates.forEach(function(u,i){
+    var key=monthKeyFor(u);
+    if(!key||firstIdxForMonth[key]!==undefined)return;
+    firstIdxForMonth[key]=i;
+    months.push(key);
+  });
+  // Not worth showing for a short list, or one that's all the same month.
+  if(updates.length<8||months.length<2){rail.innerHTML='';rail.style.display='none';return;}
   rail.style.display='flex';
-  rail.innerHTML=updates.map(function(u,i){
-    var isEnd=(i===0||i===updates.length-1);
-    var label=isEnd&&u.date?('<span class="pd-timeline-date">'+u.date+'</span>'):'';
-    return '<button class="pd-timeline-dot'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="scrollToUpdate('+i+',\''+feedId+'\',\''+idPrefix+'\',\''+railId+'\')" aria-label="Jump to update '+(i+1)+' of '+updates.length+'">'+label+'</button>';
+  rail.innerHTML=months.map(function(key){
+    return '<button class="pd-month-btn" onclick="scrollToUpdate('+firstIdxForMonth[key]+',\''+feedId+'\',\''+idPrefix+'\')">'+monthLabelFor(key)+'</button>';
   }).join('');
-
-  var feedEl=document.getElementById(feedId);
-  function updateActiveDot(){
-    if(Date.now()<_timelineSuppressUntil)return; // a manual click just set this — don't fight it mid-animation
-    if(!feedEl)return;
-    var entries=feedEl.querySelectorAll('.pd-update-entry');
-    if(!entries.length)return;
-    // Map however much of the ACHIEVABLE scroll range has been used onto
-    // the entries block's own cumulative height — not a fixed formula on
-    // window.scrollY directly. That was the actual bug in the first
-    // rewrite: shifting scrollY by a constant offset is still fundamentally
-    // capped by the same physical scroll ceiling as the original approach,
-    // so it didn't really decouple anything — an entry whose natural
-    // position needed a scrollY beyond what the page can physically reach
-    // was still unreachable no matter how the formula was rearranged.
-    // Rescaling the achievable range [scrollStart, maxScroll] onto [0,
-    // total] instead means every entry gets a real, reachable share
-    // regardless of whether the page has more or less room to scroll than
-    // the entries block is tall.
-    var firstTop=entries[0].getBoundingClientRect().top+window.scrollY;
-    var cumulative=[0],total=0;
-    entries.forEach(function(el){total+=el.getBoundingClientRect().height;cumulative.push(total);});
-    var scrollStart=firstTop-150;
-    var maxScroll=document.documentElement.scrollHeight-window.innerHeight;
-    var progress=maxScroll>scrollStart?(window.scrollY-scrollStart)/(maxScroll-scrollStart):1;
-    progress=Math.max(0,Math.min(1,progress));
-    var traveled=progress*total;
-    var activeIdx=0;
-    for(var i=0;i<entries.length;i++){if(traveled>=cumulative[i])activeIdx=i;}
-    rail.querySelectorAll('.pd-timeline-dot').forEach(function(d,i){d.classList.toggle('active',i===activeIdx);});
-  }
-  var ticking=false;
-  _timelineScrollHandler=function(){
-    if(!ticking){ticking=true;requestAnimationFrame(function(){ticking=false;updateActiveDot();});}
-  };
-  window.addEventListener('scroll',_timelineScrollHandler,{passive:true});
-  updateActiveDot();
 }
-var _timelineSuppressUntil=0;
-function scrollToUpdate(i,feedId,idPrefix,railId){
+function scrollToUpdate(i,feedId,idPrefix){
   var feedEl=document.getElementById(feedId);
   var el=feedEl?feedEl.querySelector('#'+idPrefix+'-'+i):null;
   if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
-  // Set instantly on click rather than waiting for the scroll-spy to settle
-  // — a clicked dot should feel like it responded immediately, and this
-  // stays correct even in edge cases (e.g. clicking an entry so close to
-  // the bottom of the page that it can't scroll all the way to the
-  // reference line). Also briefly suppress the scroll-spy recalculation —
-  // a scroll event already queued from just before the click (or the smooth
-  // scroll animation this click itself starts) would otherwise land its
-  // recalculation right after this and silently overwrite it back.
-  var rail=document.getElementById(railId);
-  if(rail)rail.querySelectorAll('.pd-timeline-dot').forEach(function(d,idx){d.classList.toggle('active',idx===i);});
-  _timelineSuppressUntil=Date.now()+700;
 }
 function goToAllUpdates(e,prodSlugStr){
   if(e)e.preventDefault();
@@ -2852,7 +2825,7 @@ function renderAllUpdates(prodSlugStr){
   document.getElementById('all-updates-feed').innerHTML=updates.length?
     updates.map(function(u,i){return buildUpdateEntryHtml(u,i,_allUpdatesResolvedImages,'_allUpdatesResolvedImages','all-update');}).join(''):
     '<p style="opacity:.4;font-size:11px;letter-spacing:.1em;text-transform:uppercase">No updates yet</p>';
-  setupTimelineRail(updates,'all-updates-timeline-rail','all-updates-feed','all-update');
+  setupMonthJump(updates,'all-updates-timeline-rail','all-updates-feed','all-update');
 }
 function renderPdGalleryMain(){
   var main=document.getElementById('pd-gallery-main');
