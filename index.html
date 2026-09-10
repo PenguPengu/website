@@ -29,6 +29,13 @@
 html{scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;}
 html::-webkit-scrollbar{width:0;height:0;}
 body{background:var(--cream);color:var(--navy);font-family:var(--mono);background-image:linear-gradient(rgba(25,41,58,.042) 1px,transparent 1px),linear-gradient(90deg,rgba(25,41,58,.042) 1px,transparent 1px);background-size:120px 120px;}
+/* Google Translate widget — we drive it entirely through our own dropdown
+   (the googtrans cookie), so its own default UI (the little widget box, the
+   banner iframe it tries to inject at the top of the page, the yellow
+   highlight it puts on hover over translated text) all get suppressed. */
+#google_translate_element,.goog-te-banner-frame,.goog-te-gadget-icon{display:none !important;}
+body{top:0 !important;}
+.goog-text-highlight{background:none !important;box-shadow:none !important;}
 a{color:inherit;}
 button{font-family:var(--mono);}
 
@@ -283,7 +290,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-name{font-family:var(--serif);font-size:clamp(24px,2.6vw,32px);font-weight:900;letter-spacing:-.02em;line-height:1.05;}
 .pd-type{font-size:10px;letter-spacing:.25em;text-transform:uppercase;opacity:.4;}
 .pd-desc{font-size:13px;line-height:1.85;opacity:.75;}
-.pd-details{font-size:11px;line-height:1.85;opacity:.45;border-top:1px solid rgba(247,239,230,.12);padding-top:14px;}
+.pd-details{font-size:13px;line-height:1.85;opacity:.75;}
 .pd-status-badge{align-self:flex-start;font-size:8px;letter-spacing:.2em;text-transform:uppercase;padding:0 16px;border:1px solid;height:36px;display:flex;align-items:center;justify-content:center;white-space:nowrap;border-radius:var(--r-full);}
 .pd-sidebar-actions{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
 .pd-cta-btn{width:100%;background:var(--cream);color:var(--navy);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:0 14px;border:none;cursor:pointer;height:44px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-full);transition:transform .2s var(--ease),box-shadow .2s var(--ease),opacity .2s var(--ease);text-decoration:none;}
@@ -293,6 +300,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 .pd-share-btn.copied{border-color:var(--cream);}
 .pd-main{min-width:0;}
 .pd-section{border-top:1px solid rgba(247,239,230,.12);padding:36px 0;}
+.pd-video-wrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:var(--r-lg);overflow:hidden;background:rgba(247,239,230,.05);margin-top:16px;}
+.pd-video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .pd-section:first-child{border-top:none;padding-top:0;}
 .pd-gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;}
 .pd-gal-cell{aspect-ratio:1;overflow:hidden;cursor:zoom-in;background:rgba(247,239,230,.06);border-radius:var(--r-sm);}
@@ -558,7 +567,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
 <nav id="main-nav">
   <button class="nav-logo" onclick="goTo(event,'home')">
     <span class="nav-logo-mark" id="nav-logo-mark"></span>
-    <span class="nav-logo-word">UNDERWAY</span>
+    <span class="nav-logo-word notranslate">UNDERWAY</span>
   </button>
   <ul class="nav-links">
     <li><a onclick="goTo(event,'products')" data-navpage="products" data-i18n="nav_products">Products</a></li>
@@ -728,6 +737,10 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
         </div>
       </aside>
       <div class="pd-main">
+        <div class="pd-section" id="pd-video-section" style="display:none">
+          <p class="section-eyebrow">Build Video</p>
+          <div class="pd-video-wrap" id="pd-video-wrap"></div>
+        </div>
         <div class="pd-section" id="pd-photos-section" style="display:none">
           <p class="section-eyebrow">Update Photos</p>
           <p class="pd-section-sub">Photos from the build updates below, all in one place.</p>
@@ -966,7 +979,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
 <footer>
   <div class="footer-logo">
     <span id="footer-logo-mark"></span>
-    <span class="footer-logo-word">UNDERWAY</span>
+    <span class="footer-logo-word notranslate">UNDERWAY</span>
   </div>
   <span class="footer-meta" data-i18n="footer_meta">Demo — placeholder content throughout</span>
   <ul class="footer-links">
@@ -1307,10 +1320,16 @@ function fixDiscordUrl(u){
     // Bare "/d/<fileId>" links with no size suffix are a known-unreliable
     // hotlinking pattern — this was never an officially supported way to
     // embed a Drive file, and Google's serving infrastructure routes the
-    // bare/no-size request less consistently than a sized one. Appending
-    // "=s0" (0 = original size, no actual resizing) routes through the
-    // more stable path — documented fix for exactly this symptom.
-    if(!/=(s|w|h)\d/.test(u))return u+'=s0';
+    // bare/no-size request less consistently than a sized one. Appending a
+    // size parameter routes through the more stable path. Using a bounded
+    // width (1600px — plenty for a fullscreen lightbox view) rather than
+    // "=s0" (the true original file, no resizing at all): a photo straight
+    // off a phone can be several MB at full resolution, and that larger,
+    // slower request seems to be more prone to failing outright than a
+    // reasonably-sized one — which reads as "no photo, just the lightbox's
+    // dark background" since it's the one place a failed image is most
+    // visible.
+    if(!/=(s|w|h)\d/.test(u))return u+'=w1600';
     return u;
   }
   if(u.indexOf('drive.google.com')!==-1)return u;
@@ -1324,16 +1343,41 @@ function fixDiscordUrl(u){
   // failed and fell back to the original attachment link).
   return u;
 }
-// Broken images — an expired Discord link, a deleted Drive file, any bad URL
-// from the sheet — fail gracefully (just hides the element; every image
-// container already has its own subtle background, so this leaves a plain
-// empty tile instead of the browser's default broken-image icon) instead of
-// needing an onerror handler hand-added to every single <img> we generate.
-// The 'error' event doesn't bubble, but it does fire during the capture
-// phase, so this one listener catches every image on the site, including
-// ones rendered after this line runs.
+// Broken images — an expired Discord link, a deleted Drive file, a Google
+// hotlink that just failed to resolve this one time, any bad URL from the
+// sheet — get ONE retry before giving up (Google Drive hotlinking is known
+// to be occasionally flaky rather than permanently broken, so a retry
+// genuinely recovers a real fraction of these), then fail gracefully: the
+// lightbox's single full-screen image gets a clear "unavailable" message
+// (a blank failure there is the most visible/confusing spot on the whole
+// site), everywhere else just hides the element (every image container
+// already has its own subtle background, so that leaves a plain empty tile
+// instead of the browser's default broken-image icon). One listener catches
+// every image site-wide instead of hand-adding onerror to each <img> we
+// generate — the 'error' event doesn't bubble, but it does fire during the
+// capture phase, so this still sees images rendered after this line runs.
 document.addEventListener('error',function(e){
-  if(e.target.tagName==='IMG')e.target.style.display='none';
+  var img=e.target;
+  if(img.tagName!=='IMG')return;
+  if(!img.dataset.retried){
+    img.dataset.retried='1';
+    var src=img.src;
+    // A hash fragment forces the browser to treat this as a distinct src
+    // (so it actually re-attempts the request rather than possibly no-op'ing
+    // on an identical string) without touching the URL Google actually
+    // receives — fragments are never sent over the network, so this is safe
+    // regardless of whether the URL already ends in a "=w1600"-style Google
+    // size directive or a normal "?query=string".
+    setTimeout(function(){img.src=src+'#retry-'+Date.now();},600);
+    return;
+  }
+  if(img.id==='lb-img'){
+    img.style.display='none';
+    var caption=document.getElementById('lb-caption');
+    if(caption){caption.textContent='Photo unavailable';caption.classList.add('show');}
+  }else{
+    img.style.display='none';
+  }
 },true);
 
 function parseCSV(text){
@@ -1416,7 +1460,7 @@ function loadProductsFromSheet(){
     var mapped=rows.map(function(row){
       var r={};Object.keys(row).forEach(function(k){r[k.toLowerCase()]=(row[k]||'').trim();});
       return{name:r.name||'',type:r.type||'',status:r.status||'Active',desc:r.desc||r.description||'',
-        details:r.details||'',image:r.image||'',cover_image:r.cover_image||'',cta:r.cta||'',cta_url:r.cta_url||'',dc_channel:r.dc_channel||''};
+        details:r.details||'',image:r.image||'',cover_image:r.cover_image||'',cta:r.cta||'',cta_url:r.cta_url||'',dc_channel:r.dc_channel||'',yt_video:r.yt_video||''};
     }).filter(function(p){return p.name;});
     if(!mapped.length)throw 0;
     DEMO_PRODUCTS.splice.apply(DEMO_PRODUCTS,[0,DEMO_PRODUCTS.length].concat(mapped));
@@ -2145,6 +2189,16 @@ var CURRENT_LANG='en';
    the key server-side and forwards translate requests — happy to build
    that alongside this if/when you're ready.
 ═══════════════════════════════════════════════════════════════════════════ */
+// NOT currently in use — the site now uses the free Google Translate
+// website widget instead (see setLang/setGoogleTranslateCookie and the
+// google_translate_element script near the end of the file), which costs
+// nothing and needs no API key. This paid-API system is left here dormant
+// and 100% inert (every function below bails out immediately with the key
+// empty, so it can never make a request or incur any cost) in case you ever
+// want more precise, cached, per-string control over dynamic content
+// translation instead of the widget's whole-page approach — just paste a
+// real key below to turn it back on. Until then, this whole block does
+// nothing.
 var GOOGLE_TRANSLATE_API_KEY=''; // <-- paste your key here to turn this on
 
 // Terms that must NEVER be translated — the brand name and third-party
@@ -2277,20 +2331,7 @@ function retranslateActivePage(){
 function safeLocalGet(key){try{return localStorage.getItem(key);}catch(e){return null;}}
 function safeLocalSet(key,val){try{localStorage.setItem(key,val);}catch(e){}}
 function applyLanguage(code){
-  var dict=I18N[code]||I18N.en;
-  CURRENT_LANG=I18N[code]?code:'en';
-  document.querySelectorAll('[data-i18n]').forEach(function(el){
-    var key=el.getAttribute('data-i18n');
-    if(dict[key]!==undefined)el.textContent=dict[key];
-  });
-  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
-    var key=el.getAttribute('data-i18n-html');
-    if(dict[key]!==undefined)el.innerHTML=dict[key];
-  });
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
-    var key=el.getAttribute('data-i18n-placeholder');
-    if(dict[key]!==undefined)el.setAttribute('placeholder',dict[key]);
-  });
+  CURRENT_LANG=code;
   document.documentElement.setAttribute('lang',CURRENT_LANG);
   safeLocalSet('underway_lang',CURRENT_LANG);
   var meta=LANGUAGES.filter(function(l){return l.code===CURRENT_LANG;})[0]||LANGUAGES.filter(function(l){return l.code==='en';})[0];
@@ -2300,12 +2341,34 @@ function applyLanguage(code){
   document.querySelectorAll('.lang-option').forEach(function(o){o.classList.toggle('active',o.getAttribute('data-lang')===CURRENT_LANG);});
   document.querySelectorAll('.mobile-lang-chip').forEach(function(o){o.classList.toggle('active',o.getAttribute('data-lang')===CURRENT_LANG);});
   if(window._updateCustomScrollbar)window._updateCustomScrollbar();
-  retranslateActivePage();
+}
+// Google's widget expects standard Google Translate codes — Norwegian is
+// specifically 'no' there, not 'nb' (the ISO code for Bokmål we use as our
+// own internal identifier since it's what the flag/dropdown list uses).
+var GOOGLE_TRANSLATE_CODE={nb:'no'};
+function setGoogleTranslateCookie(code){
+  if(code==='en'){
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie='googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain='+location.hostname+';';
+  }else{
+    var target=GOOGLE_TRANSLATE_CODE[code]||code;
+    var value='/en/'+target;
+    // A year-long expiry so this stays in sync with the localStorage choice
+    // (which persists indefinitely) — without it, this defaults to a
+    // session-only cookie and the language would silently revert to English
+    // the next time the browser fully restarts, even though the flag/
+    // dropdown UI (driven by localStorage) would still show the old choice.
+    var expires='; expires='+new Date(Date.now()+365*24*60*60*1000).toUTCString();
+    document.cookie='googtrans='+value+expires+'; path=/;';
+    document.cookie='googtrans='+value+expires+'; path=/; domain='+location.hostname+';';
+  }
 }
 function setLang(code){
   var sel=document.getElementById('lang-selector');
   if(sel)sel.classList.remove('open');
   applyLanguage(code);
+  setGoogleTranslateCookie(code);
+  location.reload();
 }
 function toggleLangDropdown(e){
   e.stopPropagation();
@@ -2657,7 +2720,11 @@ function renderProductDetail(slug){
   document.getElementById('pd-eyebrow').textContent='Product No. '+String(idx+1).padStart(2,'0');
   document.getElementById('pd-name').textContent=p.name;
   document.getElementById('pd-type').textContent=p.type;
-  document.getElementById('pd-desc').textContent=p.desc;
+  // Desc is the card's short teaser; Details is the detail page's own,
+  // separate write-up — showing Desc again here too was redundant with the
+  // card you just clicked from, and didn't leave room for genuinely
+  // different content in each spot.
+  document.getElementById('pd-desc').style.display='none';
   document.getElementById('pd-details').textContent=p.details||'';
   document.getElementById('pd-breadcrumb-type').textContent=p.type||'';
   document.getElementById('pd-breadcrumb-current').textContent=p.name;
@@ -2674,6 +2741,15 @@ function renderProductDetail(slug){
     ctaBtn.textContent='Request a Quote →';
     ctaBtn.removeAttribute('href');
     ctaBtn.onclick=function(){showToast('Quote requested (demo)','Not wired to a backend yet.');return false;};
+  }
+
+  var videoSection=document.getElementById('pd-video-section');
+  var videoId=_extractVideoId(p.yt_video||'');
+  if(videoId){
+    videoSection.style.display='block';
+    document.getElementById('pd-video-wrap').innerHTML='<iframe src="https://www.youtube.com/embed/'+videoId+'" title="'+escapeHtml(p.name)+' build video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+  }else{
+    videoSection.style.display='none';
   }
 
   _pdImages=productImages(p);
@@ -3182,7 +3258,14 @@ function wireCommunityLinks(){
 renderLogos();
 wireCommunityLinks();
 renderLangSelectors();
-applyLanguage(safeLocalGet('underway_lang')||'en');
+var _savedLang=safeLocalGet('underway_lang')||'en';
+applyLanguage(_savedLang);
+// Defensive sync: if the cookie was cleared some other way (browser cookie
+// settings, manual clearing, etc.) but localStorage still remembers a
+// non-English choice, re-set the cookie now — early enough that Google's
+// widget (loaded async, reads the cookie when it initializes) still picks
+// it up without needing an actual reload.
+if(_savedLang!=='en'&&document.cookie.indexOf('googtrans=')===-1)setGoogleTranslateCookie(_savedLang);
 renderHome();
 initScrollAnimations();
 renderVideos();
@@ -3202,5 +3285,8 @@ loadConfigFromSheet();
 loadBetaBuildsFromSheet();
 loadBetaIssuesFromSheet();
 </script>
+<div id="google_translate_element"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'no,sv,da,fi,de,nl,fr,es,it,en',autoDisplay:false},'google_translate_element');}</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
 </body>
 </html>
