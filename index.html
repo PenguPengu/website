@@ -718,17 +718,17 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
       <span class="breadcrumb-sep">/</span>
       <button class="breadcrumb-type" id="pd-breadcrumb-type" onclick="goToProductsFiltered(event, this.textContent)"></button>
       <span class="breadcrumb-sep">/</span>
-      <span class="breadcrumb-current" id="pd-breadcrumb-current"></span>
+      <span class="breadcrumb-current notranslate" id="pd-breadcrumb-current"></span>
     </nav>
     <div class="pd-gallery" id="pd-gallery">
       <div class="pd-gallery-main" id="pd-gallery-main"></div>
-      <div class="pd-gallery-name" id="pd-gallery-name"></div>
+      <div class="pd-gallery-name notranslate" id="pd-gallery-name"></div>
       <div class="pd-gallery-thumbs" id="pd-gallery-thumbs" style="display:none"></div>
     </div>
     <div class="pd-layout">
       <aside class="pd-sidebar">
         <div class="pd-eyebrow" id="pd-eyebrow"></div>
-        <div class="pd-name" id="pd-name"></div>
+        <div class="pd-name notranslate" id="pd-name"></div>
         <div class="pd-type" id="pd-type"></div>
         <span class="pd-status-badge" id="pd-status"></span>
         <p class="pd-desc" id="pd-desc"></p>
@@ -769,7 +769,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
   <div class="page-inner">
     <button class="back-link" id="all-updates-back-link" onclick="goBackToProductFromUpdates(event)">&#8592; Back to Product</button>
     <div class="page-header">
-      <p class="page-eyebrow" id="all-updates-eyebrow"></p>
+      <p class="page-eyebrow notranslate" id="all-updates-eyebrow"></p>
       <h1 class="page-title" id="all-updates-title">All Updates</h1>
     </div>
     <div class="pd-updates-layout">
@@ -787,7 +787,7 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
   <div class="page-inner">
     <button class="back-link" id="gallery-back-link" onclick="goBackToProductFromGallery(event)">&#8592; Back to Product</button>
     <div class="page-header">
-      <p class="page-eyebrow" id="gallery-eyebrow"></p>
+      <p class="page-eyebrow notranslate" id="gallery-eyebrow"></p>
       <h1 class="page-title" id="gallery-title"></h1>
     </div>
     <div class="update-gallery-grid" id="update-gallery-grid"></div>
@@ -840,12 +840,12 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <button class="breadcrumb-link" onclick="goTo(event,'partners')" data-i18n="nav_partners">Partners</button>
       <span class="breadcrumb-sep">/</span>
-      <span class="breadcrumb-current" id="pt-breadcrumb-current"></span>
+      <span class="breadcrumb-current notranslate" id="pt-breadcrumb-current"></span>
     </nav>
     <div class="partner-detail-head">
       <div class="partner-detail-mark" id="pt-mark"><div class="partner-detail-initial" id="pt-initial"></div></div>
       <div>
-        <div class="partner-detail-name" id="pt-name"></div>
+        <div class="partner-detail-name notranslate" id="pt-name"></div>
         <div class="partner-detail-type" id="pt-type"></div>
       </div>
     </div>
@@ -1860,7 +1860,7 @@ function renderSearchResults(query){
         var img=productImages(p)[0];
         return '<button type="button" class="search-suggest-card" onclick="pickSearchSuggestion(\''+productSlug(p.name)+'\')">'+
           '<img src="'+img+'" alt="" loading="lazy">'+
-          '<span class="search-suggest-name">'+escapeHtml(p.name)+'</span>'+
+          '<span class="search-suggest-name notranslate">'+escapeHtml(p.name)+'</span>'+
         '</button>';
       }).join('')+
     '</div>';
@@ -1893,7 +1893,7 @@ function renderSearchResults(query){
       var flatIdx=_searchFlat.length;
       _searchFlat.push(item);
       html+='<button type="button" class="search-result-item" data-flat-idx="'+flatIdx+'" onclick="pickSearchResult('+flatIdx+')">'+
-        '<span class="search-result-text"><span class="search-result-title">'+escapeHtml(item.title)+'</span>'+
+        '<span class="search-result-text"><span class="search-result-title'+((g==='Products'||g==='Partners')?' notranslate':'')+'">'+escapeHtml(item.title)+'</span>'+
         (item.sub?'<span class="search-result-sub">'+escapeHtml(item.sub)+'</span>':'')+'</span>'+
         '<span class="search-result-tag">'+g+'</span>'+
       '</button>';
@@ -2506,7 +2506,7 @@ function buildProductCard(p,idx){
     '<div class="product-card-art"><img src="'+img+'" alt="" loading="lazy"></div>'+
     '<div class="product-card-body">'+
       '<div class="product-card-header"><span class="product-number">'+String(idx+1).padStart(2,'0')+'</span><span class="product-status '+statusClass(p.status)+'">'+statusIcon(p.status)+' '+p.status+'</span></div>'+
-      '<div class="product-name">'+p.name+'</div>'+
+      '<div class="product-name notranslate">'+p.name+'</div>'+
       '<div class="product-type">'+p.type+'</div>'+
       '<p class="product-desc">'+p.desc+'</p>'+
       '<div class="product-card-hint">Click to view →</div>'+
@@ -3060,7 +3060,7 @@ function closeVideoModal(){
 function renderPartnersGrid(){
   var grid=document.getElementById('partners-grid');
   grid.innerHTML=DEMO_PARTNERS.map(function(p,i){
-    return '<button class="partner-card" data-idx="'+i+'"><div class="partner-initial">'+p.name.charAt(0)+'</div><div class="partner-name">'+p.name+'</div><div class="partner-type">'+p.type+'</div><div class="partner-hint">Click to view →</div></button>';
+    return '<button class="partner-card" data-idx="'+i+'"><div class="partner-initial">'+p.name.charAt(0)+'</div><div class="partner-name notranslate">'+p.name+'</div><div class="partner-type">'+p.type+'</div><div class="partner-hint">Click to view →</div></button>';
   }).join('');
   grid.querySelectorAll('.partner-card').forEach(function(c){
     c.addEventListener('click',function(){
