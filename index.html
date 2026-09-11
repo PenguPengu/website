@@ -62,6 +62,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
 
 /* ── DEMO BANNER ─────────────────────────────────────────────────────────── */
 /* ── LOADING SCREEN ───────────────────────────────────────────────────────── */
+#maintenance-overlay{display:none;position:fixed;inset:0;z-index:999999;background:var(--navy);color:var(--cream);align-items:center;justify-content:center;text-align:center;}
+#maintenance-overlay.show{display:flex;}
+.maintenance-content{max-width:480px;padding:40px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.maintenance-content h1{font-family:var(--serif);font-weight:900;font-size:30px;letter-spacing:.04em;margin-top:6px;}
+.maintenance-heading{font-family:var(--serif);font-size:19px;font-weight:700;opacity:.92;}
+.maintenance-message{font-size:12px;opacity:.6;line-height:1.7;}
+.maintenance-links{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;justify-content:center;}
+.maintenance-link{background:rgba(247,239,230,.08);border:1px solid rgba(247,239,230,.2);color:var(--cream);text-decoration:none;padding:10px 20px;border-radius:var(--r-full);font-size:10px;letter-spacing:.15em;text-transform:uppercase;transition:background .2s var(--ease),border-color .2s var(--ease);}
+.maintenance-link:hover{background:rgba(247,239,230,.15);border-color:rgba(247,239,230,.35);}
 #loading-screen{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 42%,rgba(201,168,76,.08),transparent 55%),var(--cream);display:flex;align-items:center;justify-content:center;overflow:hidden;}
 #loading-screen.fading{transition:opacity .6s ease;opacity:0;}
 .loading-logo-wrap{width:150px;will-change:transform;position:relative;}
@@ -545,6 +554,20 @@ footer{background:var(--navy);color:var(--cream);border-top:1px solid rgba(247,2
 
 <div id="page-backdrop"></div>
 <div id="top-loading-bar"></div>
+
+<div id="maintenance-overlay">
+  <div class="maintenance-content">
+    <span id="maintenance-logo-mark"></span>
+    <h1 class="notranslate">UNDERWAY</h1>
+    <p class="maintenance-heading">We're Closed for Maintenance</p>
+    <p class="maintenance-message" id="maintenance-message">Back soon — in the meantime, find us here:</p>
+    <div class="maintenance-links">
+      <a id="maintenance-link-youtube" class="maintenance-link notranslate" href="#" target="_blank" rel="noopener">YouTube</a>
+      <a id="maintenance-link-discord" class="maintenance-link notranslate" href="#" target="_blank" rel="noopener">Discord</a>
+      <a id="maintenance-link-steam" class="maintenance-link notranslate" href="#" target="_blank" rel="noopener">Steam</a>
+    </div>
+  </div>
+</div>
 
 <div id="loading-screen">
   <div class="loading-gloss" id="loading-gloss"></div>
@@ -1618,7 +1641,32 @@ function loadConfigFromSheet(){
     // Homepage stat overrides — plain display strings, not recomputed counts.
     if(cfg.stat_products){var sp=document.getElementById('stat-products');if(sp)sp.textContent=cfg.stat_products;}
     if(cfg.stat_customers){var sc=document.getElementById('stat-customers');if(sc)sc.textContent=cfg.stat_customers;}
+    checkMaintenanceMode(cfg);
   }).catch(function(){});
+}
+// One cell in the Config tab (maintenance_mode = TRUE) takes the whole site
+// down to a single "closed for maintenance" screen — everything else stays
+// running underneath (sheets still load, router still works), this just
+// covers it with a full-screen block. Community links stay reachable so
+// people have somewhere to go while you're offline.
+function checkMaintenanceMode(cfg){
+  var on=(cfg.maintenance_mode||'').toLowerCase();
+  if(on!=='true'&&on!=='1'&&on!=='yes')return;
+  var overlay=document.getElementById('maintenance-overlay');
+  if(!overlay)return;
+  var logoMark=document.getElementById('maintenance-logo-mark');
+  if(logoMark&&!logoMark.innerHTML)logoMark.innerHTML=logoSVG('#c9a84c',null,0,56);
+  if(cfg.maintenance_message)document.getElementById('maintenance-message').textContent=cfg.maintenance_message;
+  var yt=document.getElementById('maintenance-link-youtube'),dc=document.getElementById('maintenance-link-discord'),st=document.getElementById('maintenance-link-steam');
+  if(yt)yt.href=YOUTUBE_URL;
+  if(dc)dc.href=DISCORD_URL;
+  if(st)st.href=STEAM_URL;
+  overlay.classList.add('show');
+  // Don't let the loading intro keep playing underneath — cut straight to
+  // the maintenance screen instead of finishing that whole entrance first.
+  var loadingScreen=document.getElementById('loading-screen');
+  if(loadingScreen)loadingScreen.style.display='none';
+  stopLoadingMessages();
 }
 function loadFAQFromSheet(){
   trackedFetch(FAQ_URL).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(text){
