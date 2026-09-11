@@ -31,10 +31,12 @@ html::-webkit-scrollbar{width:0;height:0;}
 body{background:var(--cream);color:var(--navy);font-family:var(--mono);background-image:linear-gradient(rgba(25,41,58,.042) 1px,transparent 1px),linear-gradient(90deg,rgba(25,41,58,.042) 1px,transparent 1px);background-size:120px 120px;}
 /* Google Translate widget — we drive it entirely through our own dropdown
    (the googtrans cookie), so its own default UI (the little widget box, the
-   banner iframe it tries to inject at the top of the page, the yellow
-   highlight it puts on hover over translated text) all get suppressed. */
-#google_translate_element,.goog-te-banner-frame,.goog-te-gadget-icon{display:none !important;}
-body{top:0 !important;}
+   banner iframe it tries to inject at the top of the page — which also
+   shoves the whole page down via an inline "top" offset on <body>, the
+   hover tooltip it shows over translated words, the loading spinner overlay
+   it briefly shows) all get suppressed. */
+#google_translate_element,.goog-te-banner-frame,.goog-te-gadget-icon,#goog-gt-tt,.goog-tooltip,.goog-tooltip:hover,.goog-text-highlight,.goog-te-balloon-frame,iframe.skiptranslate{display:none !important;visibility:hidden !important;}
+body{top:0 !important;position:static !important;}
 .goog-text-highlight{background:none !important;box-shadow:none !important;}
 a{color:inherit;}
 button{font-family:var(--mono);}
